@@ -10,7 +10,6 @@ from app.models import Dungeon, DungeonConfig
 from app.tactical.layout import (
     TacticalRoomLayout,
     generate_all_tactical_layouts,
-    generate_tactical_layout,
 )
 
 router = APIRouter(prefix="/api/dungeon", tags=["dungeon"])
@@ -61,7 +60,6 @@ async def api_tactical_layouts(config: DungeonConfig) -> list[TacticalRoomLayout
         )
 
     dungeon = generate_dungeon(config)
-    dungeon.analysis = analyze_dungeon(dungeon)
     return generate_all_tactical_layouts(dungeon)
 
 

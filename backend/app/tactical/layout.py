@@ -10,11 +10,10 @@ Generates grid-based tactical data for rooms including:
 from __future__ import annotations
 
 import random
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from app.models import Dungeon, DungeonEdge, Room, RoomRole
+from app.models import Dungeon, DungeonEdge, Room
 
 
 # ── Tactical Models ──────────────────────────────────────────────────────
@@ -83,12 +82,12 @@ class TacticalRoomLayout(BaseModel):
 ROLE_DIMENSIONS: dict[str, tuple[int, int, int, int]] = {
     # (min_w, max_w, min_h, max_h) in grid squares (5ft each)
     "entrance": (6, 8, 6, 8),
-    "corridor": (3, 4, 8, 14),
+    "corridor": (4, 5, 8, 14),
     "shrine": (6, 10, 6, 10),
     "lair": (8, 12, 8, 12),
     "vault": (5, 8, 5, 8),
     "trap_room": (6, 10, 6, 10),
-    "secret_room": (4, 6, 4, 6),
+    "secret_room": (5, 6, 5, 6),
     "boss_room": (10, 16, 10, 16),
     "rest_area": (5, 8, 5, 8),
     "guard_post": (5, 8, 6, 10),
@@ -151,9 +150,11 @@ def _place_obstacles(
 
         for _ in range(count):
             # Place obstacles away from edges (1 tile margin)
+            if width <= 4 or height <= 4:
+                continue
             for _attempt in range(20):
-                ox = rng.randint(2, width - 3)
-                oy = rng.randint(2, height - 3)
+                ox = rng.randint(2, max(2, width - 3))
+                oy = rng.randint(2, max(2, height - 3))
                 if (ox, oy) not in occupied:
                     occupied.add((ox, oy))
                     blocks = kind not in ("pool", "fire", "web")
@@ -221,12 +222,14 @@ def _place_enemies(
             placed = False
             for _attempt in range(50):
                 # Boss monsters go toward the back of the room
+                max_x = max(1, width - 2 - grid_size)
+                max_y = max(1, height - 2 - grid_size)
                 if room.is_boss_room and monster.boss_suitable:
-                    ex = rng.randint(width // 4, 3 * width // 4)
-                    ey = rng.randint(height // 2, height - 2 - grid_size)
+                    ex = rng.randint(max(1, width // 4), min(max_x, 3 * width // 4))
+                    ey = rng.randint(max(1, height // 2), max_y)
                 else:
-                    ex = rng.randint(1, width - 2 - grid_size)
-                    ey = rng.randint(1, height - 2 - grid_size)
+                    ex = rng.randint(1, max_x)
+                    ey = rng.randint(1, max_y)
 
                 # Check all cells for this unit
                 cells_clear = True
@@ -276,9 +279,12 @@ def _place_traps(
     if not room.trap:
         return traps
 
+    if width <= 4 or height <= 4:
+        return traps
+
     for _attempt in range(30):
-        tx = rng.randint(2, width - 3)
-        ty = rng.randint(2, height - 3)
+        tx = rng.randint(2, max(2, width - 3))
+        ty = rng.randint(2, max(2, height - 3))
         if (tx, ty) not in occupied:
             occupied.add((tx, ty))
             traps.append(TacticalTrap(

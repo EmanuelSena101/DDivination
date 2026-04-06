@@ -13,7 +13,7 @@ from app.data.store import (
 from app.enrichment.tagger import enrich_equipment, enrich_magic_item, enrich_monster
 from app.models import SyncStatus
 
-BASE_URL = "https://www.dnd5eapi.co/api/2024"
+BASE_URL = "https://www.dnd5eapi.co/api/2014"
 LEGACY_BASE_URL = "https://www.dnd5eapi.co/api"
 
 
@@ -158,7 +158,7 @@ def _normalize_equipment(raw: dict) -> dict:
 
 async def sync_all(progress_callback=None) -> SyncStatus:
     """Sync all data from D&D 5e API to local store."""
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(follow_redirects=True) as client:
         # 1. Fetch monsters
         if progress_callback:
             progress_callback("Fetching monster list...")

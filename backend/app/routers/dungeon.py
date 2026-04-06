@@ -7,6 +7,11 @@ from app.analysis.analyzer import analyze_dungeon
 from app.data.store import load_sync_status
 from app.generation.dungeon_generator import generate_dungeon
 from app.models import Dungeon, DungeonConfig
+from app.tactical.layout import (
+    TacticalRoomLayout,
+    generate_all_tactical_layouts,
+    generate_tactical_layout,
+)
 
 router = APIRouter(prefix="/api/dungeon", tags=["dungeon"])
 
@@ -43,6 +48,21 @@ async def api_quick_generate(
     dungeon = generate_dungeon(config)
     dungeon.analysis = analyze_dungeon(dungeon)
     return dungeon
+
+
+@router.post("/tactical", response_model=list[TacticalRoomLayout])
+async def api_tactical_layouts(config: DungeonConfig) -> list[TacticalRoomLayout]:
+    """Generate tactical battle grid layouts for all rooms in a dungeon."""
+    status = load_sync_status()
+    if not status.is_synced:
+        raise HTTPException(
+            status_code=400,
+            detail="Data not yet synced.",
+        )
+
+    dungeon = generate_dungeon(config)
+    dungeon.analysis = analyze_dungeon(dungeon)
+    return generate_all_tactical_layouts(dungeon)
 
 
 @router.get("/options")

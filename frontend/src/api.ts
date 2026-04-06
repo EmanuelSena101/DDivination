@@ -1,6 +1,6 @@
 // DDivination API client
 
-import type { BuilderOptions, Dungeon, DungeonConfig, SyncStatus } from "./types";
+import type { BuilderOptions, Dungeon, DungeonConfig, SyncStatus, TacticalRoomLayout } from "./types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -33,4 +33,11 @@ export async function generateDungeon(config: DungeonConfig): Promise<Dungeon> {
 
 export async function getBuilderOptions(): Promise<BuilderOptions> {
   return fetchJSON<BuilderOptions>("/api/dungeon/options");
+}
+
+export async function getTacticalLayouts(config: DungeonConfig): Promise<TacticalRoomLayout[]> {
+  return fetchJSON<TacticalRoomLayout[]>("/api/dungeon/tactical", {
+    method: "POST",
+    body: JSON.stringify(config),
+  });
 }

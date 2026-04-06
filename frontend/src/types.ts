@@ -158,6 +158,67 @@ export interface BuilderOptions {
   treasure_qualities: SelectOption[];
 }
 
+// Tactical battle grid types
+
+export interface GridPosition {
+  x: number;
+  y: number;
+}
+
+export interface TacticalEnemy {
+  name: string;
+  count: number;
+  combat_role: string;
+  challenge_rating: number;
+  hit_points: number;
+  armor_class: number;
+  size: string;
+  is_boss: boolean;
+  positions: GridPosition[];
+}
+
+export interface TacticalObstacle {
+  kind: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  blocks_movement: boolean;
+  provides_cover: boolean;
+}
+
+export interface TacticalDoor {
+  x: number;
+  y: number;
+  wall: string;
+  is_locked: boolean;
+  is_hidden: boolean;
+}
+
+export interface TacticalTrap {
+  name: string;
+  x: number;
+  y: number;
+  radius: number;
+  save_dc: number;
+  damage_dice: string;
+}
+
+export interface TacticalRoomLayout {
+  room_id: number;
+  room_name: string;
+  room_role: string;
+  grid_width: number;
+  grid_height: number;
+  enemies: TacticalEnemy[];
+  obstacles: TacticalObstacle[];
+  doors: TacticalDoor[];
+  traps: TacticalTrap[];
+  is_boss_room: boolean;
+  difficulty_score: number;
+  description: string;
+}
+
 export const DEFAULT_CONFIG: DungeonConfig = {
   party_size: 4,
   party_level: 5,

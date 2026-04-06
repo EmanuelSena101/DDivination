@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import "./App.css";
-import { getSyncStatus, startSync, generateDungeon, getBuilderOptions } from "./api";
-import type { Dungeon, DungeonConfig, SyncStatus, BuilderOptions, Room } from "./types";
+import { getSyncStatus, startSync, generateDungeon, getBuilderOptions, getTacticalLayouts } from "./api";
+import type { Dungeon, DungeonConfig, SyncStatus, BuilderOptions, Room, TacticalRoomLayout } from "./types";
+import BattleGrid from "./BattleGrid";
 import { DEFAULT_CONFIG } from "./types";
 
 function DiceIcon() {
@@ -405,7 +406,10 @@ function App() {
   const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
   const [options, setOptions] = useState<BuilderOptions | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"map" | "rooms" | "analysis">("map");
+  const [activeTab, setActiveTab] = useState<"map" | "rooms" | "analysis" | "battle">("map");
+  const [tacticalLayouts, setTacticalLayouts] = useState<TacticalRoomLayout[]>([]);
+  const [selectedBattleRoom, setSelectedBattleRoom] = useState<number | null>(null);
+  const [loadingTactical, setLoadingTactical] = useState(false);
 
   useEffect(() => {
     getSyncStatus().then(setSyncStatus).catch(() => {});
@@ -424,6 +428,7 @@ function App() {
     try {
       const result = await generateDungeon(config);
       setDungeon(result); setView("results"); setActiveTab("map");
+      setTacticalLayouts([]); setSelectedBattleRoom(null);
     } catch (err) { setError(err instanceof Error ? err.message : "Generation failed"); }
     finally { setLoading(false); }
   }, [config]);
@@ -434,6 +439,7 @@ function App() {
       const newConfig = { ...config, seed: null };
       const result = await generateDungeon(newConfig);
       setDungeon(result); setConfig({ ...newConfig, seed: result.seed });
+      setTacticalLayouts([]); setSelectedBattleRoom(null);
     } catch (err) { setError(err instanceof Error ? err.message : "Reroll failed"); }
     finally { setLoading(false); }
   }, [config]);
@@ -671,6 +677,7 @@ function App() {
                 { key: "map" as const, label: "\ud83d\uddfa\ufe0f Map" },
                 { key: "rooms" as const, label: "\ud83c\udfe0 Rooms" },
                 { key: "analysis" as const, label: "\ud83d\udcca Analysis" },
+                { key: "battle" as const, label: "\u2694\ufe0f Battle" },
               ]).map((tab) => (
                 <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -696,6 +703,46 @@ function App() {
               </div>
             )}
             {activeTab === "analysis" && <AnalysisPanel dungeon={dungeon} />}
+            {activeTab === "battle" && (
+              <div>
+                {tacticalLayouts.length === 0 && !loadingTactical ? (
+                  <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 text-center">
+                    <h3 className="text-lg font-semibold text-slate-200 mb-2">3D Tactical Battle Grid</h3>
+                    <p className="text-sm text-slate-400 mb-4">Generate tactical layouts for all rooms with enemy positions, obstacles, doors, and traps on a 5ft battle grid.</p>
+                    <button
+                      onClick={async () => {
+                        setLoadingTactical(true);
+                        try {
+                          const layouts = await getTacticalLayouts({ ...dungeon.config, seed: dungeon.seed });
+                          setTacticalLayouts(layouts);
+                          const firstEncounter = layouts.find(l => l.enemies.length > 0);
+                          setSelectedBattleRoom(firstEncounter?.room_id ?? layouts[0]?.room_id ?? null);
+                        } catch (err) {
+                          setError(err instanceof Error ? err.message : "Failed to generate tactical layouts");
+                        } finally {
+                          setLoadingTactical(false);
+                        }
+                      }}
+                      disabled={loadingTactical}
+                      className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-500 transition-colors disabled:opacity-50"
+                    >
+                      {loadingTactical ? "Generating..." : "Generate Battle Grids"}
+                    </button>
+                  </div>
+                ) : loadingTactical ? (
+                  <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 text-center">
+                    <SyncIcon spinning />
+                    <p className="text-slate-400 mt-2">Generating tactical layouts...</p>
+                  </div>
+                ) : (
+                  <BattleGrid
+                    layouts={tacticalLayouts}
+                    selectedRoomId={selectedBattleRoom}
+                    onSelectRoom={setSelectedBattleRoom}
+                  />
+                )}
+              </div>
+            )}
           </div>
         ) : null}
       </main>

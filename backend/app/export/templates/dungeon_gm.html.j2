@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ dungeon.name }} — DDivination</title>
+  <style>{{ stylesheet | safe }}</style>
+</head>
+<body>
+
+  {# ── Cover ─────────────────────────────────────────── #}
+  <section class="cover">
+    <div class="cover-inner">
+      <div class="logo-mark">⚀</div>
+      <h1 class="cover-title">{{ dungeon.name }}</h1>
+      {% if dungeon.summary %}
+      <p class="cover-summary">{{ dungeon.summary }}</p>
+      {% endif %}
+
+      <div class="cover-meta">
+        <div><span class="meta-label">Seed</span><span class="meta-value">{{ dungeon.seed }}</span></div>
+        <div><span class="meta-label">Party</span><span class="meta-value">{{ cfg.party_size }} × Lv {{ cfg.party_level }}</span></div>
+        <div><span class="meta-label">Theme</span><span class="meta-value">{{ cfg.theme.value | title_clean }}</span></div>
+        <div><span class="meta-label">Biome</span><span class="meta-value">{{ cfg.biome.value | title_clean }}</span></div>
+        <div><span class="meta-label">Size</span><span class="meta-value">{{ cfg.dungeon_size.value | title_clean }}</span></div>
+        <div><span class="meta-label">Difficulty</span><span class="meta-value">{{ cfg.difficulty.value | title_clean }}</span></div>
+      </div>
+
+      {% if dungeon.narrative_hook %}
+      <div class="cover-hook">
+        <div class="section-label">Adventure Hook</div>
+        <p>{{ dungeon.narrative_hook }}</p>
+      </div>
+      {% endif %}
+      {% if dungeon.narrative_intro %}
+      <div class="cover-hook">
+        <div class="section-label">Setting</div>
+        <p>{{ dungeon.narrative_intro }}</p>
+      </div>
+      {% endif %}
+
+      <div class="cover-footer">DDivination · Powered by the D&amp;D 5e SRD</div>
+    </div>
+  </section>
+
+  {# ── Map ─────────────────────────────────────────────── #}
+  <section class="page">
+    <h2 class="section-title">Dungeon Map</h2>
+    <div class="map-wrap">
+      <img class="map-image" src="{{ graph_data_uri }}" alt="Dungeon map">
+    </div>
+
+    <h3 class="subsection-title">Rooms</h3>
+    <table class="room-table">
+      <thead>
+        <tr><th>#</th><th>Name</th><th>Role</th><th>Difficulty</th><th>Content</th></tr>
+      </thead>
+      <tbody>
+        {% for r in dungeon.rooms %}
+        <tr{% if r.is_boss_room %} class="row-boss"{% elif r.is_secret %} class="row-secret"{% endif %}>
+          <td class="c-id">{{ r.room_id }}</td>
+          <td>{{ r.name }}{% if r.is_boss_room %} <span class="pill pill-boss">boss</span>{% endif %}{% if r.is_secret %} <span class="pill pill-secret">secret</span>{% endif %}</td>
+          <td>{{ r.role.value | title_clean }}</td>
+          <td class="c-num">{{ "%.1f"|format(r.difficulty_score) }}/10</td>
+          <td class="c-tiny">
+            {% if r.encounter %}⚔{% endif %}
+            {% if r.trap %}⚠{% endif %}
+            {% if r.treasure and (r.treasure.gold or r.treasure.items or r.treasure.equipment) %}✦{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if dungeon.edges %}
+    <h3 class="subsection-title">Connections</h3>
+    <ul class="edge-list">
+      {% for e in dungeon.edges %}
+      <li>
+        Room {{ e.from_room }} ↔ Room {{ e.to_room }} — {{ e.description }}
+        {% if e.is_locked %}<span class="tag tag-locked">locked</span>{% endif %}
+        {% if e.is_hidden %}<span class="tag tag-hidden">hidden</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+
+  {# ── Rooms ───────────────────────────────────────────── #}
+  <section class="page">
+    <h2 class="section-title">Room Detail</h2>
+    {% for r in dungeon.rooms %}
+    <article class="room-card {% if r.is_boss_room %}room-boss{% elif r.is_secret %}room-secret{% endif %}">
+      <header class="room-header">
+        <div class="room-number">{{ loop.index }}</div>
+        <div class="room-title">
+          <h3>{{ r.name }}</h3>
+          <div class="room-sub">{{ r.role.value | title_clean }} · Difficulty {{ "%.1f"|format(r.difficulty_score) }}/10</div>
+        </div>
+        <div class="room-flags">
+          {% if r.is_boss_room %}<span class="pill pill-boss">BOSS</span>{% endif %}
+          {% if r.is_secret %}<span class="pill pill-secret">SECRET</span>{% endif %}
+        </div>
+      </header>
+
+      {% if r.description %}<p class="room-desc">{{ r.description }}</p>{% endif %}
+      {% if r.flavor_text %}<p class="room-flavor">“{{ r.flavor_text }}”</p>{% endif %}
+
+      {% if r.encounter %}
+      <div class="block block-combat">
+        <div class="block-title"><span class="glyph">⚔</span> Combat — <em>{{ r.encounter.difficulty_rating | upper }}</em></div>
+        {% if r.encounter.description %}<p class="block-desc">{{ r.encounter.description }}</p>{% endif %}
+        <ul class="mon-list">
+          {% for em in r.encounter.monsters %}
+          <li>
+            <span class="mon-count">{{ em.count }}×</span>
+            <span class="mon-name">{{ em.monster.name }}</span>
+            <span class="mon-meta">CR {{ em.monster.challenge_rating }} · {{ em.monster.combat_role.value }} · HP {{ em.monster.hit_points }} · AC {{ em.monster.armor_class }}</span>
+            <span class="mon-xp">{{ (em.monster.xp * em.count) }} XP</span>
+          </li>
+          {% endfor %}
+        </ul>
+        <div class="block-foot">Total {{ r.encounter.total_xp }} XP · Adjusted {{ r.encounter.adjusted_xp }} XP</div>
+      </div>
+      {% endif %}
+
+      {% if r.trap %}
+      <div class="block block-trap">
+        <div class="block-title"><span class="glyph">⚠</span> Trap — {{ r.trap.name }} <em>({{ r.trap.danger_level.value }})</em></div>
+        <p class="block-desc">{{ r.trap.description }}</p>
+        <div class="block-foot">Damage <code>{{ r.trap.damage_dice }}</code> · DC {{ r.trap.save_dc }} {{ r.trap.save_type }}</div>
+      </div>
+      {% endif %}
+
+      {% if r.treasure and (r.treasure.gold or r.treasure.items or r.treasure.equipment) %}
+      <div class="block block-treasure">
+        <div class="block-title"><span class="glyph">✦</span> Treasure</div>
+        <ul class="loot-list">
+          {% if r.treasure.gold %}<li><strong>{{ r.treasure.gold }}</strong> gp</li>{% endif %}
+          {% for item in r.treasure.items %}
+          <li>{{ item.name }} <span class="dim">({{ item.rarity }})</span></li>
+          {% endfor %}
+          {% for eq in r.treasure.equipment %}
+          <li class="dim-item">{{ eq.name }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </section>
+
+  {# ── Analysis ───────────────────────────────────────── #}
+  {% if dungeon.analysis %}
+  <section class="page">
+    <h2 class="section-title">Analysis</h2>
+
+    <div class="stat-grid">
+      <div class="stat"><span class="stat-label">Rooms</span><span class="stat-value">{{ dungeon.analysis.total_rooms }}</span></div>
+      <div class="stat"><span class="stat-label">Encounters</span><span class="stat-value">{{ dungeon.analysis.total_encounters }}</span></div>
+      <div class="stat"><span class="stat-label">Traps</span><span class="stat-value">{{ dungeon.analysis.total_traps }}</span></div>
+      <div class="stat"><span class="stat-label">Total XP</span><span class="stat-value">{{ "{:,}".format(dungeon.analysis.total_xp) }}</span></div>
+      <div class="stat"><span class="stat-label">Total Gold</span><span class="stat-value">{{ "{:,}".format(dungeon.analysis.total_gold) }}</span></div>
+      <div class="stat"><span class="stat-label">Magic Items</span><span class="stat-value">{{ dungeon.analysis.total_magic_items }}</span></div>
+      <div class="stat"><span class="stat-label">Critical Path</span><span class="stat-value">{{ dungeon.analysis.critical_path_length }}</span></div>
+      <div class="stat"><span class="stat-label">Dead Ends</span><span class="stat-value">{{ dungeon.analysis.dead_ends | length }}</span></div>
+    </div>
+
+    <div class="overall-diff overall-{{ dungeon.analysis.estimated_difficulty }}">
+      <div class="section-label">Overall Difficulty</div>
+      <div class="overall-value">{{ dungeon.analysis.estimated_difficulty | upper }}</div>
+      <div class="overall-meta">
+        Avg {{ dungeon.analysis.avg_room_difficulty }} · Max {{ dungeon.analysis.max_room_difficulty }} · Branching {{ dungeon.analysis.branching_factor }} · Risk/Reward: {{ dungeon.analysis.risk_reward_balance }}
+      </div>
+    </div>
+
+    <h3 class="subsection-title">Difficulty Progression</h3>
+    <div class="diff-bars">
+      {% set max_diff = dungeon.analysis.difficulty_progression | max if dungeon.analysis.difficulty_progression else 1 %}
+      {% set max_diff = max_diff if max_diff > 0 else 1 %}
+      {% for score in dungeon.analysis.difficulty_progression %}
+      <div class="diff-bar-wrap">
+        <div class="diff-bar" style="height: {{ ((score / max_diff) * 100) | round(0, 'floor') }}%; background: {% if score >= 7 %}#c93d28{% elif score >= 4 %}#c9a227{% elif score >= 1 %}#4a9f5c{% else %}#44403a{% endif %};"></div>
+        <span class="diff-bar-label">{{ loop.index0 }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if dungeon.analysis.critical_path %}
+    <h3 class="subsection-title">Critical Path</h3>
+    <div class="crit-path">
+      {% for rid in dungeon.analysis.critical_path %}
+      <span class="crit-node {% if rid == dungeon.analysis.boss_room_id %}crit-boss{% endif %}">R{{ rid }}</span>
+      {% if not loop.last %}<span class="crit-arrow">→</span>{% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if dungeon.analysis.pacing_notes %}
+    <h3 class="subsection-title">GM Pacing Notes</h3>
+    <ul class="notes-list">
+      {% for note in dungeon.analysis.pacing_notes %}
+      <li>{{ note }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+  {% endif %}
+
+</body>
+</html>

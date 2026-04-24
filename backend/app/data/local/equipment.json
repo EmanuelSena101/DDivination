@@ -1,0 +1,2135 @@
+[
+  {
+    "index": "abacus",
+    "name": "Abacus",
+    "category": "adventuring gear",
+    "cost_gp": 2.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "acid-vial",
+    "name": "Acid (vial)",
+    "category": "adventuring gear",
+    "cost_gp": 25.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "alchemists-fire-flask",
+    "name": "Alchemist's fire (flask)",
+    "category": "adventuring gear",
+    "cost_gp": 50.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "alchemists-supplies",
+    "name": "Alchemist's Supplies",
+    "category": "tools",
+    "cost_gp": 50.0,
+    "weight": 8,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "alms-box",
+    "name": "Alms box",
+    "category": "adventuring gear",
+    "cost_gp": 0.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "amulet",
+    "name": "Amulet",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "animal-feed-1-day",
+    "name": "Animal Feed (1 day)",
+    "category": "mounts and vehicles",
+    "cost_gp": 0.05,
+    "weight": 10,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "antitoxin-vial",
+    "name": "Antitoxin (vial)",
+    "category": "adventuring gear",
+    "cost_gp": 50.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "arrow",
+    "name": "Arrow",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "backpack",
+    "name": "Backpack",
+    "category": "adventuring gear",
+    "cost_gp": 2.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bagpipes",
+    "name": "Bagpipes",
+    "category": "tools",
+    "cost_gp": 30.0,
+    "weight": 6,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ball-bearings-bag-of-1000",
+    "name": "Ball bearings (bag of 1,000)",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barding-breastplate",
+    "name": "Barding: Breastplate",
+    "category": "mounts and vehicles",
+    "cost_gp": 1600.0,
+    "weight": 40,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barding-chain-mail",
+    "name": "Barding: Chain mail",
+    "category": "mounts and vehicles",
+    "cost_gp": 300.0,
+    "weight": 110,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barding-chain-shirt",
+    "name": "Barding: Chain shirt",
+    "category": "mounts and vehicles",
+    "cost_gp": 200.0,
+    "weight": 40,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barding-half-plate",
+    "name": "Barding: Half plate",
+    "category": "mounts and vehicles",
+    "cost_gp": 3000.0,
+    "weight": 80,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barding-hide",
+    "name": "Barding: Hide",
+    "category": "mounts and vehicles",
+    "cost_gp": 40.0,
+    "weight": 24,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barding-leather",
+    "name": "Barding: Leather",
+    "category": "mounts and vehicles",
+    "cost_gp": 40.0,
+    "weight": 20,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barding-padded",
+    "name": "Barding: Padded",
+    "category": "mounts and vehicles",
+    "cost_gp": 20.0,
+    "weight": 16,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barding-plate",
+    "name": "Barding: Plate",
+    "category": "mounts and vehicles",
+    "cost_gp": 6000.0,
+    "weight": 130,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barding-ring-mail",
+    "name": "Barding: Ring mail",
+    "category": "mounts and vehicles",
+    "cost_gp": 12.0,
+    "weight": 80,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barding-scale-mail",
+    "name": "Barding: Scale mail",
+    "category": "mounts and vehicles",
+    "cost_gp": 200.0,
+    "weight": 90,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barding-splint",
+    "name": "Barding: Splint",
+    "category": "mounts and vehicles",
+    "cost_gp": 800.0,
+    "weight": 120,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barding-studded-leather",
+    "name": "Barding: Studded Leather",
+    "category": "mounts and vehicles",
+    "cost_gp": 180.0,
+    "weight": 26,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barrel",
+    "name": "Barrel",
+    "category": "adventuring gear",
+    "cost_gp": 2.0,
+    "weight": 70,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "basket",
+    "name": "Basket",
+    "category": "adventuring gear",
+    "cost_gp": 0.4,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "battleaxe",
+    "name": "Battleaxe",
+    "category": "weapon",
+    "cost_gp": 10.0,
+    "weight": 4,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bedroll",
+    "name": "Bedroll",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 7,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bell",
+    "name": "Bell",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bit-and-bridle",
+    "name": "Bit and bridle",
+    "category": "mounts and vehicles",
+    "cost_gp": 2.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "blanket",
+    "name": "Blanket",
+    "category": "adventuring gear",
+    "cost_gp": 0.5,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "block-and-tackle",
+    "name": "Block and tackle",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "block-of-incense",
+    "name": "Block of incense",
+    "category": "adventuring gear",
+    "cost_gp": 0.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "blowgun",
+    "name": "Blowgun",
+    "category": "weapon",
+    "cost_gp": 10.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "blowgun-needle",
+    "name": "Blowgun needle",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "book",
+    "name": "Book",
+    "category": "adventuring gear",
+    "cost_gp": 25.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bottle-glass",
+    "name": "Bottle, glass",
+    "category": "adventuring gear",
+    "cost_gp": 2.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "breastplate",
+    "name": "Breastplate",
+    "category": "armor",
+    "cost_gp": 400.0,
+    "weight": 20,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "brewers-supplies",
+    "name": "Brewer's Supplies",
+    "category": "tools",
+    "cost_gp": 20.0,
+    "weight": 9,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bucket",
+    "name": "Bucket",
+    "category": "adventuring gear",
+    "cost_gp": 0.05,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "burglars-pack",
+    "name": "Burglar's Pack",
+    "category": "adventuring gear",
+    "cost_gp": 16.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "calligraphers-supplies",
+    "name": "Calligrapher's Supplies",
+    "category": "tools",
+    "cost_gp": 10.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "caltrops",
+    "name": "Caltrops",
+    "category": "adventuring gear",
+    "cost_gp": 0.05,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "camel",
+    "name": "Camel",
+    "category": "mounts and vehicles",
+    "cost_gp": 50.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "candle",
+    "name": "Candle",
+    "category": "adventuring gear",
+    "cost_gp": 0.01,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "carpenters-tools",
+    "name": "Carpenter's Tools",
+    "category": "tools",
+    "cost_gp": 8.0,
+    "weight": 6,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "carriage",
+    "name": "Carriage",
+    "category": "mounts and vehicles",
+    "cost_gp": 100.0,
+    "weight": 600,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "cart",
+    "name": "Cart",
+    "category": "mounts and vehicles",
+    "cost_gp": 15.0,
+    "weight": 200,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "cartographers-tools",
+    "name": "Cartographer's Tools",
+    "category": "tools",
+    "cost_gp": 15.0,
+    "weight": 6,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "case-crossbow-bolt",
+    "name": "Case, crossbow bolt",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "case-map-or-scroll",
+    "name": "Case, map or scroll",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "censer",
+    "name": "Censer",
+    "category": "adventuring gear",
+    "cost_gp": 0.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "chain-10-feet",
+    "name": "Chain (10 feet)",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 10,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "chain-mail",
+    "name": "Chain Mail",
+    "category": "armor",
+    "cost_gp": 75.0,
+    "weight": 55,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "chain-shirt",
+    "name": "Chain Shirt",
+    "category": "armor",
+    "cost_gp": 50.0,
+    "weight": 20,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "chalk-1-piece",
+    "name": "Chalk (1 piece)",
+    "category": "adventuring gear",
+    "cost_gp": 0.01,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "chariot",
+    "name": "Chariot",
+    "category": "mounts and vehicles",
+    "cost_gp": 250.0,
+    "weight": 100,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "chest",
+    "name": "Chest",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 25,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "climbers-kit",
+    "name": "Climber's Kit",
+    "category": "adventuring gear",
+    "cost_gp": 25.0,
+    "weight": 12,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "clothes-common",
+    "name": "Clothes, common",
+    "category": "adventuring gear",
+    "cost_gp": 0.5,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "clothes-costume",
+    "name": "Clothes, costume",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 4,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "clothes-fine",
+    "name": "Clothes, fine",
+    "category": "adventuring gear",
+    "cost_gp": 15.0,
+    "weight": 6,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "clothes-travelers",
+    "name": "Clothes, traveler's",
+    "category": "adventuring gear",
+    "cost_gp": 2.0,
+    "weight": 4,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "club",
+    "name": "Club",
+    "category": "weapon",
+    "cost_gp": 0.1,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "cobblers-tools",
+    "name": "Cobbler's Tools",
+    "category": "tools",
+    "cost_gp": 5.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "component-pouch",
+    "name": "Component pouch",
+    "category": "adventuring gear",
+    "cost_gp": 25.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "cooks-utensils",
+    "name": "Cook's utensils",
+    "category": "tools",
+    "cost_gp": 1.0,
+    "weight": 8,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "crossbow-bolt",
+    "name": "Crossbow bolt",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 1.5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "crossbow-hand",
+    "name": "Crossbow, hand",
+    "category": "weapon",
+    "cost_gp": 75.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "crossbow-heavy",
+    "name": "Crossbow, heavy",
+    "category": "weapon",
+    "cost_gp": 50.0,
+    "weight": 18,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "crossbow-light",
+    "name": "Crossbow, light",
+    "category": "weapon",
+    "cost_gp": 25.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "crowbar",
+    "name": "Crowbar",
+    "category": "adventuring gear",
+    "cost_gp": 2.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "crystal",
+    "name": "Crystal",
+    "category": "adventuring gear",
+    "cost_gp": 10.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "dagger",
+    "name": "Dagger",
+    "category": "weapon",
+    "cost_gp": 2.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "dart",
+    "name": "Dart",
+    "category": "weapon",
+    "cost_gp": 0.05,
+    "weight": 0.25,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "dice-set",
+    "name": "Dice Set",
+    "category": "tools",
+    "cost_gp": 0.1,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "diplomats-pack",
+    "name": "Diplomat's Pack",
+    "category": "adventuring gear",
+    "cost_gp": 39.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "disguise-kit",
+    "name": "Disguise Kit",
+    "category": "adventuring gear",
+    "cost_gp": 25.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "donkey",
+    "name": "Donkey",
+    "category": "mounts and vehicles",
+    "cost_gp": 8.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "drum",
+    "name": "Drum",
+    "category": "tools",
+    "cost_gp": 6.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "dulcimer",
+    "name": "Dulcimer",
+    "category": "tools",
+    "cost_gp": 25.0,
+    "weight": 10,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "dungeoneers-pack",
+    "name": "Dungeoneer's Pack",
+    "category": "adventuring gear",
+    "cost_gp": 12.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "elephant",
+    "name": "Elephant",
+    "category": "mounts and vehicles",
+    "cost_gp": 200.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "emblem",
+    "name": "Emblem",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "entertainers-pack",
+    "name": "Entertainer's Pack",
+    "category": "adventuring gear",
+    "cost_gp": 40.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "explorers-pack",
+    "name": "Explorer's Pack",
+    "category": "adventuring gear",
+    "cost_gp": 10.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "fishing-tackle",
+    "name": "Fishing tackle",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 4,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "flail",
+    "name": "Flail",
+    "category": "weapon",
+    "cost_gp": 10.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "flask-or-tankard",
+    "name": "Flask or tankard",
+    "category": "adventuring gear",
+    "cost_gp": 0.02,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "flute",
+    "name": "Flute",
+    "category": "tools",
+    "cost_gp": 2.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "forgery-kit",
+    "name": "Forgery Kit",
+    "category": "adventuring gear",
+    "cost_gp": 15.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "galley",
+    "name": "Galley",
+    "category": "mounts and vehicles",
+    "cost_gp": 30000.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "glaive",
+    "name": "Glaive",
+    "category": "weapon",
+    "cost_gp": 20.0,
+    "weight": 6,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "glassblowers-tools",
+    "name": "Glassblower's Tools",
+    "category": "tools",
+    "cost_gp": 30.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "grappling-hook",
+    "name": "Grappling hook",
+    "category": "adventuring gear",
+    "cost_gp": 2.0,
+    "weight": 4,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "greataxe",
+    "name": "Greataxe",
+    "category": "weapon",
+    "cost_gp": 30.0,
+    "weight": 7,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "greatclub",
+    "name": "Greatclub",
+    "category": "weapon",
+    "cost_gp": 0.2,
+    "weight": 10,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "greatsword",
+    "name": "Greatsword",
+    "category": "weapon",
+    "cost_gp": 50.0,
+    "weight": 6,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "halberd",
+    "name": "Halberd",
+    "category": "weapon",
+    "cost_gp": 20.0,
+    "weight": 6,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "half-plate-armor",
+    "name": "Half Plate Armor",
+    "category": "armor",
+    "cost_gp": 750.0,
+    "weight": 40,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hammer",
+    "name": "Hammer",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hammer-sledge",
+    "name": "Hammer, sledge",
+    "category": "adventuring gear",
+    "cost_gp": 2.0,
+    "weight": 10,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "handaxe",
+    "name": "Handaxe",
+    "category": "weapon",
+    "cost_gp": 5.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "healers-kit",
+    "name": "Healer's Kit",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "herbalism-kit",
+    "name": "Herbalism Kit",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hide-armor",
+    "name": "Hide Armor",
+    "category": "armor",
+    "cost_gp": 10.0,
+    "weight": 12,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "holy-water-flask",
+    "name": "Holy water (flask)",
+    "category": "adventuring gear",
+    "cost_gp": 25.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "horn",
+    "name": "Horn",
+    "category": "tools",
+    "cost_gp": 3.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "horse-draft",
+    "name": "Horse, draft",
+    "category": "mounts and vehicles",
+    "cost_gp": 50.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "horse-riding",
+    "name": "Horse, riding",
+    "category": "mounts and vehicles",
+    "cost_gp": 75.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hourglass",
+    "name": "Hourglass",
+    "category": "adventuring gear",
+    "cost_gp": 25.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hunting-trap",
+    "name": "Hunting trap",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 25,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ink-1-ounce-bottle",
+    "name": "Ink (1 ounce bottle)",
+    "category": "adventuring gear",
+    "cost_gp": 10.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ink-pen",
+    "name": "Ink pen",
+    "category": "adventuring gear",
+    "cost_gp": 0.02,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "javelin",
+    "name": "Javelin",
+    "category": "weapon",
+    "cost_gp": 0.5,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "jewelers-tools",
+    "name": "Jeweler's Tools",
+    "category": "tools",
+    "cost_gp": 25.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "jug-or-pitcher",
+    "name": "Jug or pitcher",
+    "category": "adventuring gear",
+    "cost_gp": 0.02,
+    "weight": 4,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "keelboat",
+    "name": "Keelboat",
+    "category": "mounts and vehicles",
+    "cost_gp": 3000.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ladder-10-foot",
+    "name": "Ladder (10-foot)",
+    "category": "adventuring gear",
+    "cost_gp": 0.1,
+    "weight": 25,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "lamp",
+    "name": "Lamp",
+    "category": "adventuring gear",
+    "cost_gp": 0.5,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "lance",
+    "name": "Lance",
+    "category": "weapon",
+    "cost_gp": 10.0,
+    "weight": 6,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "lantern-bullseye",
+    "name": "Lantern, bullseye",
+    "category": "adventuring gear",
+    "cost_gp": 10.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "lantern-hooded",
+    "name": "Lantern, hooded",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "leather-armor",
+    "name": "Leather Armor",
+    "category": "armor",
+    "cost_gp": 10.0,
+    "weight": 10,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "leatherworkers-tools",
+    "name": "Leatherworker's Tools",
+    "category": "tools",
+    "cost_gp": 5.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "light-hammer",
+    "name": "Light hammer",
+    "category": "weapon",
+    "cost_gp": 2.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "little-bag-of-sand",
+    "name": "Little bag of sand",
+    "category": "adventuring gear",
+    "cost_gp": 0.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "lock",
+    "name": "Lock",
+    "category": "adventuring gear",
+    "cost_gp": 10.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "longbow",
+    "name": "Longbow",
+    "category": "weapon",
+    "cost_gp": 50.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "longship",
+    "name": "Longship",
+    "category": "mounts and vehicles",
+    "cost_gp": 10000.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "longsword",
+    "name": "Longsword",
+    "category": "weapon",
+    "cost_gp": 15.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "lute",
+    "name": "Lute",
+    "category": "tools",
+    "cost_gp": 35.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "lyre",
+    "name": "Lyre",
+    "category": "tools",
+    "cost_gp": 30.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "mace",
+    "name": "Mace",
+    "category": "weapon",
+    "cost_gp": 5.0,
+    "weight": 4,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "magnifying-glass",
+    "name": "Magnifying glass",
+    "category": "adventuring gear",
+    "cost_gp": 100.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "manacles",
+    "name": "Manacles",
+    "category": "adventuring gear",
+    "cost_gp": 2.0,
+    "weight": 6,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "masons-tools",
+    "name": "Mason's Tools",
+    "category": "tools",
+    "cost_gp": 10.0,
+    "weight": 8,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "mastiff",
+    "name": "Mastiff",
+    "category": "mounts and vehicles",
+    "cost_gp": 25.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "maul",
+    "name": "Maul",
+    "category": "weapon",
+    "cost_gp": 10.0,
+    "weight": 10,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "mess-kit",
+    "name": "Mess Kit",
+    "category": "adventuring gear",
+    "cost_gp": 0.2,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "mirror-steel",
+    "name": "Mirror, steel",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 0.5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "morningstar",
+    "name": "Morningstar",
+    "category": "weapon",
+    "cost_gp": 15.0,
+    "weight": 4,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "mule",
+    "name": "Mule",
+    "category": "mounts and vehicles",
+    "cost_gp": 8.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "navigators-tools",
+    "name": "Navigator's Tools",
+    "category": "tools",
+    "cost_gp": 25.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "net",
+    "name": "Net",
+    "category": "weapon",
+    "cost_gp": 1.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "oil-flask",
+    "name": "Oil (flask)",
+    "category": "adventuring gear",
+    "cost_gp": 0.1,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "orb",
+    "name": "Orb",
+    "category": "adventuring gear",
+    "cost_gp": 20.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "padded-armor",
+    "name": "Padded Armor",
+    "category": "armor",
+    "cost_gp": 5.0,
+    "weight": 8,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "painters-supplies",
+    "name": "Painter's Supplies",
+    "category": "tools",
+    "cost_gp": 10.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "pan-flute",
+    "name": "Pan flute",
+    "category": "tools",
+    "cost_gp": 12.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "paper-one-sheet",
+    "name": "Paper (one sheet)",
+    "category": "adventuring gear",
+    "cost_gp": 0.2,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "parchment-one-sheet",
+    "name": "Parchment (one sheet)",
+    "category": "adventuring gear",
+    "cost_gp": 0.1,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "perfume-vial",
+    "name": "Perfume (vial)",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "pick-miners",
+    "name": "Pick, miner's",
+    "category": "adventuring gear",
+    "cost_gp": 2.0,
+    "weight": 10,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "pike",
+    "name": "Pike",
+    "category": "weapon",
+    "cost_gp": 5.0,
+    "weight": 18,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "piton",
+    "name": "Piton",
+    "category": "adventuring gear",
+    "cost_gp": 0.05,
+    "weight": 0.25,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "plate-armor",
+    "name": "Plate Armor",
+    "category": "armor",
+    "cost_gp": 1500.0,
+    "weight": 65,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "playing-card-set",
+    "name": "Playing Card Set",
+    "category": "tools",
+    "cost_gp": 0.5,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "poison-basic-vial",
+    "name": "Poison, basic (vial)",
+    "category": "adventuring gear",
+    "cost_gp": 100.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "poisoners-kit",
+    "name": "Poisoner's Kit",
+    "category": "adventuring gear",
+    "cost_gp": 50.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "pole-10-foot",
+    "name": "Pole (10-foot)",
+    "category": "adventuring gear",
+    "cost_gp": 0.05,
+    "weight": 7,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "pony",
+    "name": "Pony",
+    "category": "mounts and vehicles",
+    "cost_gp": 30.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "pot-iron",
+    "name": "Pot, iron",
+    "category": "adventuring gear",
+    "cost_gp": 2.0,
+    "weight": 10,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "potters-tools",
+    "name": "Potter's Tools",
+    "category": "tools",
+    "cost_gp": 10.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "pouch",
+    "name": "Pouch",
+    "category": "adventuring gear",
+    "cost_gp": 0.5,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "priests-pack",
+    "name": "Priest's Pack",
+    "category": "adventuring gear",
+    "cost_gp": 19.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "quarterstaff",
+    "name": "Quarterstaff",
+    "category": "weapon",
+    "cost_gp": 0.2,
+    "weight": 4,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "quiver",
+    "name": "Quiver",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ram-portable",
+    "name": "Ram, portable",
+    "category": "adventuring gear",
+    "cost_gp": 4.0,
+    "weight": 35,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "rapier",
+    "name": "Rapier",
+    "category": "weapon",
+    "cost_gp": 25.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "rations-1-day",
+    "name": "Rations (1 day)",
+    "category": "adventuring gear",
+    "cost_gp": 0.5,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "reliquary",
+    "name": "Reliquary",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ring-mail",
+    "name": "Ring Mail",
+    "category": "armor",
+    "cost_gp": 30.0,
+    "weight": 40,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "robes",
+    "name": "Robes",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 4,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "rod",
+    "name": "Rod",
+    "category": "adventuring gear",
+    "cost_gp": 10.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "rope-hempen-50-feet",
+    "name": "Rope, hempen (50 feet)",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 10,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "rope-silk-50-feet",
+    "name": "Rope, silk (50 feet)",
+    "category": "adventuring gear",
+    "cost_gp": 10.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "rowboat",
+    "name": "Rowboat",
+    "category": "mounts and vehicles",
+    "cost_gp": 50.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "sack",
+    "name": "Sack",
+    "category": "adventuring gear",
+    "cost_gp": 0.01,
+    "weight": 0.5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "saddle-exotic",
+    "name": "Saddle, Exotic",
+    "category": "mounts and vehicles",
+    "cost_gp": 60.0,
+    "weight": 50,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "saddle-military",
+    "name": "Saddle, Military",
+    "category": "mounts and vehicles",
+    "cost_gp": 20.0,
+    "weight": 30,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "saddle-pack",
+    "name": "Saddle, Pack",
+    "category": "mounts and vehicles",
+    "cost_gp": 5.0,
+    "weight": 15,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "saddle-riding",
+    "name": "Saddle, Riding",
+    "category": "mounts and vehicles",
+    "cost_gp": 10.0,
+    "weight": 25,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "saddlebags",
+    "name": "Saddlebags",
+    "category": "mounts and vehicles",
+    "cost_gp": 4.0,
+    "weight": 8,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "sailing-ship",
+    "name": "Sailing ship",
+    "category": "mounts and vehicles",
+    "cost_gp": 10000.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "scale-mail",
+    "name": "Scale Mail",
+    "category": "armor",
+    "cost_gp": 50.0,
+    "weight": 45,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "scale-merchants",
+    "name": "Scale, merchant's",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "scholars-pack",
+    "name": "Scholar's Pack",
+    "category": "adventuring gear",
+    "cost_gp": 40.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "scimitar",
+    "name": "Scimitar",
+    "category": "weapon",
+    "cost_gp": 25.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "sealing-wax",
+    "name": "Sealing wax",
+    "category": "adventuring gear",
+    "cost_gp": 0.5,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "shawm",
+    "name": "Shawm",
+    "category": "tools",
+    "cost_gp": 2.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "shield",
+    "name": "Shield",
+    "category": "armor",
+    "cost_gp": 10.0,
+    "weight": 6,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "shortbow",
+    "name": "Shortbow",
+    "category": "weapon",
+    "cost_gp": 25.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "shortsword",
+    "name": "Shortsword",
+    "category": "weapon",
+    "cost_gp": 10.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "shovel",
+    "name": "Shovel",
+    "category": "adventuring gear",
+    "cost_gp": 2.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "sickle",
+    "name": "Sickle",
+    "category": "weapon",
+    "cost_gp": 1.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "signal-whistle",
+    "name": "Signal whistle",
+    "category": "adventuring gear",
+    "cost_gp": 0.05,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "signet-ring",
+    "name": "Signet ring",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "sled",
+    "name": "Sled",
+    "category": "mounts and vehicles",
+    "cost_gp": 20.0,
+    "weight": 300,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "sling",
+    "name": "Sling",
+    "category": "weapon",
+    "cost_gp": 0.1,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "sling-bullet",
+    "name": "Sling bullet",
+    "category": "adventuring gear",
+    "cost_gp": 0.04,
+    "weight": 1.5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "small-knife",
+    "name": "Small knife",
+    "category": "adventuring gear",
+    "cost_gp": 0.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "smiths-tools",
+    "name": "Smith's Tools",
+    "category": "tools",
+    "cost_gp": 20.0,
+    "weight": 8,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "soap",
+    "name": "Soap",
+    "category": "adventuring gear",
+    "cost_gp": 0.02,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "spear",
+    "name": "Spear",
+    "category": "weapon",
+    "cost_gp": 1.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "spellbook",
+    "name": "Spellbook",
+    "category": "adventuring gear",
+    "cost_gp": 50.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "spike-iron",
+    "name": "Spike, iron",
+    "category": "adventuring gear",
+    "cost_gp": 0.1,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "splint-armor",
+    "name": "Splint Armor",
+    "category": "armor",
+    "cost_gp": 200.0,
+    "weight": 60,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "sprig-of-mistletoe",
+    "name": "Sprig of mistletoe",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "spyglass",
+    "name": "Spyglass",
+    "category": "adventuring gear",
+    "cost_gp": 1000.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "stabling-1-day",
+    "name": "Stabling (1 day)",
+    "category": "mounts and vehicles",
+    "cost_gp": 0.5,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "staff",
+    "name": "Staff",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 4,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "string-10-feet",
+    "name": "String (10 feet)",
+    "category": "adventuring gear",
+    "cost_gp": 0.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "studded-leather-armor",
+    "name": "Studded Leather Armor",
+    "category": "armor",
+    "cost_gp": 45.0,
+    "weight": 13,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "tent-two-person",
+    "name": "Tent, two-person",
+    "category": "adventuring gear",
+    "cost_gp": 2.0,
+    "weight": 20,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "thieves-tools",
+    "name": "Thieves' Tools",
+    "category": "tools",
+    "cost_gp": 25.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "tinderbox",
+    "name": "Tinderbox",
+    "category": "adventuring gear",
+    "cost_gp": 0.5,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "tinkers-tools",
+    "name": "Tinker's Tools",
+    "category": "tools",
+    "cost_gp": 50.0,
+    "weight": 10,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "torch",
+    "name": "Torch",
+    "category": "adventuring gear",
+    "cost_gp": 0.01,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "totem",
+    "name": "Totem",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "trident",
+    "name": "Trident",
+    "category": "weapon",
+    "cost_gp": 5.0,
+    "weight": 4,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "vestments",
+    "name": "Vestments",
+    "category": "adventuring gear",
+    "cost_gp": 0.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "vial",
+    "name": "Vial",
+    "category": "adventuring gear",
+    "cost_gp": 1.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "viol",
+    "name": "Viol",
+    "category": "tools",
+    "cost_gp": 30.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "wagon",
+    "name": "Wagon",
+    "category": "mounts and vehicles",
+    "cost_gp": 35.0,
+    "weight": 400,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "wand",
+    "name": "Wand",
+    "category": "adventuring gear",
+    "cost_gp": 10.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "war-pick",
+    "name": "War pick",
+    "category": "weapon",
+    "cost_gp": 5.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "warhammer",
+    "name": "Warhammer",
+    "category": "weapon",
+    "cost_gp": 15.0,
+    "weight": 2,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "warhorse",
+    "name": "Warhorse",
+    "category": "mounts and vehicles",
+    "cost_gp": 400.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "warship",
+    "name": "Warship",
+    "category": "mounts and vehicles",
+    "cost_gp": 25000.0,
+    "weight": 0,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "waterskin",
+    "name": "Waterskin",
+    "category": "adventuring gear",
+    "cost_gp": 0.2,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "weavers-tools",
+    "name": "Weaver's Tools",
+    "category": "tools",
+    "cost_gp": 1.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "whetstone",
+    "name": "Whetstone",
+    "category": "adventuring gear",
+    "cost_gp": 0.01,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "whip",
+    "name": "Whip",
+    "category": "weapon",
+    "cost_gp": 2.0,
+    "weight": 3,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "woodcarvers-tools",
+    "name": "Woodcarver's Tools",
+    "category": "tools",
+    "cost_gp": 1.0,
+    "weight": 5,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "wooden-staff",
+    "name": "Wooden staff",
+    "category": "adventuring gear",
+    "cost_gp": 5.0,
+    "weight": 4,
+    "description": "",
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "yew-wand",
+    "name": "Yew wand",
+    "category": "adventuring gear",
+    "cost_gp": 10.0,
+    "weight": 1,
+    "description": "",
+    "source": "dnd5eapi"
+  }
+]

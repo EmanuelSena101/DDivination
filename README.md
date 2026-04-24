@@ -61,6 +61,73 @@ Imagine the following prompt:
 
 ---
 
+### 🛠️ **Local Setup**
+
+This repository currently runs as two local applications:
+
+* **Backend:** FastAPI + Poetry
+* **Frontend:** React + Vite
+
+**Requirements**
+
+* **Python 3.10+**
+* **Poetry**
+* **Node.js 22** (recommended via `nvm use`, see `.nvmrc`)
+
+**1. Start the backend**
+
+```bash
+cd backend
+poetry install
+poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**2. Start the frontend**
+
+```bash
+cd frontend
+npm install
+npm run dev -- --host 0.0.0.0 --port 5173
+```
+
+**3. Open the app**
+
+* Frontend: `http://localhost:5173`
+* Backend health check: `http://localhost:8000/api/health`
+* Backend docs: `http://localhost:8000/docs`
+
+**4. First-time sync**
+
+The generator requires local D&D 5e data before creating dungeons. Use the **Sync Now** button in the UI or call:
+
+```bash
+curl -X POST http://localhost:8000/api/sync/start
+```
+
+### 🐳 **Docker Compose**
+
+This repository can also be started with Docker Compose for a simpler local stack:
+
+```bash
+docker compose up --build
+```
+
+Services:
+
+* Frontend: `http://localhost:5173`
+* Backend: `http://localhost:8000`
+* Backend docs: `http://localhost:8000/docs`
+
+The backend sync data is persisted in the named volume `backend_data`, mapped internally to `/data` through `DDIVINATION_DATA_DIR`.
+
+After the containers are up, run the initial sync once:
+
+```bash
+curl -X POST http://localhost:8000/api/sync/start
+```
+
+---
+
 ### 💡 **The Idea Behind It: Engineering and Magic**
 
 **DDivination** unites the **rigor of software engineering** with the **magic of world-building**:

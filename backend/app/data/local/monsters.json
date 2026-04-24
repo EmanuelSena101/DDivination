@@ -1,0 +1,6133 @@
+[
+  {
+    "index": "aboleth",
+    "name": "Aboleth",
+    "size": "Large",
+    "monster_type": "aberration",
+    "alignment": "lawful evil",
+    "challenge_rating": 10,
+    "hit_points": 135,
+    "armor_class": 17,
+    "xp": 5900,
+    "theme_tags": [
+      "sewer"
+    ],
+    "biome_tags": [
+      "aquatic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "acolyte",
+    "name": "Acolyte",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 0.25,
+    "hit_points": 9,
+    "armor_class": 10,
+    "xp": 50,
+    "theme_tags": [
+      "fortress",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "adult-black-dragon",
+    "name": "Adult Black Dragon",
+    "size": "Huge",
+    "monster_type": "dragon",
+    "alignment": "chaotic evil",
+    "challenge_rating": 14,
+    "hit_points": 195,
+    "armor_class": 19,
+    "xp": 11500,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "adult-blue-dragon",
+    "name": "Adult Blue Dragon",
+    "size": "Huge",
+    "monster_type": "dragon",
+    "alignment": "lawful evil",
+    "challenge_rating": 16,
+    "hit_points": 225,
+    "armor_class": 19,
+    "xp": 15000,
+    "theme_tags": [],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "adult-brass-dragon",
+    "name": "Adult Brass Dragon",
+    "size": "Huge",
+    "monster_type": "dragon",
+    "alignment": "chaotic good",
+    "challenge_rating": 13,
+    "hit_points": 172,
+    "armor_class": 18,
+    "xp": 10000,
+    "theme_tags": [],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "adult-bronze-dragon",
+    "name": "Adult Bronze Dragon",
+    "size": "Huge",
+    "monster_type": "dragon",
+    "alignment": "lawful good",
+    "challenge_rating": 15,
+    "hit_points": 212,
+    "armor_class": 19,
+    "xp": 13000,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "adult-copper-dragon",
+    "name": "Adult Copper Dragon",
+    "size": "Huge",
+    "monster_type": "dragon",
+    "alignment": "chaotic good",
+    "challenge_rating": 14,
+    "hit_points": 184,
+    "armor_class": 18,
+    "xp": 11500,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "adult-gold-dragon",
+    "name": "Adult Gold Dragon",
+    "size": "Huge",
+    "monster_type": "dragon",
+    "alignment": "lawful good",
+    "challenge_rating": 17,
+    "hit_points": 256,
+    "armor_class": 19,
+    "xp": 18000,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "adult-green-dragon",
+    "name": "Adult Green Dragon",
+    "size": "Huge",
+    "monster_type": "dragon",
+    "alignment": "lawful evil",
+    "challenge_rating": 15,
+    "hit_points": 207,
+    "armor_class": 19,
+    "xp": 13000,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "adult-red-dragon",
+    "name": "Adult Red Dragon",
+    "size": "Huge",
+    "monster_type": "dragon",
+    "alignment": "chaotic evil",
+    "challenge_rating": 17,
+    "hit_points": 256,
+    "armor_class": 19,
+    "xp": 18000,
+    "theme_tags": [],
+    "biome_tags": [
+      "volcanic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "adult-silver-dragon",
+    "name": "Adult Silver Dragon",
+    "size": "Huge",
+    "monster_type": "dragon",
+    "alignment": "lawful good",
+    "challenge_rating": 16,
+    "hit_points": 243,
+    "armor_class": 19,
+    "xp": 15000,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "adult-white-dragon",
+    "name": "Adult White Dragon",
+    "size": "Huge",
+    "monster_type": "dragon",
+    "alignment": "chaotic evil",
+    "challenge_rating": 13,
+    "hit_points": 200,
+    "armor_class": 18,
+    "xp": 10000,
+    "theme_tags": [],
+    "biome_tags": [
+      "arctic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "air-elemental",
+    "name": "Air Elemental",
+    "size": "Large",
+    "monster_type": "elemental",
+    "alignment": "neutral",
+    "challenge_rating": 5,
+    "hit_points": 90,
+    "armor_class": 15,
+    "xp": 1800,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ancient-black-dragon",
+    "name": "Ancient Black Dragon",
+    "size": "Gargantuan",
+    "monster_type": "dragon",
+    "alignment": "chaotic evil",
+    "challenge_rating": 21,
+    "hit_points": 367,
+    "armor_class": 22,
+    "xp": 33000,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ancient-blue-dragon",
+    "name": "Ancient Blue Dragon",
+    "size": "Gargantuan",
+    "monster_type": "dragon",
+    "alignment": "lawful evil",
+    "challenge_rating": 23,
+    "hit_points": 481,
+    "armor_class": 22,
+    "xp": 50000,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ancient-brass-dragon",
+    "name": "Ancient Brass Dragon",
+    "size": "Gargantuan",
+    "monster_type": "dragon",
+    "alignment": "chaotic good",
+    "challenge_rating": 20,
+    "hit_points": 297,
+    "armor_class": 20,
+    "xp": 25000,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ancient-bronze-dragon",
+    "name": "Ancient Bronze Dragon",
+    "size": "Gargantuan",
+    "monster_type": "dragon",
+    "alignment": "lawful good",
+    "challenge_rating": 22,
+    "hit_points": 444,
+    "armor_class": 22,
+    "xp": 41000,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ancient-copper-dragon",
+    "name": "Ancient Copper Dragon",
+    "size": "Gargantuan",
+    "monster_type": "dragon",
+    "alignment": "chaotic good",
+    "challenge_rating": 21,
+    "hit_points": 350,
+    "armor_class": 21,
+    "xp": 33000,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ancient-gold-dragon",
+    "name": "Ancient Gold Dragon",
+    "size": "Gargantuan",
+    "monster_type": "dragon",
+    "alignment": "lawful good",
+    "challenge_rating": 24,
+    "hit_points": 546,
+    "armor_class": 22,
+    "xp": 62000,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ancient-green-dragon",
+    "name": "Ancient Green Dragon",
+    "size": "Gargantuan",
+    "monster_type": "dragon",
+    "alignment": "lawful evil",
+    "challenge_rating": 22,
+    "hit_points": 385,
+    "armor_class": 21,
+    "xp": 41000,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ancient-red-dragon",
+    "name": "Ancient Red Dragon",
+    "size": "Gargantuan",
+    "monster_type": "dragon",
+    "alignment": "chaotic evil",
+    "challenge_rating": 24,
+    "hit_points": 546,
+    "armor_class": 22,
+    "xp": 62000,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [
+      "volcanic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ancient-silver-dragon",
+    "name": "Ancient Silver Dragon",
+    "size": "Gargantuan",
+    "monster_type": "dragon",
+    "alignment": "lawful good",
+    "challenge_rating": 23,
+    "hit_points": 487,
+    "armor_class": 22,
+    "xp": 50000,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ancient-white-dragon",
+    "name": "Ancient White Dragon",
+    "size": "Gargantuan",
+    "monster_type": "dragon",
+    "alignment": "chaotic evil",
+    "challenge_rating": 20,
+    "hit_points": 333,
+    "armor_class": 20,
+    "xp": 25000,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [
+      "arctic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "androsphinx",
+    "name": "Androsphinx",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "lawful neutral",
+    "challenge_rating": 17,
+    "hit_points": 199,
+    "armor_class": 17,
+    "xp": 18000,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "animated-armor",
+    "name": "Animated Armor",
+    "size": "Medium",
+    "monster_type": "construct",
+    "alignment": "unaligned",
+    "challenge_rating": 1,
+    "hit_points": 33,
+    "armor_class": 18,
+    "xp": 200,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ankheg",
+    "name": "Ankheg",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 39,
+    "armor_class": 14,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ape",
+    "name": "Ape",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 19,
+    "armor_class": 12,
+    "xp": 100,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "archmage",
+    "name": "Archmage",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 12,
+    "hit_points": 99,
+    "armor_class": 12,
+    "xp": 8400,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "assassin",
+    "name": "Assassin",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any non-good alignment",
+    "challenge_rating": 8,
+    "hit_points": 78,
+    "armor_class": 15,
+    "xp": 3900,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "sniper",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "awakened-shrub",
+    "name": "Awakened Shrub",
+    "size": "Small",
+    "monster_type": "plant",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 10,
+    "armor_class": 9,
+    "xp": 10,
+    "theme_tags": [],
+    "biome_tags": [
+      "swamp"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "awakened-tree",
+    "name": "Awakened Tree",
+    "size": "Huge",
+    "monster_type": "plant",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 59,
+    "armor_class": 13,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [
+      "swamp",
+      "forest"
+    ],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "axe-beak",
+    "name": "Axe Beak",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 19,
+    "armor_class": 11,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "azer",
+    "name": "Azer",
+    "size": "Medium",
+    "monster_type": "elemental",
+    "alignment": "lawful neutral",
+    "challenge_rating": 2,
+    "hit_points": 39,
+    "armor_class": 15,
+    "xp": 450,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "baboon",
+    "name": "Baboon",
+    "size": "Small",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 3,
+    "armor_class": 12,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "badger",
+    "name": "Badger",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 3,
+    "armor_class": 10,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "balor",
+    "name": "Balor",
+    "size": "Huge",
+    "monster_type": "fiend",
+    "alignment": "chaotic evil",
+    "challenge_rating": 19,
+    "hit_points": 262,
+    "armor_class": 19,
+    "xp": 22000,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bandit",
+    "name": "Bandit",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any non-lawful alignment",
+    "challenge_rating": 0.125,
+    "hit_points": 11,
+    "armor_class": 12,
+    "xp": 25,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bandit-captain",
+    "name": "Bandit Captain",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any non-lawful alignment",
+    "challenge_rating": 2,
+    "hit_points": 65,
+    "armor_class": 15,
+    "xp": 450,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "barbed-devil",
+    "name": "Barbed Devil",
+    "size": "Medium",
+    "monster_type": "fiend",
+    "alignment": "lawful evil",
+    "challenge_rating": 5,
+    "hit_points": 110,
+    "armor_class": 15,
+    "xp": 1800,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "basilisk",
+    "name": "Basilisk",
+    "size": "Medium",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 3,
+    "hit_points": 52,
+    "armor_class": 12,
+    "xp": 700,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bat",
+    "name": "Bat",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 1,
+    "armor_class": 12,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bearded-devil",
+    "name": "Bearded Devil",
+    "size": "Medium",
+    "monster_type": "fiend",
+    "alignment": "lawful evil",
+    "challenge_rating": 3,
+    "hit_points": 52,
+    "armor_class": 13,
+    "xp": 700,
+    "theme_tags": [
+      "temple",
+      "cave",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "behir",
+    "name": "Behir",
+    "size": "Huge",
+    "monster_type": "monstrosity",
+    "alignment": "neutral evil",
+    "challenge_rating": 11,
+    "hit_points": 168,
+    "armor_class": 17,
+    "xp": 7200,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "berserker",
+    "name": "Berserker",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any chaotic alignment",
+    "challenge_rating": 2,
+    "hit_points": 67,
+    "armor_class": 13,
+    "xp": 450,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "black-bear",
+    "name": "Black Bear",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 19,
+    "armor_class": 11,
+    "xp": 100,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "black-dragon-wyrmling",
+    "name": "Black Dragon Wyrmling",
+    "size": "Medium",
+    "monster_type": "dragon",
+    "alignment": "chaotic evil",
+    "challenge_rating": 2,
+    "hit_points": 33,
+    "armor_class": 17,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "black-pudding",
+    "name": "Black Pudding",
+    "size": "Large",
+    "monster_type": "ooze",
+    "alignment": "unaligned",
+    "challenge_rating": 4,
+    "hit_points": 85,
+    "armor_class": 7,
+    "xp": 1100,
+    "theme_tags": [
+      "cave",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "blink-dog",
+    "name": "Blink Dog",
+    "size": "Medium",
+    "monster_type": "fey",
+    "alignment": "lawful good",
+    "challenge_rating": 0.25,
+    "hit_points": 22,
+    "armor_class": 13,
+    "xp": 50,
+    "theme_tags": [],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "blood-hawk",
+    "name": "Blood Hawk",
+    "size": "Small",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.125,
+    "hit_points": 7,
+    "armor_class": 12,
+    "xp": 25,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "blue-dragon-wyrmling",
+    "name": "Blue Dragon Wyrmling",
+    "size": "Medium",
+    "monster_type": "dragon",
+    "alignment": "lawful evil",
+    "challenge_rating": 3,
+    "hit_points": 52,
+    "armor_class": 17,
+    "xp": 700,
+    "theme_tags": [],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "boar",
+    "name": "Boar",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 11,
+    "armor_class": 11,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bone-devil",
+    "name": "Bone Devil",
+    "size": "Large",
+    "monster_type": "fiend",
+    "alignment": "lawful evil",
+    "challenge_rating": 9,
+    "hit_points": 142,
+    "armor_class": 19,
+    "xp": 5000,
+    "theme_tags": [
+      "temple",
+      "crypt",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "brass-dragon-wyrmling",
+    "name": "Brass Dragon Wyrmling",
+    "size": "Medium",
+    "monster_type": "dragon",
+    "alignment": "chaotic good",
+    "challenge_rating": 1,
+    "hit_points": 16,
+    "armor_class": 16,
+    "xp": 100,
+    "theme_tags": [],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bronze-dragon-wyrmling",
+    "name": "Bronze Dragon Wyrmling",
+    "size": "Medium",
+    "monster_type": "dragon",
+    "alignment": "lawful good",
+    "challenge_rating": 2,
+    "hit_points": 32,
+    "armor_class": 17,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "brown-bear",
+    "name": "Brown Bear",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 1,
+    "hit_points": 34,
+    "armor_class": 11,
+    "xp": 200,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bugbear",
+    "name": "Bugbear",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "chaotic evil",
+    "challenge_rating": 1,
+    "hit_points": 27,
+    "armor_class": 16,
+    "xp": 200,
+    "theme_tags": [
+      "cave",
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "bulette",
+    "name": "Bulette",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 5,
+    "hit_points": 94,
+    "armor_class": 17,
+    "xp": 1800,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "camel",
+    "name": "Camel",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.125,
+    "hit_points": 15,
+    "armor_class": 9,
+    "xp": 25,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "cat",
+    "name": "Cat",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 2,
+    "armor_class": 12,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "centaur",
+    "name": "Centaur",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "neutral good",
+    "challenge_rating": 2,
+    "hit_points": 45,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "chain-devil",
+    "name": "Chain Devil",
+    "size": "Medium",
+    "monster_type": "fiend",
+    "alignment": "lawful evil",
+    "challenge_rating": 8,
+    "hit_points": 85,
+    "armor_class": 16,
+    "xp": 3900,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "chimera",
+    "name": "Chimera",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "chaotic evil",
+    "challenge_rating": 6,
+    "hit_points": 114,
+    "armor_class": 14,
+    "xp": 2300,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "chuul",
+    "name": "Chuul",
+    "size": "Large",
+    "monster_type": "aberration",
+    "alignment": "chaotic evil",
+    "challenge_rating": 4,
+    "hit_points": 93,
+    "armor_class": 16,
+    "xp": 1100,
+    "theme_tags": [
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "clay-golem",
+    "name": "Clay Golem",
+    "size": "Large",
+    "monster_type": "construct",
+    "alignment": "unaligned",
+    "challenge_rating": 9,
+    "hit_points": 133,
+    "armor_class": 14,
+    "xp": 5000,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "cloaker",
+    "name": "Cloaker",
+    "size": "Large",
+    "monster_type": "aberration",
+    "alignment": "chaotic neutral",
+    "challenge_rating": 8,
+    "hit_points": 78,
+    "armor_class": 14,
+    "xp": 3900,
+    "theme_tags": [
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "cloud-giant",
+    "name": "Cloud Giant",
+    "size": "Huge",
+    "monster_type": "giant",
+    "alignment": "neutral good (50%) or neutral evil (50%)",
+    "challenge_rating": 9,
+    "hit_points": 200,
+    "armor_class": 14,
+    "xp": 5000,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "cockatrice",
+    "name": "Cockatrice",
+    "size": "Small",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 27,
+    "armor_class": 11,
+    "xp": 100,
+    "theme_tags": [],
+    "biome_tags": [
+      "arctic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "commoner",
+    "name": "Commoner",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 0,
+    "hit_points": 4,
+    "armor_class": 10,
+    "xp": 10,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "constrictor-snake",
+    "name": "Constrictor Snake",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 13,
+    "armor_class": 12,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "copper-dragon-wyrmling",
+    "name": "Copper Dragon Wyrmling",
+    "size": "Medium",
+    "monster_type": "dragon",
+    "alignment": "chaotic good",
+    "challenge_rating": 1,
+    "hit_points": 22,
+    "armor_class": 16,
+    "xp": 200,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "couatl",
+    "name": "Couatl",
+    "size": "Medium",
+    "monster_type": "celestial",
+    "alignment": "lawful good",
+    "challenge_rating": 4,
+    "hit_points": 97,
+    "armor_class": 19,
+    "xp": 1100,
+    "theme_tags": [
+      "temple"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "crab",
+    "name": "Crab",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 2,
+    "armor_class": 11,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "aquatic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "crocodile",
+    "name": "Crocodile",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 19,
+    "armor_class": 12,
+    "xp": 100,
+    "theme_tags": [
+      "cave",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "cult-fanatic",
+    "name": "Cult Fanatic",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any non-good alignment",
+    "challenge_rating": 2,
+    "hit_points": 22,
+    "armor_class": 13,
+    "xp": 450,
+    "theme_tags": [
+      "fortress",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "cultist",
+    "name": "Cultist",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any non-good alignment",
+    "challenge_rating": 0.125,
+    "hit_points": 9,
+    "armor_class": 12,
+    "xp": 25,
+    "theme_tags": [
+      "fortress",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "darkmantle",
+    "name": "Darkmantle",
+    "size": "Small",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 22,
+    "armor_class": 11,
+    "xp": 100,
+    "theme_tags": [
+      "cult"
+    ],
+    "biome_tags": [
+      "shadow",
+      "underground"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "death-dog",
+    "name": "Death Dog",
+    "size": "Medium",
+    "monster_type": "monstrosity",
+    "alignment": "neutral evil",
+    "challenge_rating": 1,
+    "hit_points": 39,
+    "armor_class": 12,
+    "xp": 200,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "deep-gnome-svirfneblin",
+    "name": "Deep Gnome (Svirfneblin)",
+    "size": "Small",
+    "monster_type": "humanoid",
+    "alignment": "neutral good",
+    "challenge_rating": 0.5,
+    "hit_points": 16,
+    "armor_class": 15,
+    "xp": 50,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [
+      "underground"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "deer",
+    "name": "Deer",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 4,
+    "armor_class": 13,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "deva",
+    "name": "Deva",
+    "size": "Medium",
+    "monster_type": "celestial",
+    "alignment": "lawful good",
+    "challenge_rating": 10,
+    "hit_points": 136,
+    "armor_class": 17,
+    "xp": 5900,
+    "theme_tags": [
+      "temple"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "dire-wolf",
+    "name": "Dire Wolf",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 1,
+    "hit_points": 37,
+    "armor_class": 14,
+    "xp": 200,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "djinni",
+    "name": "Djinni",
+    "size": "Large",
+    "monster_type": "elemental",
+    "alignment": "chaotic good",
+    "challenge_rating": 11,
+    "hit_points": 161,
+    "armor_class": 17,
+    "xp": 7200,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "doppelganger",
+    "name": "Doppelganger",
+    "size": "Medium",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 3,
+    "hit_points": 52,
+    "armor_class": 14,
+    "xp": 700,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "draft-horse",
+    "name": "Draft Horse",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 19,
+    "armor_class": 10,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "dragon-turtle",
+    "name": "Dragon Turtle",
+    "size": "Gargantuan",
+    "monster_type": "dragon",
+    "alignment": "neutral",
+    "challenge_rating": 17,
+    "hit_points": 341,
+    "armor_class": 20,
+    "xp": 18000,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "dretch",
+    "name": "Dretch",
+    "size": "Small",
+    "monster_type": "fiend",
+    "alignment": "chaotic evil",
+    "challenge_rating": 0.25,
+    "hit_points": 18,
+    "armor_class": 11,
+    "xp": 25,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "drider",
+    "name": "Drider",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "chaotic evil",
+    "challenge_rating": 6,
+    "hit_points": 123,
+    "armor_class": 19,
+    "xp": 2300,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "drow",
+    "name": "Drow",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "neutral evil",
+    "challenge_rating": 0.25,
+    "hit_points": 13,
+    "armor_class": 15,
+    "xp": 50,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [
+      "shadow",
+      "underground"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "druid",
+    "name": "Druid",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 2,
+    "hit_points": 27,
+    "armor_class": 11,
+    "xp": 450,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "dryad",
+    "name": "Dryad",
+    "size": "Medium",
+    "monster_type": "fey",
+    "alignment": "neutral",
+    "challenge_rating": 1,
+    "hit_points": 22,
+    "armor_class": 11,
+    "xp": 200,
+    "theme_tags": [],
+    "biome_tags": [
+      "forest",
+      "desert"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "duergar",
+    "name": "Duergar",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "lawful evil",
+    "challenge_rating": 1,
+    "hit_points": 26,
+    "armor_class": 16,
+    "xp": 200,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [
+      "underground"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "dust-mephit",
+    "name": "Dust Mephit",
+    "size": "Small",
+    "monster_type": "elemental",
+    "alignment": "neutral evil",
+    "challenge_rating": 0.5,
+    "hit_points": 17,
+    "armor_class": 12,
+    "xp": 100,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "eagle",
+    "name": "Eagle",
+    "size": "Small",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 3,
+    "armor_class": 12,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "earth-elemental",
+    "name": "Earth Elemental",
+    "size": "Large",
+    "monster_type": "elemental",
+    "alignment": "neutral",
+    "challenge_rating": 5,
+    "hit_points": 126,
+    "armor_class": 17,
+    "xp": 1800,
+    "theme_tags": [
+      "cave",
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "efreeti",
+    "name": "Efreeti",
+    "size": "Large",
+    "monster_type": "elemental",
+    "alignment": "lawful evil",
+    "challenge_rating": 11,
+    "hit_points": 200,
+    "armor_class": 17,
+    "xp": 7200,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [
+      "volcanic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "elephant",
+    "name": "Elephant",
+    "size": "Huge",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 4,
+    "hit_points": 76,
+    "armor_class": 12,
+    "xp": 1100,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "elk",
+    "name": "Elk",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 13,
+    "armor_class": 10,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "erinyes",
+    "name": "Erinyes",
+    "size": "Medium",
+    "monster_type": "fiend",
+    "alignment": "lawful evil",
+    "challenge_rating": 12,
+    "hit_points": 153,
+    "armor_class": 18,
+    "xp": 8400,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ettercap",
+    "name": "Ettercap",
+    "size": "Medium",
+    "monster_type": "monstrosity",
+    "alignment": "neutral evil",
+    "challenge_rating": 2,
+    "hit_points": 44,
+    "armor_class": 13,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ettin",
+    "name": "Ettin",
+    "size": "Large",
+    "monster_type": "giant",
+    "alignment": "chaotic evil",
+    "challenge_rating": 4,
+    "hit_points": 85,
+    "armor_class": 12,
+    "xp": 1100,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "fire-elemental",
+    "name": "Fire Elemental",
+    "size": "Large",
+    "monster_type": "elemental",
+    "alignment": "neutral",
+    "challenge_rating": 5,
+    "hit_points": 102,
+    "armor_class": 13,
+    "xp": 1800,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [
+      "volcanic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "fire-giant",
+    "name": "Fire Giant",
+    "size": "Huge",
+    "monster_type": "giant",
+    "alignment": "lawful evil",
+    "challenge_rating": 9,
+    "hit_points": 162,
+    "armor_class": 18,
+    "xp": 5000,
+    "theme_tags": [],
+    "biome_tags": [
+      "volcanic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "flesh-golem",
+    "name": "Flesh Golem",
+    "size": "Medium",
+    "monster_type": "construct",
+    "alignment": "neutral",
+    "challenge_rating": 5,
+    "hit_points": 93,
+    "armor_class": 9,
+    "xp": 1800,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "flying-snake",
+    "name": "Flying Snake",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.125,
+    "hit_points": 5,
+    "armor_class": 14,
+    "xp": 25,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "flying-sword",
+    "name": "Flying Sword",
+    "size": "Small",
+    "monster_type": "construct",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 17,
+    "armor_class": 17,
+    "xp": 50,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "frog",
+    "name": "Frog",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 1,
+    "armor_class": 11,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "swamp"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "frost-giant",
+    "name": "Frost Giant",
+    "size": "Huge",
+    "monster_type": "giant",
+    "alignment": "neutral evil",
+    "challenge_rating": 8,
+    "hit_points": 138,
+    "armor_class": 15,
+    "xp": 3900,
+    "theme_tags": [],
+    "biome_tags": [
+      "arctic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "gargoyle",
+    "name": "Gargoyle",
+    "size": "Medium",
+    "monster_type": "elemental",
+    "alignment": "chaotic evil",
+    "challenge_rating": 2,
+    "hit_points": 52,
+    "armor_class": 15,
+    "xp": 450,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "gelatinous-cube",
+    "name": "Gelatinous Cube",
+    "size": "Large",
+    "monster_type": "ooze",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 84,
+    "armor_class": 6,
+    "xp": 450,
+    "theme_tags": [
+      "cave",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ghast",
+    "name": "Ghast",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "chaotic evil",
+    "challenge_rating": 2,
+    "hit_points": 36,
+    "armor_class": 13,
+    "xp": 450,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ghost",
+    "name": "Ghost",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "any alignment",
+    "challenge_rating": 4,
+    "hit_points": 45,
+    "armor_class": 11,
+    "xp": 1100,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ghoul",
+    "name": "Ghoul",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "chaotic evil",
+    "challenge_rating": 1,
+    "hit_points": 22,
+    "armor_class": 12,
+    "xp": 200,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-ape",
+    "name": "Giant Ape",
+    "size": "Huge",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 7,
+    "hit_points": 157,
+    "armor_class": 12,
+    "xp": 2900,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-badger",
+    "name": "Giant Badger",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 13,
+    "armor_class": 10,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-bat",
+    "name": "Giant Bat",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 22,
+    "armor_class": 13,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-boar",
+    "name": "Giant Boar",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 42,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-centipede",
+    "name": "Giant Centipede",
+    "size": "Small",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 4,
+    "armor_class": 13,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-constrictor-snake",
+    "name": "Giant Constrictor Snake",
+    "size": "Huge",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 60,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-crab",
+    "name": "Giant Crab",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.125,
+    "hit_points": 13,
+    "armor_class": 15,
+    "xp": 25,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "aquatic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-crocodile",
+    "name": "Giant Crocodile",
+    "size": "Huge",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 5,
+    "hit_points": 85,
+    "armor_class": 14,
+    "xp": 1800,
+    "theme_tags": [
+      "cave",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-eagle",
+    "name": "Giant Eagle",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "neutral good",
+    "challenge_rating": 1,
+    "hit_points": 26,
+    "armor_class": 13,
+    "xp": 200,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-elk",
+    "name": "Giant Elk",
+    "size": "Huge",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 42,
+    "armor_class": 14,
+    "xp": 450,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-fire-beetle",
+    "name": "Giant Fire Beetle",
+    "size": "Small",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 4,
+    "armor_class": 13,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "volcanic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-frog",
+    "name": "Giant Frog",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 18,
+    "armor_class": 11,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "swamp"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-goat",
+    "name": "Giant Goat",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 19,
+    "armor_class": 11,
+    "xp": 100,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-hyena",
+    "name": "Giant Hyena",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 1,
+    "hit_points": 45,
+    "armor_class": 12,
+    "xp": 200,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-lizard",
+    "name": "Giant Lizard",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 19,
+    "armor_class": 12,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "swamp"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-octopus",
+    "name": "Giant Octopus",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 1,
+    "hit_points": 52,
+    "armor_class": 11,
+    "xp": 200,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-owl",
+    "name": "Giant Owl",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "neutral",
+    "challenge_rating": 0.25,
+    "hit_points": 19,
+    "armor_class": 12,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-poisonous-snake",
+    "name": "Giant Poisonous Snake",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 11,
+    "armor_class": 14,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-rat",
+    "name": "Giant Rat",
+    "size": "Small",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.125,
+    "hit_points": 7,
+    "armor_class": 12,
+    "xp": 25,
+    "theme_tags": [
+      "cave",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-rat-diseased",
+    "name": "Giant Rat (Diseased)",
+    "size": "Small",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.125,
+    "hit_points": 7,
+    "armor_class": 12,
+    "xp": 25,
+    "theme_tags": [
+      "cave",
+      "sewer"
+    ],
+    "biome_tags": [
+      "aquatic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-scorpion",
+    "name": "Giant Scorpion",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 3,
+    "hit_points": 52,
+    "armor_class": 15,
+    "xp": 700,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "brute",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-sea-horse",
+    "name": "Giant Sea Horse",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 16,
+    "armor_class": 13,
+    "xp": 100,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "aquatic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-shark",
+    "name": "Giant Shark",
+    "size": "Huge",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 5,
+    "hit_points": 126,
+    "armor_class": 13,
+    "xp": 1800,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "aquatic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-spider",
+    "name": "Giant Spider",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 1,
+    "hit_points": 26,
+    "armor_class": 14,
+    "xp": 200,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-toad",
+    "name": "Giant Toad",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 1,
+    "hit_points": 39,
+    "armor_class": 11,
+    "xp": 200,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "swamp"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-vulture",
+    "name": "Giant Vulture",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "neutral evil",
+    "challenge_rating": 1,
+    "hit_points": 22,
+    "armor_class": 10,
+    "xp": 200,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-wasp",
+    "name": "Giant Wasp",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 13,
+    "armor_class": 12,
+    "xp": 100,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-weasel",
+    "name": "Giant Weasel",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.125,
+    "hit_points": 9,
+    "armor_class": 13,
+    "xp": 25,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "giant-wolf-spider",
+    "name": "Giant Wolf Spider",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 11,
+    "armor_class": 13,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "gibbering-mouther",
+    "name": "Gibbering Mouther",
+    "size": "Medium",
+    "monster_type": "aberration",
+    "alignment": "neutral",
+    "challenge_rating": 2,
+    "hit_points": 67,
+    "armor_class": 9,
+    "xp": 450,
+    "theme_tags": [
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "glabrezu",
+    "name": "Glabrezu",
+    "size": "Large",
+    "monster_type": "fiend",
+    "alignment": "chaotic evil",
+    "challenge_rating": 9,
+    "hit_points": 157,
+    "armor_class": 17,
+    "xp": 5000,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "gladiator",
+    "name": "Gladiator",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 5,
+    "hit_points": 112,
+    "armor_class": 16,
+    "xp": 1800,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "gnoll",
+    "name": "Gnoll",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "chaotic evil",
+    "challenge_rating": 0.5,
+    "hit_points": 22,
+    "armor_class": 15,
+    "xp": 100,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "goat",
+    "name": "Goat",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 4,
+    "armor_class": 10,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "goblin",
+    "name": "Goblin",
+    "size": "Small",
+    "monster_type": "humanoid",
+    "alignment": "neutral evil",
+    "challenge_rating": 0.25,
+    "hit_points": 7,
+    "armor_class": 15,
+    "xp": 50,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "gold-dragon-wyrmling",
+    "name": "Gold Dragon Wyrmling",
+    "size": "Medium",
+    "monster_type": "dragon",
+    "alignment": "lawful good",
+    "challenge_rating": 3,
+    "hit_points": 60,
+    "armor_class": 17,
+    "xp": 700,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "gorgon",
+    "name": "Gorgon",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 5,
+    "hit_points": 114,
+    "armor_class": 19,
+    "xp": 1800,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "gray-ooze",
+    "name": "Gray Ooze",
+    "size": "Medium",
+    "monster_type": "ooze",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 22,
+    "armor_class": 8,
+    "xp": 100,
+    "theme_tags": [
+      "cave",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "green-dragon-wyrmling",
+    "name": "Green Dragon Wyrmling",
+    "size": "Medium",
+    "monster_type": "dragon",
+    "alignment": "lawful evil",
+    "challenge_rating": 2,
+    "hit_points": 38,
+    "armor_class": 17,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "green-hag",
+    "name": "Green Hag",
+    "size": "Medium",
+    "monster_type": "fey",
+    "alignment": "neutral evil",
+    "challenge_rating": 3,
+    "hit_points": 82,
+    "armor_class": 17,
+    "xp": 700,
+    "theme_tags": [],
+    "biome_tags": [
+      "swamp",
+      "forest"
+    ],
+    "combat_role": "controller",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "grick",
+    "name": "Grick",
+    "size": "Medium",
+    "monster_type": "monstrosity",
+    "alignment": "neutral",
+    "challenge_rating": 2,
+    "hit_points": 27,
+    "armor_class": 14,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "griffon",
+    "name": "Griffon",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 59,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "grimlock",
+    "name": "Grimlock",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "neutral evil",
+    "challenge_rating": 0.25,
+    "hit_points": 11,
+    "armor_class": 11,
+    "xp": 50,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "guard",
+    "name": "Guard",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 0.125,
+    "hit_points": 11,
+    "armor_class": 16,
+    "xp": 25,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "guardian-naga",
+    "name": "Guardian Naga",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "lawful good",
+    "challenge_rating": 10,
+    "hit_points": 127,
+    "armor_class": 18,
+    "xp": 5900,
+    "theme_tags": [
+      "ruins",
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "gynosphinx",
+    "name": "Gynosphinx",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "lawful neutral",
+    "challenge_rating": 11,
+    "hit_points": 136,
+    "armor_class": 17,
+    "xp": 7200,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "half-red-dragon-veteran",
+    "name": "Half-Red Dragon Veteran",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 5,
+    "hit_points": 65,
+    "armor_class": 18,
+    "xp": 1800,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [
+      "volcanic"
+    ],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "harpy",
+    "name": "Harpy",
+    "size": "Medium",
+    "monster_type": "monstrosity",
+    "alignment": "chaotic evil",
+    "challenge_rating": 1,
+    "hit_points": 38,
+    "armor_class": 11,
+    "xp": 200,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hawk",
+    "name": "Hawk",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 1,
+    "armor_class": 13,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hell-hound",
+    "name": "Hell Hound",
+    "size": "Medium",
+    "monster_type": "fiend",
+    "alignment": "lawful evil",
+    "challenge_rating": 3,
+    "hit_points": 45,
+    "armor_class": 15,
+    "xp": 700,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [
+      "volcanic"
+    ],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hezrou",
+    "name": "Hezrou",
+    "size": "Large",
+    "monster_type": "fiend",
+    "alignment": "chaotic evil",
+    "challenge_rating": 8,
+    "hit_points": 136,
+    "armor_class": 16,
+    "xp": 3900,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hill-giant",
+    "name": "Hill Giant",
+    "size": "Huge",
+    "monster_type": "giant",
+    "alignment": "chaotic evil",
+    "challenge_rating": 5,
+    "hit_points": 105,
+    "armor_class": 13,
+    "xp": 1800,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hippogriff",
+    "name": "Hippogriff",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 1,
+    "hit_points": 19,
+    "armor_class": 11,
+    "xp": 200,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hobgoblin",
+    "name": "Hobgoblin",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "lawful evil",
+    "challenge_rating": 0.5,
+    "hit_points": 11,
+    "armor_class": 18,
+    "xp": 100,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "homunculus",
+    "name": "Homunculus",
+    "size": "Tiny",
+    "monster_type": "construct",
+    "alignment": "neutral",
+    "challenge_rating": 0,
+    "hit_points": 5,
+    "armor_class": 13,
+    "xp": 10,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "horned-devil",
+    "name": "Horned Devil",
+    "size": "Large",
+    "monster_type": "fiend",
+    "alignment": "lawful evil",
+    "challenge_rating": 11,
+    "hit_points": 178,
+    "armor_class": 18,
+    "xp": 7200,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hunter-shark",
+    "name": "Hunter Shark",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 45,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "aquatic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hydra",
+    "name": "Hydra",
+    "size": "Huge",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 8,
+    "hit_points": 172,
+    "armor_class": 15,
+    "xp": 3900,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "hyena",
+    "name": "Hyena",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 5,
+    "armor_class": 11,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ice-devil",
+    "name": "Ice Devil",
+    "size": "Large",
+    "monster_type": "fiend",
+    "alignment": "lawful evil",
+    "challenge_rating": 14,
+    "hit_points": 180,
+    "armor_class": 18,
+    "xp": 11500,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [
+      "arctic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ice-mephit",
+    "name": "Ice Mephit",
+    "size": "Small",
+    "monster_type": "elemental",
+    "alignment": "neutral evil",
+    "challenge_rating": 0.5,
+    "hit_points": 21,
+    "armor_class": 11,
+    "xp": 100,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [
+      "arctic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "imp",
+    "name": "Imp",
+    "size": "Tiny",
+    "monster_type": "fiend",
+    "alignment": "lawful evil",
+    "challenge_rating": 1,
+    "hit_points": 10,
+    "armor_class": 13,
+    "xp": 200,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "invisible-stalker",
+    "name": "Invisible Stalker",
+    "size": "Medium",
+    "monster_type": "elemental",
+    "alignment": "neutral",
+    "challenge_rating": 6,
+    "hit_points": 104,
+    "armor_class": 14,
+    "xp": 2300,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "iron-golem",
+    "name": "Iron Golem",
+    "size": "Large",
+    "monster_type": "construct",
+    "alignment": "unaligned",
+    "challenge_rating": 16,
+    "hit_points": 210,
+    "armor_class": 20,
+    "xp": 15000,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "jackal",
+    "name": "Jackal",
+    "size": "Small",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 3,
+    "armor_class": 12,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "killer-whale",
+    "name": "Killer Whale",
+    "size": "Huge",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 3,
+    "hit_points": 90,
+    "armor_class": 12,
+    "xp": 700,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "knight",
+    "name": "Knight",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 3,
+    "hit_points": 52,
+    "armor_class": 18,
+    "xp": 700,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "kobold",
+    "name": "Kobold",
+    "size": "Small",
+    "monster_type": "humanoid",
+    "alignment": "lawful evil",
+    "challenge_rating": 0.125,
+    "hit_points": 5,
+    "armor_class": 12,
+    "xp": 25,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "kraken",
+    "name": "Kraken",
+    "size": "Gargantuan",
+    "monster_type": "monstrosity",
+    "alignment": "chaotic evil",
+    "challenge_rating": 23,
+    "hit_points": 472,
+    "armor_class": 18,
+    "xp": 50000,
+    "theme_tags": [],
+    "biome_tags": [
+      "aquatic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "lamia",
+    "name": "Lamia",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "chaotic evil",
+    "challenge_rating": 4,
+    "hit_points": 97,
+    "armor_class": 13,
+    "xp": 1100,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "lemure",
+    "name": "Lemure",
+    "size": "Medium",
+    "monster_type": "fiend",
+    "alignment": "lawful evil",
+    "challenge_rating": 0,
+    "hit_points": 13,
+    "armor_class": 7,
+    "xp": 10,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "lich",
+    "name": "Lich",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "any evil alignment",
+    "challenge_rating": 21,
+    "hit_points": 135,
+    "armor_class": 17,
+    "xp": 33000,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "lion",
+    "name": "Lion",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 1,
+    "hit_points": 26,
+    "armor_class": 12,
+    "xp": 200,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "lizard",
+    "name": "Lizard",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 2,
+    "armor_class": 10,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "swamp"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "lizardfolk",
+    "name": "Lizardfolk",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "neutral",
+    "challenge_rating": 0.5,
+    "hit_points": 22,
+    "armor_class": 13,
+    "xp": 100,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [
+      "swamp"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "mage",
+    "name": "Mage",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 6,
+    "hit_points": 40,
+    "armor_class": 12,
+    "xp": 2300,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "controller",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "magma-mephit",
+    "name": "Magma Mephit",
+    "size": "Small",
+    "monster_type": "elemental",
+    "alignment": "neutral evil",
+    "challenge_rating": 0.5,
+    "hit_points": 22,
+    "armor_class": 11,
+    "xp": 100,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [
+      "volcanic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "magmin",
+    "name": "Magmin",
+    "size": "Small",
+    "monster_type": "elemental",
+    "alignment": "chaotic neutral",
+    "challenge_rating": 0.5,
+    "hit_points": 9,
+    "armor_class": 14,
+    "xp": 100,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "mammoth",
+    "name": "Mammoth",
+    "size": "Huge",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 6,
+    "hit_points": 126,
+    "armor_class": 13,
+    "xp": 2300,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "manticore",
+    "name": "Manticore",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "lawful evil",
+    "challenge_rating": 3,
+    "hit_points": 68,
+    "armor_class": 14,
+    "xp": 700,
+    "theme_tags": [
+      "mine"
+    ],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "marilith",
+    "name": "Marilith",
+    "size": "Large",
+    "monster_type": "fiend",
+    "alignment": "chaotic evil",
+    "challenge_rating": 16,
+    "hit_points": 189,
+    "armor_class": 18,
+    "xp": 15000,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "mastiff",
+    "name": "Mastiff",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.125,
+    "hit_points": 5,
+    "armor_class": 12,
+    "xp": 25,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "medusa",
+    "name": "Medusa",
+    "size": "Medium",
+    "monster_type": "monstrosity",
+    "alignment": "lawful evil",
+    "challenge_rating": 6,
+    "hit_points": 127,
+    "armor_class": 15,
+    "xp": 2300,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "merfolk",
+    "name": "Merfolk",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "neutral",
+    "challenge_rating": 0.125,
+    "hit_points": 11,
+    "armor_class": 11,
+    "xp": 25,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [
+      "aquatic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "merrow",
+    "name": "Merrow",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "chaotic evil",
+    "challenge_rating": 2,
+    "hit_points": 45,
+    "armor_class": 13,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "mimic",
+    "name": "Mimic",
+    "size": "Medium",
+    "monster_type": "monstrosity",
+    "alignment": "neutral",
+    "challenge_rating": 2,
+    "hit_points": 58,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "minotaur",
+    "name": "Minotaur",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "chaotic evil",
+    "challenge_rating": 3,
+    "hit_points": 76,
+    "armor_class": 14,
+    "xp": 700,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "minotaur-skeleton",
+    "name": "Minotaur Skeleton",
+    "size": "Large",
+    "monster_type": "undead",
+    "alignment": "lawful evil",
+    "challenge_rating": 2,
+    "hit_points": 67,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "mule",
+    "name": "Mule",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.125,
+    "hit_points": 11,
+    "armor_class": 10,
+    "xp": 25,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "mummy",
+    "name": "Mummy",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "lawful evil",
+    "challenge_rating": 3,
+    "hit_points": 58,
+    "armor_class": 11,
+    "xp": 700,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "mummy-lord",
+    "name": "Mummy Lord",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "lawful evil",
+    "challenge_rating": 15,
+    "hit_points": 97,
+    "armor_class": 17,
+    "xp": 13000,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "nalfeshnee",
+    "name": "Nalfeshnee",
+    "size": "Large",
+    "monster_type": "fiend",
+    "alignment": "chaotic evil",
+    "challenge_rating": 13,
+    "hit_points": 184,
+    "armor_class": 18,
+    "xp": 10000,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "night-hag",
+    "name": "Night Hag",
+    "size": "Medium",
+    "monster_type": "fiend",
+    "alignment": "neutral evil",
+    "challenge_rating": 5,
+    "hit_points": 112,
+    "armor_class": 17,
+    "xp": 1800,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [
+      "swamp"
+    ],
+    "combat_role": "controller",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "nightmare",
+    "name": "Nightmare",
+    "size": "Large",
+    "monster_type": "fiend",
+    "alignment": "neutral evil",
+    "challenge_rating": 3,
+    "hit_points": 68,
+    "armor_class": 13,
+    "xp": 700,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [
+      "shadow"
+    ],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "noble",
+    "name": "Noble",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 0.125,
+    "hit_points": 9,
+    "armor_class": 15,
+    "xp": 25,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ochre-jelly",
+    "name": "Ochre Jelly",
+    "size": "Large",
+    "monster_type": "ooze",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 45,
+    "armor_class": 8,
+    "xp": 450,
+    "theme_tags": [
+      "cave",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "octopus",
+    "name": "Octopus",
+    "size": "Small",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 3,
+    "armor_class": 12,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ogre",
+    "name": "Ogre",
+    "size": "Large",
+    "monster_type": "giant",
+    "alignment": "chaotic evil",
+    "challenge_rating": 2,
+    "hit_points": 59,
+    "armor_class": 11,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "ogre-zombie",
+    "name": "Ogre Zombie",
+    "size": "Large",
+    "monster_type": "undead",
+    "alignment": "neutral evil",
+    "challenge_rating": 2,
+    "hit_points": 85,
+    "armor_class": 8,
+    "xp": 450,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "oni",
+    "name": "Oni",
+    "size": "Large",
+    "monster_type": "giant",
+    "alignment": "lawful evil",
+    "challenge_rating": 7,
+    "hit_points": 110,
+    "armor_class": 16,
+    "xp": 2900,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "orc",
+    "name": "Orc",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "chaotic evil",
+    "challenge_rating": 0.5,
+    "hit_points": 15,
+    "armor_class": 13,
+    "xp": 100,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "otyugh",
+    "name": "Otyugh",
+    "size": "Large",
+    "monster_type": "aberration",
+    "alignment": "neutral",
+    "challenge_rating": 5,
+    "hit_points": 114,
+    "armor_class": 14,
+    "xp": 1800,
+    "theme_tags": [
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "owl",
+    "name": "Owl",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 1,
+    "armor_class": 11,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "owlbear",
+    "name": "Owlbear",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 3,
+    "hit_points": 59,
+    "armor_class": 13,
+    "xp": 700,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "panther",
+    "name": "Panther",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 13,
+    "armor_class": 12,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "pegasus",
+    "name": "Pegasus",
+    "size": "Large",
+    "monster_type": "celestial",
+    "alignment": "chaotic good",
+    "challenge_rating": 2,
+    "hit_points": 59,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [
+      "temple"
+    ],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "phase-spider",
+    "name": "Phase Spider",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 3,
+    "hit_points": 32,
+    "armor_class": 13,
+    "xp": 700,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "pit-fiend",
+    "name": "Pit Fiend",
+    "size": "Large",
+    "monster_type": "fiend",
+    "alignment": "lawful evil",
+    "challenge_rating": 20,
+    "hit_points": 300,
+    "armor_class": 19,
+    "xp": 25000,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "planetar",
+    "name": "Planetar",
+    "size": "Large",
+    "monster_type": "celestial",
+    "alignment": "lawful good",
+    "challenge_rating": 16,
+    "hit_points": 200,
+    "armor_class": 19,
+    "xp": 15000,
+    "theme_tags": [
+      "temple"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "plesiosaurus",
+    "name": "Plesiosaurus",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 68,
+    "armor_class": 13,
+    "xp": 450,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "poisonous-snake",
+    "name": "Poisonous Snake",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.125,
+    "hit_points": 2,
+    "armor_class": 13,
+    "xp": 25,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "polar-bear",
+    "name": "Polar Bear",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 42,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "arctic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "pony",
+    "name": "Pony",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.125,
+    "hit_points": 11,
+    "armor_class": 10,
+    "xp": 25,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "priest",
+    "name": "Priest",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 2,
+    "hit_points": 27,
+    "armor_class": 13,
+    "xp": 450,
+    "theme_tags": [
+      "temple",
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "pseudodragon",
+    "name": "Pseudodragon",
+    "size": "Tiny",
+    "monster_type": "dragon",
+    "alignment": "neutral good",
+    "challenge_rating": 0.25,
+    "hit_points": 7,
+    "armor_class": 13,
+    "xp": 50,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "purple-worm",
+    "name": "Purple Worm",
+    "size": "Gargantuan",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 15,
+    "hit_points": 247,
+    "armor_class": 18,
+    "xp": 13000,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "quasit",
+    "name": "Quasit",
+    "size": "Tiny",
+    "monster_type": "fiend",
+    "alignment": "chaotic evil",
+    "challenge_rating": 1,
+    "hit_points": 7,
+    "armor_class": 13,
+    "xp": 200,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "quipper",
+    "name": "Quipper",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 1,
+    "armor_class": 13,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "rakshasa",
+    "name": "Rakshasa",
+    "size": "Medium",
+    "monster_type": "fiend",
+    "alignment": "lawful evil",
+    "challenge_rating": 13,
+    "hit_points": 110,
+    "armor_class": 16,
+    "xp": 10000,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "rat",
+    "name": "Rat",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 1,
+    "armor_class": 10,
+    "xp": 10,
+    "theme_tags": [
+      "cave",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "raven",
+    "name": "Raven",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 1,
+    "armor_class": 12,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "red-dragon-wyrmling",
+    "name": "Red Dragon Wyrmling",
+    "size": "Medium",
+    "monster_type": "dragon",
+    "alignment": "chaotic evil",
+    "challenge_rating": 4,
+    "hit_points": 75,
+    "armor_class": 17,
+    "xp": 1100,
+    "theme_tags": [],
+    "biome_tags": [
+      "volcanic"
+    ],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "reef-shark",
+    "name": "Reef Shark",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 22,
+    "armor_class": 12,
+    "xp": 100,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "aquatic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "remorhaz",
+    "name": "Remorhaz",
+    "size": "Huge",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 11,
+    "hit_points": 195,
+    "armor_class": 17,
+    "xp": 7200,
+    "theme_tags": [],
+    "biome_tags": [
+      "arctic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "rhinoceros",
+    "name": "Rhinoceros",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 45,
+    "armor_class": 11,
+    "xp": 450,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "riding-horse",
+    "name": "Riding Horse",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 13,
+    "armor_class": 10,
+    "xp": 25,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "roc",
+    "name": "Roc",
+    "size": "Gargantuan",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 11,
+    "hit_points": 248,
+    "armor_class": 15,
+    "xp": 7200,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "roper",
+    "name": "Roper",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "neutral evil",
+    "challenge_rating": 5,
+    "hit_points": 93,
+    "armor_class": 20,
+    "xp": 1800,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "rug-of-smothering",
+    "name": "Rug of Smothering",
+    "size": "Large",
+    "monster_type": "construct",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 33,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "rust-monster",
+    "name": "Rust Monster",
+    "size": "Medium",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 27,
+    "armor_class": 14,
+    "xp": 100,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "saber-toothed-tiger",
+    "name": "Saber-Toothed Tiger",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 52,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "sahuagin",
+    "name": "Sahuagin",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "lawful evil",
+    "challenge_rating": 0.5,
+    "hit_points": 22,
+    "armor_class": 12,
+    "xp": 100,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [
+      "aquatic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "salamander",
+    "name": "Salamander",
+    "size": "Large",
+    "monster_type": "elemental",
+    "alignment": "neutral evil",
+    "challenge_rating": 5,
+    "hit_points": 90,
+    "armor_class": 15,
+    "xp": 1800,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [
+      "volcanic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "satyr",
+    "name": "Satyr",
+    "size": "Medium",
+    "monster_type": "fey",
+    "alignment": "chaotic neutral",
+    "challenge_rating": 0.5,
+    "hit_points": 31,
+    "armor_class": 14,
+    "xp": 100,
+    "theme_tags": [],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "scorpion",
+    "name": "Scorpion",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 1,
+    "armor_class": 11,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "scout",
+    "name": "Scout",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 0.5,
+    "hit_points": 16,
+    "armor_class": 13,
+    "xp": 100,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "sniper",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "sea-hag",
+    "name": "Sea Hag",
+    "size": "Medium",
+    "monster_type": "fey",
+    "alignment": "chaotic evil",
+    "challenge_rating": 2,
+    "hit_points": 52,
+    "armor_class": 14,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [
+      "swamp",
+      "aquatic",
+      "forest"
+    ],
+    "combat_role": "controller",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "sea-horse",
+    "name": "Sea Horse",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 1,
+    "armor_class": 11,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "aquatic"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "shadow",
+    "name": "Shadow",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "chaotic evil",
+    "challenge_rating": 0.5,
+    "hit_points": 16,
+    "armor_class": 12,
+    "xp": 100,
+    "theme_tags": [
+      "crypt",
+      "cult"
+    ],
+    "biome_tags": [
+      "shadow"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "shambling-mound",
+    "name": "Shambling Mound",
+    "size": "Large",
+    "monster_type": "plant",
+    "alignment": "unaligned",
+    "challenge_rating": 5,
+    "hit_points": 136,
+    "armor_class": 15,
+    "xp": 1800,
+    "theme_tags": [],
+    "biome_tags": [
+      "swamp"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "shield-guardian",
+    "name": "Shield Guardian",
+    "size": "Large",
+    "monster_type": "construct",
+    "alignment": "unaligned",
+    "challenge_rating": 7,
+    "hit_points": 142,
+    "armor_class": 17,
+    "xp": 2900,
+    "theme_tags": [
+      "ruins",
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "shrieker",
+    "name": "Shrieker",
+    "size": "Medium",
+    "monster_type": "plant",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 13,
+    "armor_class": 5,
+    "xp": 10,
+    "theme_tags": [],
+    "biome_tags": [
+      "swamp"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "silver-dragon-wyrmling",
+    "name": "Silver Dragon Wyrmling",
+    "size": "Medium",
+    "monster_type": "dragon",
+    "alignment": "lawful good",
+    "challenge_rating": 2,
+    "hit_points": 45,
+    "armor_class": 17,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "skeleton",
+    "name": "Skeleton",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "lawful evil",
+    "challenge_rating": 0.25,
+    "hit_points": 13,
+    "armor_class": 13,
+    "xp": 50,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "solar",
+    "name": "Solar",
+    "size": "Large",
+    "monster_type": "celestial",
+    "alignment": "lawful good",
+    "challenge_rating": 21,
+    "hit_points": 243,
+    "armor_class": 21,
+    "xp": 33000,
+    "theme_tags": [
+      "temple"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "specter",
+    "name": "Specter",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "chaotic evil",
+    "challenge_rating": 1,
+    "hit_points": 22,
+    "armor_class": 12,
+    "xp": 200,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [
+      "shadow"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "spider",
+    "name": "Spider",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 1,
+    "armor_class": 12,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "spirit-naga",
+    "name": "Spirit Naga",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "chaotic evil",
+    "challenge_rating": 8,
+    "hit_points": 75,
+    "armor_class": 15,
+    "xp": 3900,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "sprite",
+    "name": "Sprite",
+    "size": "Tiny",
+    "monster_type": "fey",
+    "alignment": "neutral good",
+    "challenge_rating": 0.25,
+    "hit_points": 2,
+    "armor_class": 15,
+    "xp": 50,
+    "theme_tags": [],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "spy",
+    "name": "Spy",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 1,
+    "hit_points": 27,
+    "armor_class": 12,
+    "xp": 200,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "steam-mephit",
+    "name": "Steam Mephit",
+    "size": "Small",
+    "monster_type": "elemental",
+    "alignment": "neutral evil",
+    "challenge_rating": 0.25,
+    "hit_points": 21,
+    "armor_class": 10,
+    "xp": 50,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "stirge",
+    "name": "Stirge",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.125,
+    "hit_points": 2,
+    "armor_class": 14,
+    "xp": 25,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "stone-giant",
+    "name": "Stone Giant",
+    "size": "Huge",
+    "monster_type": "giant",
+    "alignment": "neutral",
+    "challenge_rating": 7,
+    "hit_points": 126,
+    "armor_class": 17,
+    "xp": 2900,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "stone-golem",
+    "name": "Stone Golem",
+    "size": "Large",
+    "monster_type": "construct",
+    "alignment": "unaligned",
+    "challenge_rating": 10,
+    "hit_points": 178,
+    "armor_class": 17,
+    "xp": 5900,
+    "theme_tags": [
+      "cave",
+      "ruins"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "storm-giant",
+    "name": "Storm Giant",
+    "size": "Huge",
+    "monster_type": "giant",
+    "alignment": "chaotic good",
+    "challenge_rating": 13,
+    "hit_points": 230,
+    "armor_class": 16,
+    "xp": 10000,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "succubus-incubus",
+    "name": "Succubus/Incubus",
+    "size": "Medium",
+    "monster_type": "fiend",
+    "alignment": "neutral evil",
+    "challenge_rating": 4,
+    "hit_points": 66,
+    "armor_class": 15,
+    "xp": 1100,
+    "theme_tags": [
+      "temple",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "swarm-of-bats",
+    "name": "Swarm of Bats",
+    "size": "Medium",
+    "monster_type": "swarm of Tiny beasts",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 22,
+    "armor_class": 12,
+    "xp": 50,
+    "theme_tags": [
+      "cave",
+      "fortress",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "swarm-of-beetles",
+    "name": "Swarm of Beetles",
+    "size": "Medium",
+    "monster_type": "swarm of Tiny beasts",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 22,
+    "armor_class": 12,
+    "xp": 100,
+    "theme_tags": [
+      "cave",
+      "fortress",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "swarm-of-centipedes",
+    "name": "Swarm of Centipedes",
+    "size": "Medium",
+    "monster_type": "swarm of Tiny beasts",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 22,
+    "armor_class": 12,
+    "xp": 100,
+    "theme_tags": [
+      "cave",
+      "fortress",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "swarm-of-insects",
+    "name": "Swarm of Insects",
+    "size": "Medium",
+    "monster_type": "swarm of Tiny beasts",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 22,
+    "armor_class": 12,
+    "xp": 100,
+    "theme_tags": [
+      "cave",
+      "fortress",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "swarm-of-poisonous-snakes",
+    "name": "Swarm of Poisonous Snakes",
+    "size": "Medium",
+    "monster_type": "swarm of Tiny beasts",
+    "alignment": "unaligned",
+    "challenge_rating": 2,
+    "hit_points": 36,
+    "armor_class": 14,
+    "xp": 450,
+    "theme_tags": [
+      "cave",
+      "fortress",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "swarm-of-quippers",
+    "name": "Swarm of Quippers",
+    "size": "Medium",
+    "monster_type": "swarm of Tiny beasts",
+    "alignment": "unaligned",
+    "challenge_rating": 1,
+    "hit_points": 28,
+    "armor_class": 13,
+    "xp": 200,
+    "theme_tags": [
+      "cave",
+      "fortress",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "swarm-of-rats",
+    "name": "Swarm of Rats",
+    "size": "Medium",
+    "monster_type": "swarm of Tiny beasts",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 24,
+    "armor_class": 10,
+    "xp": 50,
+    "theme_tags": [
+      "cave",
+      "fortress",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "swarm-of-ravens",
+    "name": "Swarm of Ravens",
+    "size": "Medium",
+    "monster_type": "swarm of Tiny beasts",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 24,
+    "armor_class": 12,
+    "xp": 50,
+    "theme_tags": [
+      "cave",
+      "fortress",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "swarm-of-spiders",
+    "name": "Swarm of Spiders",
+    "size": "Medium",
+    "monster_type": "swarm of Tiny beasts",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 22,
+    "armor_class": 12,
+    "xp": 100,
+    "theme_tags": [
+      "cave",
+      "fortress",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "swarm-of-wasps",
+    "name": "Swarm of Wasps",
+    "size": "Medium",
+    "monster_type": "swarm of Tiny beasts",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 22,
+    "armor_class": 12,
+    "xp": 100,
+    "theme_tags": [
+      "cave",
+      "fortress",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "tarrasque",
+    "name": "Tarrasque",
+    "size": "Gargantuan",
+    "monster_type": "monstrosity",
+    "alignment": "unaligned",
+    "challenge_rating": 30,
+    "hit_points": 676,
+    "armor_class": 25,
+    "xp": 155000,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "thug",
+    "name": "Thug",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any non-good alignment",
+    "challenge_rating": 0.5,
+    "hit_points": 32,
+    "armor_class": 11,
+    "xp": 100,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "tiger",
+    "name": "Tiger",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 1,
+    "hit_points": 37,
+    "armor_class": 12,
+    "xp": 200,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "treant",
+    "name": "Treant",
+    "size": "Huge",
+    "monster_type": "plant",
+    "alignment": "chaotic good",
+    "challenge_rating": 9,
+    "hit_points": 138,
+    "armor_class": 16,
+    "xp": 5000,
+    "theme_tags": [],
+    "biome_tags": [
+      "swamp",
+      "forest"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "tribal-warrior",
+    "name": "Tribal Warrior",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 0.125,
+    "hit_points": 11,
+    "armor_class": 12,
+    "xp": 25,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "triceratops",
+    "name": "Triceratops",
+    "size": "Huge",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 5,
+    "hit_points": 95,
+    "armor_class": 13,
+    "xp": 1800,
+    "theme_tags": [
+      "cave",
+      "sewer"
+    ],
+    "biome_tags": [
+      "arctic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "troll",
+    "name": "Troll",
+    "size": "Large",
+    "monster_type": "giant",
+    "alignment": "chaotic evil",
+    "challenge_rating": 5,
+    "hit_points": 84,
+    "armor_class": 15,
+    "xp": 1800,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "tyrannosaurus-rex",
+    "name": "Tyrannosaurus Rex",
+    "size": "Huge",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 8,
+    "hit_points": 136,
+    "armor_class": 13,
+    "xp": 3900,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "unicorn",
+    "name": "Unicorn",
+    "size": "Large",
+    "monster_type": "celestial",
+    "alignment": "lawful good",
+    "challenge_rating": 5,
+    "hit_points": 67,
+    "armor_class": 12,
+    "xp": 1800,
+    "theme_tags": [
+      "temple"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "vampire-bat",
+    "name": "Vampire, Bat Form",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "lawful evil",
+    "challenge_rating": 13,
+    "hit_points": 144,
+    "armor_class": 16,
+    "xp": 10000,
+    "theme_tags": [
+      "crypt",
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "vampire-mist",
+    "name": "Vampire, Mist Form",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "lawful evil",
+    "challenge_rating": 13,
+    "hit_points": 144,
+    "armor_class": 16,
+    "xp": 10000,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "vampire-spawn",
+    "name": "Vampire Spawn",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "neutral evil",
+    "challenge_rating": 5,
+    "hit_points": 82,
+    "armor_class": 15,
+    "xp": 1800,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "vampire-vampire",
+    "name": "Vampire, Vampire Form",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "lawful evil",
+    "challenge_rating": 13,
+    "hit_points": 144,
+    "armor_class": 16,
+    "xp": 10000,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "veteran",
+    "name": "Veteran",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "any alignment",
+    "challenge_rating": 3,
+    "hit_points": 58,
+    "armor_class": 17,
+    "xp": 700,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "violet-fungus",
+    "name": "Violet Fungus",
+    "size": "Medium",
+    "monster_type": "plant",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 18,
+    "armor_class": 5,
+    "xp": 50,
+    "theme_tags": [],
+    "biome_tags": [
+      "swamp"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "vrock",
+    "name": "Vrock",
+    "size": "Large",
+    "monster_type": "fiend",
+    "alignment": "chaotic evil",
+    "challenge_rating": 6,
+    "hit_points": 104,
+    "armor_class": 15,
+    "xp": 2300,
+    "theme_tags": [
+      "temple",
+      "cave",
+      "cult"
+    ],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "vulture",
+    "name": "Vulture",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 5,
+    "armor_class": 10,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "warhorse",
+    "name": "Warhorse",
+    "size": "Large",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.5,
+    "hit_points": 19,
+    "armor_class": 11,
+    "xp": 100,
+    "theme_tags": [
+      "cave",
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "warhorse-skeleton",
+    "name": "Warhorse Skeleton",
+    "size": "Large",
+    "monster_type": "undead",
+    "alignment": "lawful evil",
+    "challenge_rating": 0.5,
+    "hit_points": 22,
+    "armor_class": 13,
+    "xp": 100,
+    "theme_tags": [
+      "crypt",
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "water-elemental",
+    "name": "Water Elemental",
+    "size": "Large",
+    "monster_type": "elemental",
+    "alignment": "neutral",
+    "challenge_rating": 5,
+    "hit_points": 114,
+    "armor_class": 14,
+    "xp": 1800,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [
+      "aquatic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "weasel",
+    "name": "Weasel",
+    "size": "Tiny",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0,
+    "hit_points": 1,
+    "armor_class": 13,
+    "xp": 10,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "werebear-bear",
+    "name": "Werebear, Bear Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "neutral good",
+    "challenge_rating": 5,
+    "hit_points": 135,
+    "armor_class": 11,
+    "xp": 1800,
+    "theme_tags": [
+      "cave",
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "werebear-human",
+    "name": "Werebear, Human Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "neutral good",
+    "challenge_rating": 5,
+    "hit_points": 135,
+    "armor_class": 10,
+    "xp": 1800,
+    "theme_tags": [
+      "cave",
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "werebear-hybrid",
+    "name": "Werebear, Hybrid Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "neutral good",
+    "challenge_rating": 5,
+    "hit_points": 135,
+    "armor_class": 11,
+    "xp": 1800,
+    "theme_tags": [
+      "cave",
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "wereboar-boar",
+    "name": "Wereboar, Boar Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "neutral evil",
+    "challenge_rating": 4,
+    "hit_points": 78,
+    "armor_class": 11,
+    "xp": 1100,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "wereboar-human",
+    "name": "Wereboar, Human Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "neutral evil",
+    "challenge_rating": 4,
+    "hit_points": 78,
+    "armor_class": 10,
+    "xp": 1100,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "wereboar-hybrid",
+    "name": "Wereboar, Hybrid Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "neutral evil",
+    "challenge_rating": 4,
+    "hit_points": 78,
+    "armor_class": 11,
+    "xp": 1100,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "wererat-human",
+    "name": "Wererat, Human Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "lawful evil",
+    "challenge_rating": 2,
+    "hit_points": 33,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [
+      "fortress",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "wererat-hybrid",
+    "name": "Wererat, Hybrid Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "lawful evil",
+    "challenge_rating": 2,
+    "hit_points": 33,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [
+      "fortress",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "wererat-rat",
+    "name": "Wererat, Rat Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "lawful evil",
+    "challenge_rating": 2,
+    "hit_points": 33,
+    "armor_class": 12,
+    "xp": 450,
+    "theme_tags": [
+      "fortress",
+      "sewer"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "weretiger-human",
+    "name": "Weretiger, Human Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "neutral",
+    "challenge_rating": 4,
+    "hit_points": 120,
+    "armor_class": 12,
+    "xp": 1100,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "weretiger-hybrid",
+    "name": "Weretiger, Hybrid Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "neutral",
+    "challenge_rating": 4,
+    "hit_points": 120,
+    "armor_class": 12,
+    "xp": 1100,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "weretiger-tiger",
+    "name": "Weretiger, Tiger Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "neutral",
+    "challenge_rating": 4,
+    "hit_points": 120,
+    "armor_class": 12,
+    "xp": 1100,
+    "theme_tags": [
+      "fortress"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "werewolf-human",
+    "name": "Werewolf, Human Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "chaotic evil",
+    "challenge_rating": 3,
+    "hit_points": 58,
+    "armor_class": 11,
+    "xp": 700,
+    "theme_tags": [
+      "cave",
+      "fortress"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "werewolf-hybrid",
+    "name": "Werewolf, Hybrid Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "chaotic evil",
+    "challenge_rating": 3,
+    "hit_points": 58,
+    "armor_class": 12,
+    "xp": 700,
+    "theme_tags": [
+      "cave",
+      "fortress"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "werewolf-wolf",
+    "name": "Werewolf, Wolf Form",
+    "size": "Medium",
+    "monster_type": "humanoid",
+    "alignment": "chaotic evil",
+    "challenge_rating": 3,
+    "hit_points": 58,
+    "armor_class": 12,
+    "xp": 700,
+    "theme_tags": [
+      "cave",
+      "fortress"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "white-dragon-wyrmling",
+    "name": "White Dragon Wyrmling",
+    "size": "Medium",
+    "monster_type": "dragon",
+    "alignment": "chaotic evil",
+    "challenge_rating": 2,
+    "hit_points": 32,
+    "armor_class": 16,
+    "xp": 450,
+    "theme_tags": [],
+    "biome_tags": [
+      "arctic"
+    ],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "wight",
+    "name": "Wight",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "neutral evil",
+    "challenge_rating": 3,
+    "hit_points": 45,
+    "armor_class": 14,
+    "xp": 700,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "will-o-wisp",
+    "name": "Will-o'-Wisp",
+    "size": "Tiny",
+    "monster_type": "undead",
+    "alignment": "chaotic evil",
+    "challenge_rating": 2,
+    "hit_points": 22,
+    "armor_class": 19,
+    "xp": 450,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "winter-wolf",
+    "name": "Winter Wolf",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "neutral evil",
+    "challenge_rating": 3,
+    "hit_points": 75,
+    "armor_class": 13,
+    "xp": 700,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "forest",
+      "arctic"
+    ],
+    "combat_role": "brute",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "wolf",
+    "name": "Wolf",
+    "size": "Medium",
+    "monster_type": "beast",
+    "alignment": "unaligned",
+    "challenge_rating": 0.25,
+    "hit_points": 11,
+    "armor_class": 13,
+    "xp": 50,
+    "theme_tags": [
+      "cave"
+    ],
+    "biome_tags": [
+      "forest"
+    ],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "worg",
+    "name": "Worg",
+    "size": "Large",
+    "monster_type": "monstrosity",
+    "alignment": "neutral evil",
+    "challenge_rating": 0.5,
+    "hit_points": 26,
+    "armor_class": 13,
+    "xp": 100,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "wraith",
+    "name": "Wraith",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "neutral evil",
+    "challenge_rating": 5,
+    "hit_points": 67,
+    "armor_class": 13,
+    "xp": 1800,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [
+      "shadow"
+    ],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "wyvern",
+    "name": "Wyvern",
+    "size": "Large",
+    "monster_type": "dragon",
+    "alignment": "unaligned",
+    "challenge_rating": 6,
+    "hit_points": 110,
+    "armor_class": 13,
+    "xp": 2300,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "xorn",
+    "name": "Xorn",
+    "size": "Medium",
+    "monster_type": "elemental",
+    "alignment": "neutral",
+    "challenge_rating": 5,
+    "hit_points": 73,
+    "armor_class": 19,
+    "xp": 1800,
+    "theme_tags": [
+      "ruins",
+      "mine"
+    ],
+    "biome_tags": [],
+    "combat_role": "skirmisher",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "young-black-dragon",
+    "name": "Young Black Dragon",
+    "size": "Large",
+    "monster_type": "dragon",
+    "alignment": "chaotic evil",
+    "challenge_rating": 7,
+    "hit_points": 127,
+    "armor_class": 18,
+    "xp": 2900,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "young-blue-dragon",
+    "name": "Young Blue Dragon",
+    "size": "Large",
+    "monster_type": "dragon",
+    "alignment": "lawful evil",
+    "challenge_rating": 9,
+    "hit_points": 152,
+    "armor_class": 18,
+    "xp": 5000,
+    "theme_tags": [],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "young-brass-dragon",
+    "name": "Young Brass Dragon",
+    "size": "Large",
+    "monster_type": "dragon",
+    "alignment": "chaotic good",
+    "challenge_rating": 6,
+    "hit_points": 110,
+    "armor_class": 17,
+    "xp": 2300,
+    "theme_tags": [],
+    "biome_tags": [
+      "desert"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "young-bronze-dragon",
+    "name": "Young Bronze Dragon",
+    "size": "Large",
+    "monster_type": "dragon",
+    "alignment": "lawful good",
+    "challenge_rating": 8,
+    "hit_points": 142,
+    "armor_class": 18,
+    "xp": 3900,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "young-copper-dragon",
+    "name": "Young Copper Dragon",
+    "size": "Large",
+    "monster_type": "dragon",
+    "alignment": "chaotic good",
+    "challenge_rating": 7,
+    "hit_points": 119,
+    "armor_class": 17,
+    "xp": 2900,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "young-gold-dragon",
+    "name": "Young Gold Dragon",
+    "size": "Large",
+    "monster_type": "dragon",
+    "alignment": "lawful good",
+    "challenge_rating": 10,
+    "hit_points": 178,
+    "armor_class": 18,
+    "xp": 5900,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "young-green-dragon",
+    "name": "Young Green Dragon",
+    "size": "Large",
+    "monster_type": "dragon",
+    "alignment": "lawful evil",
+    "challenge_rating": 8,
+    "hit_points": 136,
+    "armor_class": 18,
+    "xp": 3900,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "young-red-dragon",
+    "name": "Young Red Dragon",
+    "size": "Large",
+    "monster_type": "dragon",
+    "alignment": "chaotic evil",
+    "challenge_rating": 10,
+    "hit_points": 178,
+    "armor_class": 18,
+    "xp": 5900,
+    "theme_tags": [],
+    "biome_tags": [
+      "volcanic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "young-silver-dragon",
+    "name": "Young Silver Dragon",
+    "size": "Large",
+    "monster_type": "dragon",
+    "alignment": "lawful good",
+    "challenge_rating": 9,
+    "hit_points": 168,
+    "armor_class": 18,
+    "xp": 5000,
+    "theme_tags": [],
+    "biome_tags": [],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "young-white-dragon",
+    "name": "Young White Dragon",
+    "size": "Large",
+    "monster_type": "dragon",
+    "alignment": "chaotic evil",
+    "challenge_rating": 6,
+    "hit_points": 133,
+    "armor_class": 17,
+    "xp": 2300,
+    "theme_tags": [],
+    "biome_tags": [
+      "arctic"
+    ],
+    "combat_role": "boss",
+    "boss_suitable": true,
+    "source": "dnd5eapi"
+  },
+  {
+    "index": "zombie",
+    "name": "Zombie",
+    "size": "Medium",
+    "monster_type": "undead",
+    "alignment": "neutral evil",
+    "challenge_rating": 0.25,
+    "hit_points": 22,
+    "armor_class": 8,
+    "xp": 50,
+    "theme_tags": [
+      "crypt"
+    ],
+    "biome_tags": [],
+    "combat_role": "minion",
+    "boss_suitable": false,
+    "source": "dnd5eapi"
+  }
+]

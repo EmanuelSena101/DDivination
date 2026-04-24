@@ -4,6 +4,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 
 from app.analysis.analyzer import analyze_dungeon
+from app.data import dungeon_repo
 from app.data.store import load_sync_status
 from app.generation.dungeon_generator import generate_dungeon
 from app.models import Dungeon, DungeonConfig
@@ -17,7 +18,7 @@ router = APIRouter(prefix="/api/dungeon", tags=["dungeon"])
 
 @router.post("/generate", response_model=Dungeon)
 async def api_generate_dungeon(config: DungeonConfig) -> Dungeon:
-    """Generate a dungeon from configuration."""
+    """Generate a dungeon from configuration and persist it to history."""
     status = load_sync_status()
     if not status.is_synced:
         raise HTTPException(
@@ -27,7 +28,7 @@ async def api_generate_dungeon(config: DungeonConfig) -> Dungeon:
 
     dungeon = generate_dungeon(config)
     dungeon.analysis = analyze_dungeon(dungeon)
-    return dungeon
+    return dungeon_repo.save_dungeon(dungeon)
 
 
 @router.post("/quick-generate", response_model=Dungeon)
@@ -46,7 +47,7 @@ async def api_quick_generate(
     config = DungeonConfig(party_size=party_size, party_level=party_level)
     dungeon = generate_dungeon(config)
     dungeon.analysis = analyze_dungeon(dungeon)
-    return dungeon
+    return dungeon_repo.save_dungeon(dungeon)
 
 
 @router.post("/tactical", response_model=list[TacticalRoomLayout])

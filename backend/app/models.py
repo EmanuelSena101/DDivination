@@ -241,6 +241,7 @@ class DungeonAnalysis(BaseModel):
 
 class Dungeon(BaseModel):
     """A complete generated dungeon."""
+    id: Optional[str] = Field(default=None, description="Persistent short id assigned by the server on save")
     name: str
     seed: int
     config: DungeonConfig
@@ -250,6 +251,32 @@ class Dungeon(BaseModel):
     analysis: Optional[DungeonAnalysis] = None
     narrative_intro: str = ""
     narrative_hook: str = ""
+    created_at: Optional[str] = Field(default=None, description="ISO-8601 timestamp when persisted")
+    favorite: bool = Field(default=False, description="Marked as a favorite by the GM")
+    notes: Optional[str] = Field(default=None, description="GM-only notes attached after play")
+
+
+class DungeonListItem(BaseModel):
+    """Lightweight summary row for history list views."""
+    id: str
+    name: str
+    seed: int
+    created_at: str
+    favorite: bool = False
+    theme: str
+    biome: str
+    party_size: int
+    party_level: int
+    summary: str = ""
+    estimated_difficulty: Optional[str] = None
+    total_rooms: int = 0
+
+
+class DungeonUpdate(BaseModel):
+    """PATCH payload for history rows."""
+    favorite: Optional[bool] = None
+    notes: Optional[str] = None
+    name: Optional[str] = None
 
 
 # ── Sync status ───────────────────────────────────────────────────────────

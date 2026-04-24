@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import "./App.css";
-import { getSyncStatus, startSync, generateDungeon, getBuilderOptions, getTacticalLayouts } from "./api";
-import type { Dungeon, DungeonConfig, SyncStatus, BuilderOptions, Room, TacticalRoomLayout } from "./types";
+import { getSyncStatus, startSync, generateDungeon, getBuilderOptions, getTacticalLayouts, exportDungeonPdf, exportDungeonMarkdown, listDungeons, getStoredDungeon, updateStoredDungeon, deleteStoredDungeon, buildDungeonPermalink } from "./api";
+import type { Dungeon, DungeonConfig, SyncStatus, BuilderOptions, Room, TacticalRoomLayout, DungeonListItem } from "./types";
 import BattleGrid from "./BattleGrid";
 import { DEFAULT_CONFIG } from "./types";
 
@@ -24,6 +24,78 @@ function SyncIcon({ spinning }: { spinning?: boolean }) {
       <path d="M21 2v6h-6M3 22v-6h6M21 13a9 9 0 0 1-15 6.7L3 17M3 11a9 9 0 0 1 15-6.7L21 7" />
     </svg>
   );
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  );
+}
+
+function StarIcon({ filled = false }: { filled?: boolean }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+      <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+    </svg>
+  );
+}
+
+function ShareIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+    </svg>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+
+function XIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
+function formatRelative(iso: string): string {
+  const ts = Date.parse(iso);
+  if (Number.isNaN(ts)) return iso;
+  const diffMs = Date.now() - ts;
+  const sec = Math.round(diffMs / 1000);
+  if (sec < 45) return "just now";
+  const min = Math.round(sec / 60);
+  if (min < 45) return `${min} min ago`;
+  const hr = Math.round(min / 60);
+  if (hr < 24) return `${hr} hr ago`;
+  const day = Math.round(hr / 24);
+  if (day < 30) return `${day}d ago`;
+  return new Date(ts).toLocaleDateString();
 }
 
 function difficultyColor(diff: string): string {
@@ -393,6 +465,127 @@ function AnalysisPanel({ dungeon }: { dungeon: Dungeon }) {
   );
 }
 
+function HistoryDrawer({
+  open, items, loading, filter, onFilterChange, onClose, onLoad, onDelete, onToggleFavorite, activeId,
+}: {
+  open: boolean;
+  items: DungeonListItem[];
+  loading: boolean;
+  filter: "all" | "favorites";
+  onFilterChange: (f: "all" | "favorites") => void;
+  onClose: () => void;
+  onLoad: (id: string) => void;
+  onDelete: (id: string) => void;
+  onToggleFavorite: (id: string, next: boolean) => void;
+  activeId: string | null;
+}) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-40 flex">
+      <div className="flex-1 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <aside className="w-full sm:w-[420px] bg-slate-800 border-l border-slate-700 shadow-2xl flex flex-col">
+        <header className="px-5 py-4 border-b border-slate-700 flex items-center gap-3">
+          <span className="text-purple-400"><ClockIcon /></span>
+          <h3 className="text-lg font-semibold text-slate-100 flex-1">History</h3>
+          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded-lg transition-colors" title="Close">
+            <XIcon />
+          </button>
+        </header>
+
+        <div className="px-4 py-2 flex gap-1 bg-slate-900/50 border-b border-slate-700">
+          {(["all", "favorites"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => onFilterChange(f)}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                filter === f ? "bg-purple-600 text-white" : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              {f === "all" ? "All" : "Favorites"}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2">
+          {loading ? (
+            <div className="text-center py-10 text-slate-400 text-sm">
+              <div className="inline-block mb-2 text-purple-400"><SyncIcon spinning /></div>
+              <div>Loading…</div>
+            </div>
+          ) : items.length === 0 ? (
+            <div className="text-center py-10 text-slate-400 text-sm">
+              {filter === "favorites" ? "No favorites yet." : "No saved dungeons yet."}
+            </div>
+          ) : (
+            items.map((item) => (
+              <div
+                key={item.id}
+                className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                  activeId === item.id
+                    ? "bg-purple-900/20 border-purple-700"
+                    : "bg-slate-900/40 border-slate-700 hover:bg-slate-900/80"
+                }`}
+                onClick={() => onLoad(item.id)}
+              >
+                <div className="flex items-start gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleFavorite(item.id, !item.favorite);
+                    }}
+                    className={`mt-0.5 transition-colors ${item.favorite ? "text-yellow-400" : "text-slate-500 hover:text-yellow-400"}`}
+                    title={item.favorite ? "Unfavorite" : "Favorite"}
+                  >
+                    <StarIcon filled={item.favorite} />
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-slate-100 text-sm truncate">{item.name}</div>
+                    <div className="text-xs text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
+                      <span>{formatRelative(item.created_at)}</span>
+                      <span>·</span>
+                      <span>{item.total_rooms} rooms</span>
+                      <span>·</span>
+                      <span>Lv {item.party_level} × {item.party_size}</span>
+                    </div>
+                    <div className="text-xs mt-1 flex items-center gap-1.5 flex-wrap">
+                      <span className="px-2 py-0.5 bg-slate-700 text-slate-300 rounded">{item.theme}</span>
+                      <span className="px-2 py-0.5 bg-slate-700 text-slate-300 rounded">{item.biome}</span>
+                      {item.estimated_difficulty && (
+                        <span className={`px-2 py-0.5 rounded border ${difficultyBg(item.estimated_difficulty)} ${difficultyColor(item.estimated_difficulty)}`}>
+                          {item.estimated_difficulty}
+                        </span>
+                      )}
+                    </div>
+                    {item.summary && (
+                      <p className="text-xs text-slate-400 mt-2 line-clamp-2">{item.summary}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (window.confirm(`Delete "${item.name}"? This cannot be undone.`)) {
+                        onDelete(item.id);
+                      }
+                    }}
+                    className="p-1 text-slate-500 hover:text-red-400 transition-colors"
+                    title="Delete"
+                  >
+                    <TrashIcon />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        <footer className="px-5 py-3 border-t border-slate-700 text-xs text-slate-500">
+          {items.length} saved · favorites kept forever · others pruned beyond 100
+        </footer>
+      </aside>
+    </div>
+  );
+}
+
 type AppView = "builder" | "results";
 type BuilderMode = "quick" | "guided" | "advanced";
 
@@ -410,11 +603,56 @@ function App() {
   const [tacticalLayouts, setTacticalLayouts] = useState<TacticalRoomLayout[]>([]);
   const [selectedBattleRoom, setSelectedBattleRoom] = useState<number | null>(null);
   const [loadingTactical, setLoadingTactical] = useState(false);
+  const [exportingFormat, setExportingFormat] = useState<"pdf" | "md" | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState<DungeonListItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState<"all" | "favorites">("all");
+  const [permalinkCopied, setPermalinkCopied] = useState(false);
+  const [favoriting, setFavoriting] = useState(false);
 
   useEffect(() => {
     getSyncStatus().then(setSyncStatus).catch(() => {});
     getBuilderOptions().then(setOptions).catch(() => {});
+
+    // Deep-link support: ?id=<dungeonId> restores a saved dungeon.
+    const params = new URLSearchParams(window.location.search);
+    const deepId = params.get("id");
+    if (deepId) {
+      getStoredDungeon(deepId)
+        .then((d) => {
+          setDungeon(d);
+          setView("results");
+          setActiveTab("map");
+        })
+        .catch((err) => {
+          setError(err instanceof Error ? err.message : "Dungeon not found");
+          // Strip the bad ?id= so subsequent reloads don't keep erroring.
+          const url = new URL(window.location.href);
+          url.searchParams.delete("id");
+          window.history.replaceState(null, "", url.toString());
+        });
+    }
   }, []);
+
+  const syncUrlId = useCallback((id: string | null) => {
+    const url = new URL(window.location.href);
+    if (id) url.searchParams.set("id", id);
+    else url.searchParams.delete("id");
+    window.history.replaceState(null, "", url.toString());
+  }, []);
+
+  const refreshHistory = useCallback(async (filter: "all" | "favorites" = historyFilter) => {
+    setHistoryLoading(true);
+    try {
+      const items = await listDungeons({ favoritesOnly: filter === "favorites", limit: 100 });
+      setHistory(items);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load history");
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, [historyFilter]);
 
   const handleSync = useCallback(async () => {
     setSyncing(true); setError(null);
@@ -429,9 +667,10 @@ function App() {
       const result = await generateDungeon(config);
       setDungeon(result); setView("results"); setActiveTab("map");
       setTacticalLayouts([]); setSelectedBattleRoom(null);
+      syncUrlId(result.id);
     } catch (err) { setError(err instanceof Error ? err.message : "Generation failed"); }
     finally { setLoading(false); }
-  }, [config]);
+  }, [config, syncUrlId]);
 
   const handleReroll = useCallback(async () => {
     setLoading(true); setError(null);
@@ -440,13 +679,84 @@ function App() {
       const result = await generateDungeon(newConfig);
       setDungeon(result); setConfig({ ...newConfig, seed: result.seed });
       setTacticalLayouts([]); setSelectedBattleRoom(null);
+      syncUrlId(result.id);
     } catch (err) { setError(err instanceof Error ? err.message : "Reroll failed"); }
     finally { setLoading(false); }
-  }, [config]);
+  }, [config, syncUrlId]);
 
   const updateConfig = useCallback((key: keyof DungeonConfig, value: unknown) => {
     setConfig((prev) => ({ ...prev, [key]: value }));
   }, []);
+
+  const handleExport = useCallback(async (format: "pdf" | "md") => {
+    if (!dungeon) return;
+    setExportingFormat(format); setError(null);
+    try {
+      if (format === "pdf") await exportDungeonPdf(dungeon);
+      else await exportDungeonMarkdown(dungeon);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : `Export to ${format.toUpperCase()} failed`);
+    } finally { setExportingFormat(null); }
+  }, [dungeon]);
+
+  const handleOpenHistory = useCallback(() => {
+    setShowHistory(true);
+    refreshHistory(historyFilter);
+  }, [refreshHistory, historyFilter]);
+
+  const handleLoadFromHistory = useCallback(async (id: string) => {
+    setLoading(true); setError(null);
+    try {
+      const d = await getStoredDungeon(id);
+      setDungeon(d); setConfig({ ...d.config, seed: d.seed });
+      setView("results"); setActiveTab("map");
+      setTacticalLayouts([]); setSelectedBattleRoom(null);
+      syncUrlId(d.id);
+      setShowHistory(false);
+    } catch (err) { setError(err instanceof Error ? err.message : "Failed to load dungeon"); }
+    finally { setLoading(false); }
+  }, [syncUrlId]);
+
+  const handleDeleteFromHistory = useCallback(async (id: string) => {
+    try {
+      await deleteStoredDungeon(id);
+      setHistory((prev) => prev.filter((h) => h.id !== id));
+      if (dungeon?.id === id) {
+        setDungeon(null); setView("builder"); syncUrlId(null);
+      }
+    } catch (err) { setError(err instanceof Error ? err.message : "Delete failed"); }
+  }, [dungeon, syncUrlId]);
+
+  const handleToggleFavorite = useCallback(async () => {
+    if (!dungeon?.id) return;
+    setFavoriting(true);
+    try {
+      const updated = await updateStoredDungeon(dungeon.id, { favorite: !dungeon.favorite });
+      setDungeon(updated);
+      setHistory((prev) => prev.map((h) => (h.id === updated.id ? { ...h, favorite: updated.favorite } : h)));
+    } catch (err) { setError(err instanceof Error ? err.message : "Favorite toggle failed"); }
+    finally { setFavoriting(false); }
+  }, [dungeon]);
+
+  const handleToggleFavoriteFromHistory = useCallback(async (id: string, nextValue: boolean) => {
+    try {
+      const updated = await updateStoredDungeon(id, { favorite: nextValue });
+      setHistory((prev) => prev.map((h) => (h.id === id ? { ...h, favorite: updated.favorite } : h)));
+      if (dungeon?.id === id) setDungeon(updated);
+    } catch (err) { setError(err instanceof Error ? err.message : "Favorite toggle failed"); }
+  }, [dungeon]);
+
+  const handleSharePermalink = useCallback(async () => {
+    if (!dungeon?.id) return;
+    const url = buildDungeonPermalink(dungeon.id);
+    try {
+      await navigator.clipboard.writeText(url);
+      setPermalinkCopied(true);
+      window.setTimeout(() => setPermalinkCopied(false), 1800);
+    } catch {
+      window.prompt("Copy this permalink:", url);
+    }
+  }, [dungeon]);
 
   return (
     <div className="min-h-screen bg-slate-900">
@@ -475,8 +785,15 @@ function App() {
                 <SyncIcon spinning={syncing} />
               </button>
             </div>
+            <button
+              onClick={handleOpenHistory}
+              className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded-lg transition-colors"
+              title="History"
+            >
+              <ClockIcon />
+            </button>
             {dungeon && view === "results" && (
-              <button onClick={() => setView("builder")}
+              <button onClick={() => { setView("builder"); syncUrlId(null); }}
                 className="px-3 py-1.5 text-sm bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition-colors">
                 {"\u2190"} Builder
               </button>
@@ -646,7 +963,49 @@ function App() {
                   <h2 className="text-2xl font-bold text-slate-100">{dungeon.name}</h2>
                   <p className="text-sm text-slate-400 mt-1">{dungeon.summary}</p>
                 </div>
-                <div className="flex items-center gap-2 ml-4">
+                <div className="flex flex-wrap items-center gap-2 ml-4">
+                  {dungeon.id && (
+                    <button
+                      onClick={handleToggleFavorite}
+                      disabled={favoriting}
+                      className={`p-2 rounded-lg transition-colors text-sm flex items-center gap-1 ${
+                        dungeon.favorite
+                          ? "bg-yellow-500/20 text-yellow-400 border border-yellow-600 hover:bg-yellow-500/30"
+                          : "bg-slate-700/50 text-slate-400 border border-slate-600 hover:bg-slate-700"
+                      }`}
+                      title={dungeon.favorite ? "Remove from favorites" : "Mark as favorite"}
+                    >
+                      <StarIcon filled={dungeon.favorite} />
+                    </button>
+                  )}
+                  {dungeon.id && (
+                    <button
+                      onClick={handleSharePermalink}
+                      className="px-3 py-2 bg-slate-700/50 text-slate-300 border border-slate-600 rounded-lg hover:bg-slate-700 transition-colors text-sm flex items-center gap-1"
+                      title="Copy permalink"
+                    >
+                      <ShareIcon />
+                      {permalinkCopied ? "Copied!" : "Share"}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleExport("pdf")}
+                    disabled={exportingFormat !== null}
+                    className="px-3 py-2 bg-slate-700/50 text-slate-300 border border-slate-600 rounded-lg hover:bg-slate-700 transition-colors disabled:opacity-50 text-sm flex items-center gap-1"
+                    title="Download as PDF"
+                  >
+                    {exportingFormat === "pdf" ? <SyncIcon spinning /> : <DownloadIcon />}
+                    PDF
+                  </button>
+                  <button
+                    onClick={() => handleExport("md")}
+                    disabled={exportingFormat !== null}
+                    className="px-3 py-2 bg-slate-700/50 text-slate-300 border border-slate-600 rounded-lg hover:bg-slate-700 transition-colors disabled:opacity-50 text-sm flex items-center gap-1"
+                    title="Download as Markdown"
+                  >
+                    {exportingFormat === "md" ? <SyncIcon spinning /> : <DownloadIcon />}
+                    Markdown
+                  </button>
                   <button onClick={handleReroll} disabled={loading}
                     className="px-4 py-2 bg-purple-600/20 text-purple-400 border border-purple-700 rounded-lg hover:bg-purple-600/30 transition-colors disabled:opacity-50 text-sm flex items-center gap-1">
                     <DiceIcon /> Reroll
@@ -750,6 +1109,19 @@ function App() {
       <footer className="border-t border-slate-800 px-6 py-4 text-center text-xs text-slate-600 mt-auto">
         DDivination &mdash; Powered by D&D 5e SRD Data &mdash; Not affiliated with Wizards of the Coast
       </footer>
+
+      <HistoryDrawer
+        open={showHistory}
+        items={history}
+        loading={historyLoading}
+        filter={historyFilter}
+        onFilterChange={(f) => { setHistoryFilter(f); refreshHistory(f); }}
+        onClose={() => setShowHistory(false)}
+        onLoad={handleLoadFromHistory}
+        onDelete={handleDeleteFromHistory}
+        onToggleFavorite={handleToggleFavoriteFromHistory}
+        activeId={dungeon?.id ?? null}
+      />
     </div>
   );
 }

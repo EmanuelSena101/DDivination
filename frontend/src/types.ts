@@ -123,6 +123,7 @@ export interface DungeonAnalysis {
 }
 
 export interface Dungeon {
+  id: string | null;
   name: string;
   seed: number;
   config: DungeonConfig;
@@ -132,6 +133,30 @@ export interface Dungeon {
   analysis: DungeonAnalysis | null;
   narrative_intro: string;
   narrative_hook: string;
+  created_at: string | null;
+  favorite: boolean;
+  notes: string | null;
+}
+
+export interface DungeonListItem {
+  id: string;
+  name: string;
+  seed: number;
+  created_at: string;
+  favorite: boolean;
+  theme: string;
+  biome: string;
+  party_size: number;
+  party_level: number;
+  summary: string;
+  estimated_difficulty: string | null;
+  total_rooms: number;
+}
+
+export interface DungeonUpdate {
+  favorite?: boolean;
+  notes?: string;
+  name?: string;
 }
 
 export interface SyncStatus {

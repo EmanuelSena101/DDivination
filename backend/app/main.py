@@ -4,7 +4,10 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.data.db import init_db
 from app.routers.dungeon import router as dungeon_router
+from app.routers.dungeons import router as dungeons_router
+from app.routers.export import router as export_router
 from app.routers.sync import router as sync_router
 
 app = FastAPI(
@@ -22,8 +25,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.on_event("startup")
+async def _startup() -> None:
+    init_db()
+
+
 app.include_router(sync_router)
 app.include_router(dungeon_router)
+app.include_router(dungeons_router)
+app.include_router(export_router)
 
 
 @app.get("/api/health")

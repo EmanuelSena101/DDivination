@@ -54,5 +54,6 @@ coverage.out
 .tools/
 .tmp/
 release/
+!apps/server/internal/webapp/dist/
 apps/server/internal/webapp/dist/*
 !apps/server/internal/webapp/dist/placeholder.txt

@@ -73,6 +73,15 @@ npm audit
   BATCH-001.
 - Parte das rotas ainda não participa do OpenAPI e será tratada na BATCH-002.
 
+## Correções durante a validação
+
+- O primeiro CI da PR #4 revelou que a regra global `dist/` ignorava também o
+  placeholder exigido por `go:embed`.
+- O diretório incorporado foi explicitamente reautorizado no `.gitignore` e o
+  placeholder passou a ser versionado.
+- A falha da Vercel é externa ao GitHub Actions e não representa o modelo de
+  distribuição local-first do projeto.
+
 ## Documentação atualizada
 
 - [x] `docs/STATUS.md`;

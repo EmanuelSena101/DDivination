@@ -24,7 +24,17 @@ function Get-GeneratedTreeFingerprint {
             Sort-Object FullName |
             ForEach-Object {
                 $relative = $_.FullName.Substring($Root.Length).TrimStart("\", "/")
-                "$relative`:$((Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName).Hash)"
+                $content = [System.IO.File]::ReadAllText($_.FullName)
+                $normalized = $content.Replace("`r`n", "`n").Replace("`r", "`n")
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes($normalized)
+                $hasher = [System.Security.Cryptography.SHA256]::Create()
+                try {
+                    $hashBytes = $hasher.ComputeHash($bytes)
+                } finally {
+                    $hasher.Dispose()
+                }
+                $hash = [System.BitConverter]::ToString($hashBytes).Replace("-", "")
+                "$relative`:$hash"
             }
     ) -join "`n"
 }

@@ -90,6 +90,13 @@ fronteira entre administração local e participação pela LAN.
   misturaria mudanças de cache e UX, portanto permanece fora do escopo.
 - O bundle 3D continua acima de 500 kB e permanece atribuído à BATCH-004.
 
+## Correções durante a validação
+
+- O primeiro CI revelou um falso drift no Windows: o checkout usava `CRLF` e o
+  Orval regenerava o mesmo conteúdo com `LF`.
+- O fingerprint passou a normalizar quebras de linha antes do SHA-256, mantendo
+  sensibilidade ao conteúdo e compatibilidade entre plataformas.
+
 ## Documentação atualizada
 
 - [x] `docs/STATUS.md`

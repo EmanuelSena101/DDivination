@@ -1,6 +1,6 @@
 # BATCH-002 — Contratos e fronteiras da API
 
-Estado: `IN_PROGRESS`
+Estado: `DONE`
 
 Issue: [#8](https://github.com/EmanuelSena101/DDivination/issues/8)
 
@@ -55,8 +55,8 @@ fronteira entre administração local e participação pela LAN.
 - [x] rotas administrativas retornam 404 na interface LAN;
 - [x] OpenAPI e cliente Orval não apresentam drift;
 - [x] documentação atualizada;
-- [ ] CI aprovado;
-- [ ] PR mesclada.
+- [x] CI aprovado;
+- [x] PR mesclada.
 
 ## Testes obrigatórios
 
@@ -82,7 +82,9 @@ fronteira entre administração local e participação pela LAN.
 - upload multipart e importação binária descritos no contrato;
 - allowlist LAN coberta por teste para todas as rotas locais;
 - geração e verificação de drift disponíveis por scripts e aliases npm;
-- suíte completa, incluindo Playwright, aprovada localmente.
+- suíte completa, incluindo Playwright, aprovada localmente;
+- GitHub Actions aprovou contrato, web, E2E, workflow Windows e Go
+  multiplataforma.
 
 ## Pendências encontradas
 
@@ -96,6 +98,8 @@ fronteira entre administração local e participação pela LAN.
   Orval regenerava o mesmo conteúdo com `LF`.
 - O fingerprint passou a normalizar quebras de linha antes do SHA-256, mantendo
   sensibilidade ao conteúdo e compatibilidade entre plataformas.
+- A integração externa da Vercel continua falhando, mas não participa da
+  distribuição local-first nem dos checks do projeto.
 
 ## Documentação atualizada
 

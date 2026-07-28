@@ -4,7 +4,7 @@ Estado: `IN_PROGRESS`
 
 Issue: [#8](https://github.com/EmanuelSena101/DDivination/issues/8)
 
-Pull Request: a criar
+Pull Request: [#9](https://github.com/EmanuelSena101/DDivination/pull/9)
 
 ## Contexto
 

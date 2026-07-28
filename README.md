@@ -1,215 +1,139 @@
+# DDivination
 
+DDivination é um gerador determinístico de aventuras compatíveis com 5E 2024 e
+uma VTT 3D local-first. Um único binário Go hospeda a visão do mestre; jogadores
+entram pela rede local usando um código temporário.
 
-## 🔮 **DDivination: The RPG Master's Oracle**
+> O rewrite está em desenvolvimento no branch `rewrite/go-v1`. O MVP anterior
+> permanece disponível na tag `legacy-python-mvp`.
 
-<p align="center">
-<img src="https://img.shields.io/badge/Python-3.9+-blue.svg" alt="Python 3.9+">
-<img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License">
-<img src="https://img.shields.io/badge/Status-In%20Development-orange.svg" alt="In Development">
-</p>
+## Vertical slice disponível
 
-### ✨ **Overview & Philosophy**
+- geração procedural bilíngue reproduzível por `seed + generatorVersion`;
+- mapas com múltiplos andares, salas, corredores, paredes e portais;
+- VTT 3D com câmera orbital, instancing, fog manual e tokens no grid;
+- sessão LAN com papéis `gm`, `player` e `display`;
+- validação autoritativa de movimento e filtragem de conteúdo secreto;
+- dados `d4`, `d6`, `d8`, `d10`, `d12`, `d20` e `d100`, com resultado do
+  servidor e animação física Rapier;
+- iniciativa simples, ping e diário das últimas 100 rolagens no protocolo;
+- SQLite em WAL, snapshots, optimistic locking e pacotes `.ddivination`;
+- upload validado de PNG, WebP e GLB autocontido;
+- enriquecimento narrativo opcional via Responses API, com Structured Outputs,
+  chave somente em memória e fallback procedural;
+- API OpenAPI 3.1 via Huma e configuração Orval;
+- interface em `pt-BR` e `en-US`, sem dependências de rede em runtime.
 
-**DDivination** is an **intelligent and powerful internal tool** designed to revolutionize how RPG Game Masters plan and execute their sessions. By combining advancements in **Data Science, Procedural Generation, Natural Language Processing (NLP), and Visualization**, this project aims to **mitigate the burden of preparation**, allowing creativity and storytelling to shine at the gaming table.
+## Arquitetura
 
-**Our Goal:** To **transform intuitive commands into detailed, balanced, and immersive adventures** for internal use.
-
-Imagine the following prompt:
-*"I want a dungeon in a forgotten temple, with deadly traps and a lich boss, for 4 level 5 adventurers. The atmosphere should be swampy, with aquatic monsters, and there should be rare treasure at the end."*
-
-**DDivination** will not only interpret this complex request but will also:
-
-* **Structure the Dungeon:** Generate a **logical map** with rooms, corridors, and points of interest.
-* **Populate the Environment:** Insert **monsters, traps, and treasures**, balanced for your group.
-* **Analyze Gameplay:** Evaluate **difficulty, identify paths, and assess risk/reward distribution**.
-* **Enhance Narrative:** Suggest **atmospheric descriptions and lore elements** for each room and encounter.
-* **Facilitate Play:** Present all content within the application, with an **option to generate a PDF map**.
-
-**Stop endless prepping; start playing with DDivination!**
-
----
-
-### 🚀 **Key Features**
-
-**DDivination** integrates a **robust set of features** to address the demanding needs of an RPG Game Master:
-
-**Intelligent Dungeon Generation**
-
-* **Natural Language Commands:** Create entire dungeons from simple textual descriptions.
-* **Detailed Customization:** Define themes, sizes, room types, and bosses.
-* **Graph-based Structure:** Dungeons modeled as **graphs**, allowing complex interconnections.
-
-**In-depth Dungeon Analysis**
-
-* **Structural Visualization:** Visual representations of dungeon layouts.
-* **Difficulty Metrics:** Estimated difficulty per room and entire dungeon.
-* **Path Analysis:** Identify routes, optimal paths, dead ends, and backtracking.
-* **Risk and Reward Distribution:** Balanced spacing of treasures and challenges.
-
-**Dynamic Encounter Generation**
-
-* **Contextual Encounters:** Populate rooms based on environment, party level, and theme.
-* **Automatic Balancing:** Combat encounters **fairly challenging** using CR and other metrics.
-* **Treasure Suggestions:** Generate **balanced loot** based on rarity and player power.
-* **Narrative Elements:** Add **atmosphere, NPC motivations, and scene details** via LLMs.
-
-**Output & Visualization**
-
-* **Internal Web UI:** All generated content displayed within the application.
-* **PDF Map Generation:** Export **visual dungeon maps** for offline use.
-* **Interactive Views:** Interactive maps, room tables, and difficulty distribution graphs.
-
----
-
-### 🛠️ **Local Setup**
-
-This repository currently runs as two local applications:
-
-* **Backend:** FastAPI + Poetry
-* **Frontend:** React + Vite
-
-**Requirements**
-
-* **Python 3.10+**
-* **Poetry**
-* **Node.js 22** (recommended via `nvm use`, see `.nvmrc`)
-
-**1. Start the backend**
-
-```bash
-cd backend
-poetry install
-poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```mermaid
+flowchart LR
+  GM["Navegador do mestre"] -->|REST + WebSocket| Go["Servidor Go / Huma"]
+  P["Jogadores na LAN"] -->|WebSocket filtrado| Go
+  Go --> SQLite["SQLite WAL"]
+  Go --> Gen["Gerador determinístico"]
+  Go --> Pack["Pacotes e assets"]
+  GM --> Scene["React Three Fiber + Rapier"]
+  P --> Scene
 ```
 
-**2. Start the frontend**
+O documento persistido é semântico: tiles, paredes, entidades, salas e
+referências de assets. As meshes são derivadas no frontend e nunca entram no
+banco.
 
-```bash
-cd frontend
+## Requisitos para desenvolvimento
+
+- Go 1.26;
+- Node.js 24;
+- npm 11 ou mais recente.
+
+## Executar
+
+Em dois terminais:
+
+```powershell
+cd apps/server
+go run ./cmd/ddivination
+```
+
+```powershell
 npm install
-npm run dev -- --host 0.0.0.0 --port 5173
+npm run dev:web
 ```
 
-**3. Open the app**
+Abra `http://127.0.0.1:5173`. O servidor permanece restrito ao loopback até o
+mestre abrir uma sessão; nesse momento, somente a interface de jogador é
+exposta nos endereços IPv4 privados.
 
-* Frontend: `http://localhost:5173`
-* Backend health check: `http://localhost:8000/api/health`
-* Backend docs: `http://localhost:8000/docs`
+Para servir o build web sem Vite:
 
-**4. First-time sync**
-
-The generator requires local D&D 5e data before creating dungeons. Use the **Sync Now** button in the UI or call:
-
-```bash
-curl -X POST http://localhost:8000/api/sync/start
+```powershell
+npm run build:web
+$env:DDIVINATION_WEB_DIR = (Resolve-Path "apps/web/dist")
+cd apps/server
+go run ./cmd/ddivination
 ```
 
-### 🐳 **Docker Compose**
+## Verificação
 
-This repository can also be started with Docker Compose for a simpler local stack:
-
-```bash
-docker compose up --build
+```powershell
+cd apps/server
+go test ./...
+go vet ./...
 ```
 
-Services:
-
-* Frontend: `http://localhost:5173`
-* Backend: `http://localhost:8000`
-* Backend docs: `http://localhost:8000/docs`
-
-The backend sync data is persisted in the named volume `backend_data`, mapped internally to `/data` through `DDIVINATION_DATA_DIR`.
-
-After the containers are up, run the initial sync once:
-
-```bash
-curl -X POST http://localhost:8000/api/sync/start
+```powershell
+npm run lint:web
+npm run test:web
+npm run build:web
 ```
 
----
+Os testes Go verificam determinismo, conectividade de centenas de seeds,
+portais, persistência SQLite, optimistic locking, permissões, dados, filtragem
+de segredos e segurança de pacotes.
 
-### 💡 **The Idea Behind It: Engineering and Magic**
+## OpenAPI e cliente TypeScript
 
-**DDivination** unites the **rigor of software engineering** with the **magic of world-building**:
+Gere o contrato e o cliente depois de instalar as dependências:
 
-* **Dungeons as Data Structures:** Represent dungeons as **graphs (networkx)** with rooms as nodes and connections as edges.
-* **NLP for Intuition:** **LLMs interpret Game Master's commands** into concrete parameters.
-* **Robust Procedural Generation:** Custom rules and controlled randomness for **unique, coherent content**.
-* **Data Science for Balance:** Algorithms to **balance encounters, loot, and adventure progression**.
-
----
-
-### ⚙️ **Detailed Tech Stack**
-
-**DDivination** uses modern technologies across its stack:
-
-| Layer                       | Tools / Libraries                                           |
-| --------------------------- | ----------------------------------------------------------- |
-| **Backend / Core Logic**    | Python, FastAPI, pandas, NumPy, networkx, random            |
-| **NLP (Interpretation)**    | OpenAI API / Local LLM (Mistral via Ollama), spaCy          |
-| **Procedural Generation**   | Python with custom rules for rooms, paths, encounters       |
-| **Database**                | MongoDB / PostgreSQL, Vector DB (FAISS / Pinecone optional) |
-| **Visualization**           | matplotlib, plotly, Graphviz, pygame (future interactive)   |
-| **Frontend**                | Streamlit / React / Vue                                     |
-| **Export**                  | reportlab (PDF map generation)                              |
-| **Infrastructure / Deploy** | Docker, GitHub Actions, Vercel / Render                     |
-
----
-
-### 📂 **Project Structure**
-
-```
-ddivination/
-├── generation/
-│   ├── dungeon_generator.py
-│   ├── encounter_generator.py
-│   ├── room_types.py
-│   └── assets/
-├── analysis/
-│   ├── difficulty_analyzer.py
-│   ├── path_finder.py
-│   └── loot_analyzer.py
-├── nlp/
-│   ├── prompt_parser.py
-│   ├── llm_integrator.py
-│   └── templates/
-├── ui/
-│   ├── app.py
-│   └── static/
-├── data/
-│   ├── bestiary.json
-│   ├── loot_tables.json
-│   └── narrative_snippets.json
-├── export/
-│   └── pdf_exporter.py
-├── tests/
-│   ├── unit/
-│   └── integration/
-├── utils/
-│   ├── decorators.py
-│   └── helpers.py
-├── main.py
-├── config.py
-├── requirements.txt
-└── README.md
+```powershell
+cd apps/server
+go run ./cmd/openapi | Set-Content -Encoding utf8 ../web/openapi.json
+cd ../..
+npm run api:generate
 ```
 
----
+## Build portátil
 
-### 🤝 **Contributing**
+```powershell
+./scripts/build.ps1 -TargetOS windows -TargetArch amd64
+```
 
-We welcome **contributions** from the internal team and collaborators! Whether it's **code, documentation, ideas, or feedback**, every bit helps DDivination grow. Please refer to **CONTRIBUTING.md** for guidelines.
+O script compila o frontend, o incorpora no binário Go e copia
+`assets/base-pack` ao lado do executável em `release/`.
 
----
+## Dados e segurança
 
-### 📜 **License**
+- O banco fica no diretório de configuração do usuário, em `DDivination/`.
+- `DDIVINATION_DATA_DIR` escolhe um diretório alternativo.
+- Códigos de entrada expiram em 15 minutos e tokens de sessão são efêmeros.
+- A interface LAN não expõe criação, catálogo, importação ou administração.
+- Chaves de IA ainda não são persistidas nem solicitadas pelo vertical slice.
+- Imports rejeitam path traversal, entradas excessivas, hashes divergentes,
+  formatos não permitidos e GLBs com recursos externos.
 
-This project is licensed under the **MIT License** - see the LICENSE file for details.
+## Licenciamento e SRD
 
----
+O catálogo inicial e as aventuras incluem atribuição ao **System Reference
+Document 5.2.1**, de Wizards of the Coast LLC, licenciado sob CC-BY-4.0.
+DDivination não é um produto oficial de D&D.
 
-### 💬 **Contact**
+O pack visual inicial contém somente primitivas procedurais originais sob
+CC0-1.0. Consulte `assets/base-pack/manifest.json` e `LICENSE.md`.
 
-Have **questions, suggestions, or just want to chat** about DDivination? Feel free to **open an issue** or reach out to the project maintainers!
+## Próximos marcos
 
----
+O vertical slice é funcional, mas o release v1 ainda precisa do editor completo,
+regeneração parcial, catálogo SRD ampliado, configuração visual/keychain do
+adapter de IA, regressão visual automatizada, validação formal dos budgets de
+performance e empacotamento do instalador Windows.

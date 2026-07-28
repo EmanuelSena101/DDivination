@@ -6,6 +6,9 @@
     "apps/web"
   ],
   "scripts": {
+    "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev.ps1",
+    "stop": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/stop.ps1",
+    "test:all": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1",
     "dev:web": "npm --workspace apps/web run dev",
     "build:web": "npm --workspace apps/web run build",
     "api:generate": "npm --workspace apps/web run api:generate",

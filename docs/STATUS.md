@@ -44,9 +44,13 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 - bundle inicial da VTT precisa de code splitting;
 - instalador Windows ainda não existe.
 
-## Batch atual
+## Última batch concluída
 
 `BATCH-000 — Baseline e governança`
 
 Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-000-baseline.md](batches/BATCH-000-baseline.md).
+
+## Próxima batch
+
+`BATCH-001 — Experiência de desenvolvimento`

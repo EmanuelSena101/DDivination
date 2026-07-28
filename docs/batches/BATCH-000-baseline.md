@@ -1,10 +1,13 @@
 # BATCH-000 — Baseline e governança
 
-Estado: `VALIDATING`
+Estado: `DONE`
 
 Issue: representada pela Pull Request inicial do rewrite
 
-Pull Request: [#4](https://github.com/EmanuelSena101/DDivination/pull/4)
+Pull Requests:
+
+- [#4 — baseline do rewrite](https://github.com/EmanuelSena101/DDivination/pull/4)
+- [#5 — correção do frontend incorporado](https://github.com/EmanuelSena101/DDivination/pull/5)
 
 ## Contexto
 
@@ -72,6 +75,23 @@ npm audit
 - O fluxo de desenvolvimento ainda exige dois terminais e será tratado na
   BATCH-001.
 - Parte das rotas ainda não participa do OpenAPI e será tratada na BATCH-002.
+
+## Correções durante a validação
+
+- O primeiro CI da PR #4 revelou que a regra global `dist/` ignorava também o
+  placeholder exigido por `go:embed`.
+- O diretório incorporado foi explicitamente reautorizado no `.gitignore` e o
+  placeholder passou a ser versionado.
+- A falha da Vercel é externa ao GitHub Actions e não representa o modelo de
+  distribuição local-first do projeto.
+
+## Resultado
+
+- Baseline do rewrite publicado e incorporado à `main`.
+- Tag `legacy-python-mvp` disponível no GitHub.
+- Build limpo validado em Linux, Windows e macOS.
+- Frontend, E2E e build do servidor aprovados no GitHub Actions.
+- Processo de batches documentado e obrigatório para as próximas entregas.
 
 ## Documentação atualizada
 

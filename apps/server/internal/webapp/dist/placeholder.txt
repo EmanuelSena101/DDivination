@@ -1,0 +1,1 @@
+﻿Frontend production files are copied here temporarily by scripts/build.ps1.

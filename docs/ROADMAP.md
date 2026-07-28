@@ -24,8 +24,8 @@ issue correspondente.
 
 | Batch | Tema | Estado |
 | --- | --- | --- |
-| BATCH-000 | Baseline e governança | VALIDATING |
-| BATCH-001 | Experiência de desenvolvimento | PLANNED |
+| BATCH-000 | Baseline e governança | DONE |
+| BATCH-001 | Experiência de desenvolvimento | READY |
 | BATCH-002 | Contratos e fronteiras da API | PLANNED |
 | BATCH-003 | Instrumentação do VTT | PLANNED |
 | BATCH-004 | Spike e otimização 3D | PLANNED |

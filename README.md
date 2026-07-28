@@ -49,21 +49,29 @@ banco.
 
 ## Executar
 
-Em dois terminais:
+Na raiz do repositório:
 
 ```powershell
-cd apps/server
-go run ./cmd/ddivination
+.\scripts\dev.ps1
 ```
+
+Abra `http://127.0.0.1:5173`. Logs e registros dos processos ficam em
+`.tmp/dev-runtime`.
+
+Para encerrar backend e frontend:
 
 ```powershell
-npm install
-npm run dev:web
+.\scripts\stop.ps1
 ```
 
-Abra `http://127.0.0.1:5173`. O servidor permanece restrito ao loopback até o
-mestre abrir uma sessão; nesse momento, somente a interface de jogador é
-exposta nos endereços IPv4 privados.
+O servidor permanece restrito ao loopback até o mestre abrir uma sessão; nesse
+momento, somente a interface de jogador é exposta nos endereços IPv4 privados.
+
+O `go.work` também permite executar somente o backend a partir da raiz:
+
+```powershell
+go run ./apps/server/cmd/ddivination
+```
 
 Para servir o build web sem Vite:
 
@@ -76,21 +84,23 @@ go run ./cmd/ddivination
 
 ## Verificação
 
-```powershell
-cd apps/server
-go test ./...
-go vet ./...
-```
+Suite completa:
 
 ```powershell
-npm run lint:web
-npm run test:web
-npm run build:web
+.\scripts\test.ps1
+```
+
+Para omitir apenas o E2E:
+
+```powershell
+.\scripts\test.ps1 -SkipE2E
 ```
 
 Os testes Go verificam determinismo, conectividade de centenas de seeds,
 portais, persistência SQLite, optimistic locking, permissões, dados, filtragem
 de segredos e segurança de pacotes.
+
+Consulte [docs/TESTING.md](docs/TESTING.md) para detalhes e diagnóstico.
 
 ## OpenAPI e cliente TypeScript
 

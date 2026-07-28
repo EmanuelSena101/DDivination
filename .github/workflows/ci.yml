@@ -53,3 +53,30 @@ jobs:
       - run: npm run build:web
       - run: npx playwright install --with-deps chromium
       - run: npm --workspace apps/web run test:e2e
+
+  developer-workflow:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+          cache-dependency-path: apps/server/go.sum
+      - run: npm ci
+      - name: Start and stop the development environment
+        shell: pwsh
+        run: |
+          try {
+            .\scripts\dev.ps1 -SkipInstall
+            Invoke-WebRequest -UseBasicParsing -Uri http://127.0.0.1:8080/api/v1/health
+            Invoke-WebRequest -UseBasicParsing -Uri http://127.0.0.1:5173
+          } finally {
+            .\scripts\stop.ps1
+          }
+      - name: Run the unified test command
+        shell: pwsh
+        run: .\scripts\test.ps1 -SkipE2E -SkipInstall

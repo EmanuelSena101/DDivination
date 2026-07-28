@@ -51,6 +51,8 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-000-baseline.md](batches/BATCH-000-baseline.md).
 
-## Próxima batch
+## Batch atual
 
 `BATCH-001 — Experiência de desenvolvimento`
+
+Issue: [#6](https://github.com/EmanuelSena101/DDivination/issues/6)

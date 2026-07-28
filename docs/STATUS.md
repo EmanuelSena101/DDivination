@@ -46,13 +46,11 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 ## Última batch concluída
 
-`BATCH-000 — Baseline e governança`
-
-Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-000-baseline.md](batches/BATCH-000-baseline.md).
-
-## Batch atual
-
 `BATCH-001 — Experiência de desenvolvimento`
 
-Issue: [#6](https://github.com/EmanuelSena101/DDivination/issues/6)
+Consulte [ROADMAP.md](ROADMAP.md) e
+[BATCH-001-dev-workflow.md](batches/BATCH-001-dev-workflow.md).
+
+## Próxima batch planejada
+
+`BATCH-002 — Contratos e fronteiras da API`

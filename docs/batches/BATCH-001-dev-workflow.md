@@ -1,6 +1,6 @@
 # BATCH-001 — Experiência de desenvolvimento
 
-Estado: `IN_PROGRESS`
+Estado: `DONE`
 
 Issue: [#6](https://github.com/EmanuelSena101/DDivination/issues/6)
 
@@ -53,8 +53,8 @@ PowerShell únicos e mensagens de diagnóstico claras.
 - [x] `test.ps1` executa a suite completa;
 - [x] comandos Go pela raiz funcionam com `go.work`;
 - [x] documentação atualizada;
-- [ ] CI aprovado;
-- [ ] PR mesclada.
+- [x] CI aprovado;
+- [x] PR mesclada.
 
 ## Testes obrigatórios
 
@@ -78,12 +78,15 @@ PowerShell únicos e mensagens de diagnóstico claras.
 - uma segunda inicialização foi recusada sem perder o registro dos processos;
 - `stop.ps1` encerrou as duas árvores e liberou as portas 8080 e 5173;
 - os aliases `npm run dev` e `npm run stop` foram validados;
-- as suítes com e sem Playwright passaram localmente.
+- as suítes com e sem Playwright passaram localmente;
+- GitHub Actions aprovou web, E2E, Go multiplataforma e o fluxo Windows.
 
 ## Pendências encontradas
 
 - O bundle web gera um aviso de chunk acima de 500 kB. A otimização pertence à
   BATCH-004 e não impede esta batch.
+- A integração externa da Vercel continua falhando, mas não participa da
+  distribuição local-first nem dos checks do projeto.
 
 ## Documentação atualizada
 

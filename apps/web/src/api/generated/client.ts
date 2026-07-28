@@ -8,6 +8,8 @@
 import type {
   AdventureDocument,
   AdventureSummary,
+  AiEnrichRequest,
+  AssetRef,
   Catalog,
   CreateSessionInputBody,
   CreateSessionResponse,
@@ -16,7 +18,11 @@ import type {
   GenerationResult,
   GenerationRun,
   HealthBody,
-  ListApiV1AdventuresParams
+  ImportAssetBody,
+  JoinRequest,
+  Joined,
+  ListAdventuresParams,
+  Result
 } from './models';
 
 
@@ -53,26 +59,31 @@ export type HTTPStatusCode4xx = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 
 export type HTTPStatusCode5xx = 500 | 501 | 502 | 503 | 504 | 505 | 507 | 511;
 export type HTTPStatusCodes = HTTPStatusCode1xx | HTTPStatusCode2xx | HTTPStatusCode3xx | HTTPStatusCode4xx | HTTPStatusCode5xx;
 
-export type listApiV1AdventuresResponse200 = {
+export type listAdventuresResponse200 = {
   data: AdventureSummary[] | null
   status: 200
 }
 
-export type listApiV1AdventuresResponseDefault = {
+export type listAdventuresResponse422 = {
   data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
+  status: 422
 }
 
-export type listApiV1AdventuresResponseSuccess = (listApiV1AdventuresResponse200) & {
+export type listAdventuresResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type listAdventuresResponseSuccess = (listAdventuresResponse200) & {
   headers: Headers;
 };
-export type listApiV1AdventuresResponseError = (listApiV1AdventuresResponseDefault) & {
+export type listAdventuresResponseError = (listAdventuresResponse422 | listAdventuresResponse500) & {
   headers: Headers;
 };
 
-export type listApiV1AdventuresResponse = (listApiV1AdventuresResponseSuccess | listApiV1AdventuresResponseError)
+export type listAdventuresResponse = (listAdventuresResponseSuccess | listAdventuresResponseError)
 
-export const getListApiV1AdventuresUrl = (params?: ListApiV1AdventuresParams,) => {
+export const getListAdventuresUrl = (params?: ListAdventuresParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -88,11 +99,11 @@ export const getListApiV1AdventuresUrl = (params?: ListApiV1AdventuresParams,) =
 }
 
 /**
- * @summary List API v1 adventures
+ * @summary List adventures
  */
-export const listApiV1Adventures = async (params?: ListApiV1AdventuresParams, options?: RequestInit): Promise<listApiV1AdventuresResponse> => {
+export const listAdventures = async (params?: ListAdventuresParams, options?: RequestInit): Promise<listAdventuresResponse> => {
 
-  const res = await fetch(getListApiV1AdventuresUrl(params),
+  const res = await fetch(getListAdventuresUrl(params),
   {
     ...options,
     method: 'GET'
@@ -104,32 +115,42 @@ export const listApiV1Adventures = async (params?: ListApiV1AdventuresParams, op
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: listApiV1AdventuresResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as listApiV1AdventuresResponse
+  const data: listAdventuresResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as listAdventuresResponse
 }
 
 
 
-export type deleteApiV1AdventuresByIdResponse204 = {
+export type deleteAdventureResponse204 = {
   data: void
   status: 204
 }
 
-export type deleteApiV1AdventuresByIdResponseDefault = {
+export type deleteAdventureResponse404 = {
   data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 204>
+  status: 404
 }
 
-export type deleteApiV1AdventuresByIdResponseSuccess = (deleteApiV1AdventuresByIdResponse204) & {
+export type deleteAdventureResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type deleteAdventureResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type deleteAdventureResponseSuccess = (deleteAdventureResponse204) & {
   headers: Headers;
 };
-export type deleteApiV1AdventuresByIdResponseError = (deleteApiV1AdventuresByIdResponseDefault) & {
+export type deleteAdventureResponseError = (deleteAdventureResponse404 | deleteAdventureResponse422 | deleteAdventureResponse500) & {
   headers: Headers;
 };
 
-export type deleteApiV1AdventuresByIdResponse = (deleteApiV1AdventuresByIdResponseSuccess | deleteApiV1AdventuresByIdResponseError)
+export type deleteAdventureResponse = (deleteAdventureResponseSuccess | deleteAdventureResponseError)
 
-export const getDeleteApiV1AdventuresByIdUrl = (id: string,) => {
+export const getDeleteAdventureUrl = (id: string,) => {
 
 
 
@@ -138,11 +159,11 @@ export const getDeleteApiV1AdventuresByIdUrl = (id: string,) => {
 }
 
 /**
- * @summary Delete API v1 adventures by ID
+ * @summary Delete an adventure
  */
-export const deleteApiV1AdventuresById = async (id: string, options?: RequestInit): Promise<deleteApiV1AdventuresByIdResponse> => {
+export const deleteAdventure = async (id: string, options?: RequestInit): Promise<deleteAdventureResponse> => {
 
-  const res = await fetch(getDeleteApiV1AdventuresByIdUrl(id),
+  const res = await fetch(getDeleteAdventureUrl(id),
   {
     ...options,
     method: 'DELETE'
@@ -154,32 +175,42 @@ export const deleteApiV1AdventuresById = async (id: string, options?: RequestIni
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: deleteApiV1AdventuresByIdResponse['data'] = body ? JSON.parse(body) : undefined
-  return { data, status: res.status, headers: res.headers } as deleteApiV1AdventuresByIdResponse
+  const data: deleteAdventureResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as deleteAdventureResponse
 }
 
 
 
-export type getApiV1AdventuresByIdResponse200 = {
+export type getAdventureResponse200 = {
   data: AdventureDocument
   status: 200
 }
 
-export type getApiV1AdventuresByIdResponseDefault = {
+export type getAdventureResponse404 = {
   data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
+  status: 404
 }
 
-export type getApiV1AdventuresByIdResponseSuccess = (getApiV1AdventuresByIdResponse200) & {
+export type getAdventureResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type getAdventureResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type getAdventureResponseSuccess = (getAdventureResponse200) & {
   headers: Headers;
 };
-export type getApiV1AdventuresByIdResponseError = (getApiV1AdventuresByIdResponseDefault) & {
+export type getAdventureResponseError = (getAdventureResponse404 | getAdventureResponse422 | getAdventureResponse500) & {
   headers: Headers;
 };
 
-export type getApiV1AdventuresByIdResponse = (getApiV1AdventuresByIdResponseSuccess | getApiV1AdventuresByIdResponseError)
+export type getAdventureResponse = (getAdventureResponseSuccess | getAdventureResponseError)
 
-export const getGetApiV1AdventuresByIdUrl = (id: string,) => {
+export const getGetAdventureUrl = (id: string,) => {
 
 
 
@@ -188,11 +219,11 @@ export const getGetApiV1AdventuresByIdUrl = (id: string,) => {
 }
 
 /**
- * @summary Get API v1 adventures by ID
+ * @summary Get an adventure
  */
-export const getApiV1AdventuresById = async (id: string, options?: RequestInit): Promise<getApiV1AdventuresByIdResponse> => {
+export const getAdventure = async (id: string, options?: RequestInit): Promise<getAdventureResponse> => {
 
-  const res = await fetch(getGetApiV1AdventuresByIdUrl(id),
+  const res = await fetch(getGetAdventureUrl(id),
   {
     ...options,
     method: 'GET'
@@ -204,32 +235,52 @@ export const getApiV1AdventuresById = async (id: string, options?: RequestInit):
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getApiV1AdventuresByIdResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getApiV1AdventuresByIdResponse
+  const data: getAdventureResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getAdventureResponse
 }
 
 
 
-export type putApiV1AdventuresByIdResponse200 = {
+export type updateAdventureResponse200 = {
   data: AdventureDocument
   status: 200
 }
 
-export type putApiV1AdventuresByIdResponseDefault = {
+export type updateAdventureResponse400 = {
   data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
+  status: 400
 }
 
-export type putApiV1AdventuresByIdResponseSuccess = (putApiV1AdventuresByIdResponse200) & {
+export type updateAdventureResponse404 = {
+  data: ErrorModel
+  status: 404
+}
+
+export type updateAdventureResponse409 = {
+  data: ErrorModel
+  status: 409
+}
+
+export type updateAdventureResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type updateAdventureResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type updateAdventureResponseSuccess = (updateAdventureResponse200) & {
   headers: Headers;
 };
-export type putApiV1AdventuresByIdResponseError = (putApiV1AdventuresByIdResponseDefault) & {
+export type updateAdventureResponseError = (updateAdventureResponse400 | updateAdventureResponse404 | updateAdventureResponse409 | updateAdventureResponse422 | updateAdventureResponse500) & {
   headers: Headers;
 };
 
-export type putApiV1AdventuresByIdResponse = (putApiV1AdventuresByIdResponseSuccess | putApiV1AdventuresByIdResponseError)
+export type updateAdventureResponse = (updateAdventureResponseSuccess | updateAdventureResponseError)
 
-export const getPutApiV1AdventuresByIdUrl = (id: string,) => {
+export const getUpdateAdventureUrl = (id: string,) => {
 
 
 
@@ -238,12 +289,12 @@ export const getPutApiV1AdventuresByIdUrl = (id: string,) => {
 }
 
 /**
- * @summary Put API v1 adventures by ID
+ * @summary Replace an adventure using optimistic locking
  */
-export const putApiV1AdventuresById = async (id: string,
-    adventureDocument: NonReadonly<AdventureDocument>, options?: RequestInit): Promise<putApiV1AdventuresByIdResponse> => {
+export const updateAdventure = async (id: string,
+    adventureDocument: NonReadonly<AdventureDocument>, options?: RequestInit): Promise<updateAdventureResponse> => {
 
-  const res = await fetch(getPutApiV1AdventuresByIdUrl(id),
+  const res = await fetch(getUpdateAdventureUrl(id),
   {
     ...options,
     method: 'PUT',
@@ -255,32 +306,42 @@ export const putApiV1AdventuresById = async (id: string,
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: putApiV1AdventuresByIdResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as putApiV1AdventuresByIdResponse
+  const data: updateAdventureResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as updateAdventureResponse
 }
 
 
 
-export type postApiV1AdventuresByIdCheckpointsResponse200 = {
+export type checkpointAdventureResponse200 = {
   data: AdventureDocument
   status: 200
 }
 
-export type postApiV1AdventuresByIdCheckpointsResponseDefault = {
+export type checkpointAdventureResponse404 = {
   data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
+  status: 404
 }
 
-export type postApiV1AdventuresByIdCheckpointsResponseSuccess = (postApiV1AdventuresByIdCheckpointsResponse200) & {
+export type checkpointAdventureResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type checkpointAdventureResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type checkpointAdventureResponseSuccess = (checkpointAdventureResponse200) & {
   headers: Headers;
 };
-export type postApiV1AdventuresByIdCheckpointsResponseError = (postApiV1AdventuresByIdCheckpointsResponseDefault) & {
+export type checkpointAdventureResponseError = (checkpointAdventureResponse404 | checkpointAdventureResponse422 | checkpointAdventureResponse500) & {
   headers: Headers;
 };
 
-export type postApiV1AdventuresByIdCheckpointsResponse = (postApiV1AdventuresByIdCheckpointsResponseSuccess | postApiV1AdventuresByIdCheckpointsResponseError)
+export type checkpointAdventureResponse = (checkpointAdventureResponseSuccess | checkpointAdventureResponseError)
 
-export const getPostApiV1AdventuresByIdCheckpointsUrl = (id: string,) => {
+export const getCheckpointAdventureUrl = (id: string,) => {
 
 
 
@@ -289,11 +350,11 @@ export const getPostApiV1AdventuresByIdCheckpointsUrl = (id: string,) => {
 }
 
 /**
- * @summary Post API v1 adventures by ID checkpoints
+ * @summary Create an immutable adventure checkpoint
  */
-export const postApiV1AdventuresByIdCheckpoints = async (id: string, options?: RequestInit): Promise<postApiV1AdventuresByIdCheckpointsResponse> => {
+export const checkpointAdventure = async (id: string, options?: RequestInit): Promise<checkpointAdventureResponse> => {
 
-  const res = await fetch(getPostApiV1AdventuresByIdCheckpointsUrl(id),
+  const res = await fetch(getCheckpointAdventureUrl(id),
   {
     ...options,
     method: 'POST'
@@ -305,45 +366,230 @@ export const postApiV1AdventuresByIdCheckpoints = async (id: string, options?: R
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: postApiV1AdventuresByIdCheckpointsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as postApiV1AdventuresByIdCheckpointsResponse
+  const data: checkpointAdventureResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as checkpointAdventureResponse
 }
 
 
 
-export type getApiV1CatalogResponse200 = {
-  data: Catalog
+export type exportAdventureMarkdownResponse200 = {
+  data: string
   status: 200
 }
 
-export type getApiV1CatalogResponseDefault = {
+export type exportAdventureMarkdownResponse404 = {
   data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
+  status: 404
 }
 
-export type getApiV1CatalogResponseSuccess = (getApiV1CatalogResponse200) & {
+export type exportAdventureMarkdownResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type exportAdventureMarkdownResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type exportAdventureMarkdownResponseSuccess = (exportAdventureMarkdownResponse200) & {
   headers: Headers;
 };
-export type getApiV1CatalogResponseError = (getApiV1CatalogResponseDefault) & {
+export type exportAdventureMarkdownResponseError = (exportAdventureMarkdownResponse404 | exportAdventureMarkdownResponse422 | exportAdventureMarkdownResponse500) & {
   headers: Headers;
 };
 
-export type getApiV1CatalogResponse = (getApiV1CatalogResponseSuccess | getApiV1CatalogResponseError)
+export type exportAdventureMarkdownResponse = (exportAdventureMarkdownResponseSuccess | exportAdventureMarkdownResponseError)
 
-export const getGetApiV1CatalogUrl = () => {
-
-
+export const getExportAdventureMarkdownUrl = (id: string,) => {
 
 
-  return `/api/v1/catalog`
+
+
+  return `/api/v1/adventures/${id}/export.md`
 }
 
 /**
- * @summary Get API v1 catalog
+ * @summary Export an adventure as Markdown
  */
-export const getApiV1Catalog = async ( options?: RequestInit): Promise<getApiV1CatalogResponse> => {
+export const exportAdventureMarkdown = async (id: string, options?: RequestInit): Promise<exportAdventureMarkdownResponse> => {
 
-  const res = await fetch(getGetApiV1CatalogUrl(),
+  const res = await fetch(getExportAdventureMarkdownUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+  const contentType = (res.headers.get('content-type') ?? '').toLowerCase();
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: exportAdventureMarkdownResponse['data'] = body ? (contentType.includes('json') ? JSON.parse(body) : body) : {}
+  return { data, status: res.status, headers: res.headers } as exportAdventureMarkdownResponse
+}
+
+
+
+export type printAdventureResponse200 = {
+  data: string
+  status: 200
+}
+
+export type printAdventureResponse404 = {
+  data: ErrorModel
+  status: 404
+}
+
+export type printAdventureResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type printAdventureResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type printAdventureResponseSuccess = (printAdventureResponse200) & {
+  headers: Headers;
+};
+export type printAdventureResponseError = (printAdventureResponse404 | printAdventureResponse422 | printAdventureResponse500) & {
+  headers: Headers;
+};
+
+export type printAdventureResponse = (printAdventureResponseSuccess | printAdventureResponseError)
+
+export const getPrintAdventureUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/adventures/${id}/print`
+}
+
+/**
+ * @summary Render a printable adventure as HTML
+ */
+export const printAdventure = async (id: string, options?: RequestInit): Promise<printAdventureResponse> => {
+
+  const res = await fetch(getPrintAdventureUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+  const contentType = (res.headers.get('content-type') ?? '').toLowerCase();
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: printAdventureResponse['data'] = body ? (contentType.includes('json') ? JSON.parse(body) : body) : {}
+  return { data, status: res.status, headers: res.headers } as printAdventureResponse
+}
+
+
+
+export type enrichAdventureResponse200 = {
+  data: Result
+  status: 200
+}
+
+export type enrichAdventureResponse400 = {
+  data: ErrorModel
+  status: 400
+}
+
+export type enrichAdventureResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type enrichAdventureResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type enrichAdventureResponse502 = {
+  data: ErrorModel
+  status: 502
+}
+
+export type enrichAdventureResponseSuccess = (enrichAdventureResponse200) & {
+  headers: Headers;
+};
+export type enrichAdventureResponseError = (enrichAdventureResponse400 | enrichAdventureResponse422 | enrichAdventureResponse500 | enrichAdventureResponse502) & {
+  headers: Headers;
+};
+
+export type enrichAdventureResponse = (enrichAdventureResponseSuccess | enrichAdventureResponseError)
+
+export const getEnrichAdventureUrl = () => {
+
+
+
+
+  return `/api/v1/ai/enrich`
+}
+
+/**
+ * @summary Enrich an adventure specification with optional AI
+ */
+export const enrichAdventure = async (aiEnrichRequest: NonReadonly<AiEnrichRequest>, options?: RequestInit): Promise<enrichAdventureResponse> => {
+
+  const res = await fetch(getEnrichAdventureUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(aiEnrichRequest)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: enrichAdventureResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as enrichAdventureResponse
+}
+
+
+
+export type listAssetsResponse200 = {
+  data: AssetRef[] | null
+  status: 200
+}
+
+export type listAssetsResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type listAssetsResponseSuccess = (listAssetsResponse200) & {
+  headers: Headers;
+};
+export type listAssetsResponseError = (listAssetsResponse500) & {
+  headers: Headers;
+};
+
+export type listAssetsResponse = (listAssetsResponseSuccess | listAssetsResponseError)
+
+export const getListAssetsUrl = () => {
+
+
+
+
+  return `/api/v1/assets`
+}
+
+/**
+ * @summary List imported assets
+ */
+export const listAssets = async ( options?: RequestInit): Promise<listAssetsResponse> => {
+
+  const res = await fetch(getListAssetsUrl(),
   {
     ...options,
     method: 'GET'
@@ -355,8 +601,126 @@ export const getApiV1Catalog = async ( options?: RequestInit): Promise<getApiV1C
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getApiV1CatalogResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getApiV1CatalogResponse
+  const data: listAssetsResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as listAssetsResponse
+}
+
+
+
+export type importAssetResponse201 = {
+  data: AssetRef
+  status: 201
+}
+
+export type importAssetResponse400 = {
+  data: ErrorModel
+  status: 400
+}
+
+export type importAssetResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type importAssetResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type importAssetResponseSuccess = (importAssetResponse201) & {
+  headers: Headers;
+};
+export type importAssetResponseError = (importAssetResponse400 | importAssetResponse422 | importAssetResponse500) & {
+  headers: Headers;
+};
+
+export type importAssetResponse = (importAssetResponseSuccess | importAssetResponseError)
+
+export const getImportAssetUrl = () => {
+
+
+
+
+  return `/api/v1/assets`
+}
+
+/**
+ * @summary Import a PNG, WebP, or self-contained GLB
+ */
+export const importAsset = async (importAssetBody: ImportAssetBody, options?: RequestInit): Promise<importAssetResponse> => {
+    const formData = new FormData();
+if(importAssetBody.creator !== undefined) {
+ formData.append(`creator`, importAssetBody.creator instanceof Blob ? importAssetBody.creator : new Blob([importAssetBody.creator], { type: 'text/plain' }));
+ }
+formData.append(`file`, importAssetBody.file);
+if(importAssetBody.license !== undefined) {
+ formData.append(`license`, importAssetBody.license instanceof Blob ? importAssetBody.license : new Blob([importAssetBody.license], { type: 'text/plain' }));
+ }
+
+  const res = await fetch(getImportAssetUrl(),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body: formData
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: importAssetResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as importAssetResponse
+}
+
+
+
+export type getCatalogResponse200 = {
+  data: Catalog
+  status: 200
+}
+
+export type getCatalogResponseDefault = {
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type getCatalogResponseSuccess = (getCatalogResponse200) & {
+  headers: Headers;
+};
+export type getCatalogResponseError = (getCatalogResponseDefault) & {
+  headers: Headers;
+};
+
+export type getCatalogResponse = (getCatalogResponseSuccess | getCatalogResponseError)
+
+export const getGetCatalogUrl = () => {
+
+
+
+
+  return `/api/v1/catalog`
+}
+
+/**
+ * @summary Get the bundled 5E-compatible catalog
+ */
+export const getCatalog = async ( options?: RequestInit): Promise<getCatalogResponse> => {
+
+  const res = await fetch(getGetCatalogUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCatalogResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getCatalogResponse
 }
 
 
@@ -366,15 +730,25 @@ export type createGenerationRunResponse202 = {
   status: 202
 }
 
-export type createGenerationRunResponseDefault = {
+export type createGenerationRunResponse400 = {
   data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 202>
+  status: 400
+}
+
+export type createGenerationRunResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type createGenerationRunResponse500 = {
+  data: ErrorModel
+  status: 500
 }
 
 export type createGenerationRunResponseSuccess = (createGenerationRunResponse202) & {
   headers: Headers;
 };
-export type createGenerationRunResponseError = (createGenerationRunResponseDefault) & {
+export type createGenerationRunResponseError = (createGenerationRunResponse400 | createGenerationRunResponse422 | createGenerationRunResponse500) & {
   headers: Headers;
 };
 
@@ -411,26 +785,36 @@ export const createGenerationRun = async (generationInputBody: NonReadonly<Gener
 
 
 
-export type getApiV1GenerationRunsByIdResponse200 = {
+export type getGenerationRunResponse200 = {
   data: GenerationRun
   status: 200
 }
 
-export type getApiV1GenerationRunsByIdResponseDefault = {
+export type getGenerationRunResponse404 = {
   data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
+  status: 404
 }
 
-export type getApiV1GenerationRunsByIdResponseSuccess = (getApiV1GenerationRunsByIdResponse200) & {
+export type getGenerationRunResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type getGenerationRunResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type getGenerationRunResponseSuccess = (getGenerationRunResponse200) & {
   headers: Headers;
 };
-export type getApiV1GenerationRunsByIdResponseError = (getApiV1GenerationRunsByIdResponseDefault) & {
+export type getGenerationRunResponseError = (getGenerationRunResponse404 | getGenerationRunResponse422 | getGenerationRunResponse500) & {
   headers: Headers;
 };
 
-export type getApiV1GenerationRunsByIdResponse = (getApiV1GenerationRunsByIdResponseSuccess | getApiV1GenerationRunsByIdResponseError)
+export type getGenerationRunResponse = (getGenerationRunResponseSuccess | getGenerationRunResponseError)
 
-export const getGetApiV1GenerationRunsByIdUrl = (id: string,) => {
+export const getGetGenerationRunUrl = (id: string,) => {
 
 
 
@@ -439,11 +823,11 @@ export const getGetApiV1GenerationRunsByIdUrl = (id: string,) => {
 }
 
 /**
- * @summary Get API v1 generation runs by ID
+ * @summary Get a generation run
  */
-export const getApiV1GenerationRunsById = async (id: string, options?: RequestInit): Promise<getApiV1GenerationRunsByIdResponse> => {
+export const getGenerationRun = async (id: string, options?: RequestInit): Promise<getGenerationRunResponse> => {
 
-  const res = await fetch(getGetApiV1GenerationRunsByIdUrl(id),
+  const res = await fetch(getGetGenerationRunUrl(id),
   {
     ...options,
     method: 'GET'
@@ -455,32 +839,32 @@ export const getApiV1GenerationRunsById = async (id: string, options?: RequestIn
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getApiV1GenerationRunsByIdResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getApiV1GenerationRunsByIdResponse
+  const data: getGenerationRunResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getGenerationRunResponse
 }
 
 
 
-export type getApiV1HealthResponse200 = {
+export type getHealthResponse200 = {
   data: HealthBody
   status: 200
 }
 
-export type getApiV1HealthResponseDefault = {
+export type getHealthResponseDefault = {
   data: ErrorModel
   status: Exclude<HTTPStatusCodes, 200>
 }
 
-export type getApiV1HealthResponseSuccess = (getApiV1HealthResponse200) & {
+export type getHealthResponseSuccess = (getHealthResponse200) & {
   headers: Headers;
 };
-export type getApiV1HealthResponseError = (getApiV1HealthResponseDefault) & {
+export type getHealthResponseError = (getHealthResponseDefault) & {
   headers: Headers;
 };
 
-export type getApiV1HealthResponse = (getApiV1HealthResponseSuccess | getApiV1HealthResponseError)
+export type getHealthResponse = (getHealthResponseSuccess | getHealthResponseError)
 
-export const getGetApiV1HealthUrl = () => {
+export const getGetHealthUrl = () => {
 
 
 
@@ -489,11 +873,11 @@ export const getGetApiV1HealthUrl = () => {
 }
 
 /**
- * @summary Get API v1 health
+ * @summary Report server and schema versions
  */
-export const getApiV1Health = async ( options?: RequestInit): Promise<getApiV1HealthResponse> => {
+export const getHealth = async ( options?: RequestInit): Promise<getHealthResponse> => {
 
-  const res = await fetch(getGetApiV1HealthUrl(),
+  const res = await fetch(getGetHealthUrl(),
   {
     ...options,
     method: 'GET'
@@ -505,8 +889,127 @@ export const getApiV1Health = async ( options?: RequestInit): Promise<getApiV1He
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getApiV1HealthResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getApiV1HealthResponse
+  const data: getHealthResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getHealthResponse
+}
+
+
+
+export type importPackageResponse201 = {
+  data: AdventureDocument
+  status: 201
+}
+
+export type importPackageResponse413 = {
+  data: ErrorModel
+  status: 413
+}
+
+export type importPackageResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type importPackageResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type importPackageResponseSuccess = (importPackageResponse201) & {
+  headers: Headers;
+};
+export type importPackageResponseError = (importPackageResponse413 | importPackageResponse422 | importPackageResponse500) & {
+  headers: Headers;
+};
+
+export type importPackageResponse = (importPackageResponseSuccess | importPackageResponseError)
+
+export const getImportPackageUrl = () => {
+
+
+
+
+  return `/api/v1/packages`
+}
+
+/**
+ * @summary Import a portable DDivination package
+ */
+export const importPackage = async (importPackageBody: Blob, options?: RequestInit): Promise<importPackageResponse> => {
+
+  const res = await fetch(getImportPackageUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/vnd.ddivination+zip', ...options?.headers },
+    body: JSON.stringify(importPackageBody)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: importPackageResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as importPackageResponse
+}
+
+
+
+export type exportPackageResponse200 = {
+  data: Blob
+  status: 200
+}
+
+export type exportPackageResponse404 = {
+  data: ErrorModel
+  status: 404
+}
+
+export type exportPackageResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type exportPackageResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type exportPackageResponseSuccess = (exportPackageResponse200) & {
+  headers: Headers;
+};
+export type exportPackageResponseError = (exportPackageResponse404 | exportPackageResponse422 | exportPackageResponse500) & {
+  headers: Headers;
+};
+
+export type exportPackageResponse = (exportPackageResponseSuccess | exportPackageResponseError)
+
+export const getExportPackageUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/packages/${id}`
+}
+
+/**
+ * @summary Export a portable DDivination package
+ */
+export const exportPackage = async (id: string, options?: RequestInit): Promise<exportPackageResponse> => {
+
+  const res = await fetch(getExportPackageUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: exportPackageResponse['data'] = body as exportPackageResponse['data']
+  return { data, status: res.status, headers: res.headers } as exportPackageResponse
 }
 
 
@@ -516,15 +1019,25 @@ export type createSessionResponse200 = {
   status: 200
 }
 
-export type createSessionResponseDefault = {
+export type createSessionResponse404 = {
   data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
+  status: 404
+}
+
+export type createSessionResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type createSessionResponse500 = {
+  data: ErrorModel
+  status: 500
 }
 
 export type createSessionResponseSuccess = (createSessionResponse200) & {
   headers: Headers;
 };
-export type createSessionResponseError = (createSessionResponseDefault) & {
+export type createSessionResponseError = (createSessionResponse404 | createSessionResponse422 | createSessionResponse500) & {
   headers: Headers;
 };
 
@@ -557,4 +1070,145 @@ export const createSession = async (createSessionInputBody: NonReadonly<CreateSe
 
   const data: createSessionResponse['data'] = body ? JSON.parse(body) : {}
   return { data, status: res.status, headers: res.headers } as createSessionResponse
+}
+
+
+
+export type closeSessionResponse204 = {
+  data: void
+  status: 204
+}
+
+export type closeSessionResponse401 = {
+  data: ErrorModel
+  status: 401
+}
+
+export type closeSessionResponse403 = {
+  data: ErrorModel
+  status: 403
+}
+
+export type closeSessionResponse404 = {
+  data: ErrorModel
+  status: 404
+}
+
+export type closeSessionResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type closeSessionResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type closeSessionResponseSuccess = (closeSessionResponse204) & {
+  headers: Headers;
+};
+export type closeSessionResponseError = (closeSessionResponse401 | closeSessionResponse403 | closeSessionResponse404 | closeSessionResponse422 | closeSessionResponse500) & {
+  headers: Headers;
+};
+
+export type closeSessionResponse = (closeSessionResponseSuccess | closeSessionResponseError)
+
+export const getCloseSessionUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/sessions/${id}`
+}
+
+/**
+ * @summary Close a VTT session
+ */
+export const closeSession = async (id: string, options?: RequestInit): Promise<closeSessionResponse> => {
+
+  const res = await fetch(getCloseSessionUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: closeSessionResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as closeSessionResponse
+}
+
+
+
+export type joinSessionResponse200 = {
+  data: Joined
+  status: 200
+}
+
+export type joinSessionResponse400 = {
+  data: ErrorModel
+  status: 400
+}
+
+export type joinSessionResponse401 = {
+  data: ErrorModel
+  status: 401
+}
+
+export type joinSessionResponse404 = {
+  data: ErrorModel
+  status: 404
+}
+
+export type joinSessionResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type joinSessionResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type joinSessionResponseSuccess = (joinSessionResponse200) & {
+  headers: Headers;
+};
+export type joinSessionResponseError = (joinSessionResponse400 | joinSessionResponse401 | joinSessionResponse404 | joinSessionResponse422 | joinSessionResponse500) & {
+  headers: Headers;
+};
+
+export type joinSessionResponse = (joinSessionResponseSuccess | joinSessionResponseError)
+
+export const getJoinSessionUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/sessions/${id}/join`
+}
+
+/**
+ * @summary Exchange a temporary code for a session token
+ */
+export const joinSession = async (id: string,
+    joinRequest: NonReadonly<JoinRequest>, options?: RequestInit): Promise<joinSessionResponse> => {
+
+  const res = await fetch(getJoinSessionUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(joinRequest)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: joinSessionResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as joinSessionResponse
 }

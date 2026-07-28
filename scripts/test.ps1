@@ -54,6 +54,9 @@ try {
     Invoke-DDivinationStep "Build Go" {
         & $goExe -C (Join-Path $repoRoot "apps\server") build -o $testBinary ./cmd/ddivination
     }
+    Invoke-DDivinationStep "Contrato OpenAPI e cliente TypeScript" {
+        & (Join-Path $repoRoot "scripts\check-contract.ps1") -SkipInstall
+    }
     Invoke-DDivinationStep "TypeScript strict" {
         & $nodeTools.Npm run lint:web
     }

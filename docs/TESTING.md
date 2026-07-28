@@ -53,10 +53,26 @@ Sem Playwright:
 .\scripts\test.ps1 -SkipE2E
 ```
 
-O script executa testes, vet e build Go; TypeScript strict; Vitest; build Vite;
-e, por padrão, Playwright.
+O script executa testes, vet e build Go; verifica drift do OpenAPI e do cliente
+Orval; executa TypeScript strict, Vitest, build Vite e, por padrão, Playwright.
 
 O E2E exige a porta 8080 livre porque inicia um servidor isolado.
+
+## Contrato da API
+
+Regenerar OpenAPI e cliente TypeScript:
+
+```powershell
+.\scripts\generate-contract.ps1
+```
+
+Verificar que os artefatos estão sincronizados:
+
+```powershell
+.\scripts\check-contract.ps1
+```
+
+O CI executa essa verificação em um job dedicado.
 
 ## Go workspace
 

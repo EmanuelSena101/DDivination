@@ -26,7 +26,7 @@ issue correspondente.
 | --- | --- | --- |
 | BATCH-000 | Baseline e governança | DONE |
 | BATCH-001 | Experiência de desenvolvimento | DONE |
-| BATCH-002 | Contratos e fronteiras da API | PLANNED |
+| BATCH-002 | Contratos e fronteiras da API | DONE |
 | BATCH-003 | Instrumentação do VTT | PLANNED |
 | BATCH-004 | Spike e otimização 3D | PLANNED |
 | BATCH-005 | Editor de grid | PLANNED |

@@ -16,12 +16,16 @@ entram pela rede local somente depois que o mestre abre uma sessão.
 
 ## Fronteiras
 
-- REST gerencia recursos persistentes.
+- REST gerencia recursos persistentes e é integralmente contratado com Huma.
 - WebSocket transporta comandos e eventos de sessão.
 - SQLite é a fonte local de persistência.
 - O servidor é autoritativo para permissões, movimento, fog e dados.
 - O frontend deriva meshes a partir do documento semântico.
 - Conteúdo secreto é removido no servidor antes de chegar ao cliente.
+
+A superfície administrativa REST existe somente em loopback. A interface LAN
+usa uma allowlist independente com health, entrada e WebSocket de sessão.
+Consulte [API.md](API.md) para a matriz de rotas e os artefatos gerados.
 
 ## Persistência
 

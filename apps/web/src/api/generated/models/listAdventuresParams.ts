@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1.0.0-alpha.1
  */
 
-export type ListApiV1AdventuresParams = {
+export type ListAdventuresParams = {
 /**
  * @minimum 1
  * @maximum 200

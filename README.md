@@ -104,14 +104,21 @@ Consulte [docs/TESTING.md](docs/TESTING.md) para detalhes e diagnóstico.
 
 ## OpenAPI e cliente TypeScript
 
-Gere o contrato e o cliente depois de instalar as dependências:
+Gere o contrato OpenAPI 3.1 e o cliente Orval a partir da fonte Go:
 
 ```powershell
-cd apps/server
-go run ./cmd/openapi | Set-Content -Encoding utf8 ../web/openapi.json
-cd ../..
-npm run api:generate
+.\scripts\generate-contract.ps1
 ```
+
+Verifique se os artefatos estão sincronizados:
+
+```powershell
+.\scripts\check-contract.ps1
+```
+
+As operações administrativas existem somente em loopback. A interface LAN
+expõe apenas health, entrada e WebSocket de sessão. Consulte
+[docs/API.md](docs/API.md) para a matriz completa.
 
 ## Build portátil
 

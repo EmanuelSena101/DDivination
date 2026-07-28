@@ -46,11 +46,11 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 ## Última batch concluída
 
-`BATCH-001 — Experiência de desenvolvimento`
+`BATCH-002 — Contratos e fronteiras da API`
 
 Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-001-dev-workflow.md](batches/BATCH-001-dev-workflow.md).
+[BATCH-002-api-contracts.md](batches/BATCH-002-api-contracts.md).
 
 ## Próxima batch planejada
 
-`BATCH-002 — Contratos e fronteiras da API`
+`BATCH-003 — Instrumentação do VTT`

@@ -4,7 +4,7 @@ Estado: `VALIDATING`
 
 Issue: representada pela Pull Request inicial do rewrite
 
-Pull Request: a criar
+Pull Request: [#4](https://github.com/EmanuelSena101/DDivination/pull/4)
 
 ## Contexto
 
@@ -49,9 +49,9 @@ relacionadas, documentando estado, arquitetura, testes e roadmap.
 - [x] E2E GM/jogador aprovado;
 - [x] build portátil e smoke test aprovados;
 - [x] alterações legadas excluídas do commit;
-- [ ] branch enviada ao GitHub;
-- [ ] tag legada enviada ao GitHub;
-- [ ] Pull Request draft criada.
+- [x] branch enviada ao GitHub;
+- [x] tag legada enviada ao GitHub;
+- [x] Pull Request draft criada.
 
 ## Testes executados
 

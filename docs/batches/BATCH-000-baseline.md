@@ -1,10 +1,13 @@
 # BATCH-000 — Baseline e governança
 
-Estado: `VALIDATING`
+Estado: `DONE`
 
 Issue: representada pela Pull Request inicial do rewrite
 
-Pull Request: [#4](https://github.com/EmanuelSena101/DDivination/pull/4)
+Pull Requests:
+
+- [#4 — baseline do rewrite](https://github.com/EmanuelSena101/DDivination/pull/4)
+- [#5 — correção do frontend incorporado](https://github.com/EmanuelSena101/DDivination/pull/5)
 
 ## Contexto
 
@@ -81,6 +84,14 @@ npm audit
   placeholder passou a ser versionado.
 - A falha da Vercel é externa ao GitHub Actions e não representa o modelo de
   distribuição local-first do projeto.
+
+## Resultado
+
+- Baseline do rewrite publicado e incorporado à `main`.
+- Tag `legacy-python-mvp` disponível no GitHub.
+- Build limpo validado em Linux, Windows e macOS.
+- Frontend, E2E e build do servidor aprovados no GitHub Actions.
+- Processo de batches documentado e obrigatório para as próximas entregas.
 
 ## Documentação atualizada
 

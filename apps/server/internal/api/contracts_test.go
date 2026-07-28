@@ -1,0 +1,210 @@
+package api
+
+import (
+	"encoding/json"
+	"io"
+	"log/slog"
+	"net/http"
+	"net/http/httptest"
+	"path/filepath"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/EmanuelSena101/DDivination/apps/server/internal/domain"
+	"github.com/EmanuelSena101/DDivination/apps/server/internal/generator"
+	"github.com/EmanuelSena101/DDivination/apps/server/internal/session"
+	"github.com/EmanuelSena101/DDivination/apps/server/internal/store"
+)
+
+func newContractTestServer(t *testing.T) (*Server, Handlers) {
+	t.Helper()
+	root := t.TempDir()
+	database, err := store.Open(filepath.Join(root, "test.sqlite3"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := database.Close(); err != nil {
+			t.Errorf("close database: %v", err)
+		}
+	})
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+	server := New(database, session.NewHub(database), nil, logger, "", nil, filepath.Join(root, "assets"))
+	return server, server.Handlers()
+}
+
+func TestOpenAPIContainsEveryRESTContractWithStableOperationID(t *testing.T) {
+	_, handlers := newContractTestServer(t)
+	response := httptest.NewRecorder()
+	handlers.Local.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/openapi.json", nil))
+	if response.Code != http.StatusOK {
+		t.Fatalf("expected OpenAPI 200, got %d: %s", response.Code, response.Body.String())
+	}
+
+	var document struct {
+		Paths map[string]map[string]struct {
+			OperationID string `json:"operationId"`
+			Responses   map[string]struct {
+				Content map[string]any `json:"content"`
+			} `json:"responses"`
+		} `json:"paths"`
+	}
+	if err := json.Unmarshal(response.Body.Bytes(), &document); err != nil {
+		t.Fatal(err)
+	}
+
+	expectedCount := 0
+	seenIDs := make(map[string]string)
+	for _, contract := range endpointContracts {
+		if contract.Protocol != "rest" {
+			continue
+		}
+		expectedCount++
+		operation, ok := document.Paths[contract.Path][strings.ToLower(contract.Method)]
+		if !ok {
+			t.Errorf("OpenAPI missing %s %s", contract.Method, contract.Path)
+			continue
+		}
+		if operation.OperationID != contract.OperationID {
+			t.Errorf("%s %s: expected operationId %q, got %q", contract.Method, contract.Path, contract.OperationID, operation.OperationID)
+		}
+		if previous, duplicate := seenIDs[operation.OperationID]; duplicate {
+			t.Errorf("duplicate operationId %q on %s and %s %s", operation.OperationID, previous, contract.Method, contract.Path)
+		}
+		seenIDs[operation.OperationID] = contract.Method + " " + contract.Path
+
+		hasProblemResponse := false
+		for status, candidate := range operation.Responses {
+			if strings.HasPrefix(status, "2") {
+				continue
+			}
+			if _, ok := candidate.Content["application/problem+json"]; ok {
+				hasProblemResponse = true
+				break
+			}
+		}
+		if !hasProblemResponse {
+			t.Errorf("%s %s has no application/problem+json error response", contract.Method, contract.Path)
+		}
+	}
+
+	actualCount := 0
+	for _, pathItem := range document.Paths {
+		for method := range pathItem {
+			switch method {
+			case "get", "post", "put", "patch", "delete":
+				actualCount++
+			}
+		}
+	}
+	if actualCount != expectedCount {
+		t.Fatalf("expected %d documented REST operations, got %d", expectedCount, actualCount)
+	}
+}
+
+func TestLANAllowlistRejectsEveryLocalOnlyEndpoint(t *testing.T) {
+	_, handlers := newContractTestServer(t)
+
+	health := httptest.NewRecorder()
+	handlers.LAN.ServeHTTP(health, httptest.NewRequest(http.MethodGet, "/api/v1/health", nil))
+	if health.Code != http.StatusOK {
+		t.Fatalf("LAN health: expected 200, got %d", health.Code)
+	}
+
+	for _, contract := range endpointContracts {
+		if contract.Exposure != exposureLocal {
+			continue
+		}
+		requestPath := strings.ReplaceAll(contract.Path, "{id}", "missing")
+		response := httptest.NewRecorder()
+		handlers.LAN.ServeHTTP(response, httptest.NewRequest(contract.Method, requestPath, nil))
+		if response.Code != http.StatusNotFound {
+			t.Errorf("LAN leaked %s %s: expected 404, got %d", contract.Method, contract.Path, response.Code)
+			continue
+		}
+		assertProblemContentType(t, response)
+		if !strings.Contains(response.Body.String(), "Endpoint not found") {
+			t.Errorf("LAN %s %s reached a handler: %s", contract.Method, contract.Path, response.Body.String())
+		}
+	}
+}
+
+func TestLocalAndLANFailuresUseProblemJSON(t *testing.T) {
+	_, handlers := newContractTestServer(t)
+	testCases := []struct {
+		name    string
+		handler http.Handler
+		request *http.Request
+		status  int
+	}{
+		{
+			name:    "local Huma error",
+			handler: handlers.Local,
+			request: httptest.NewRequest(http.MethodGet, "/api/v1/adventures/missing", nil),
+			status:  http.StatusNotFound,
+		},
+		{
+			name:    "LAN malformed join",
+			handler: handlers.LAN,
+			request: httptest.NewRequest(http.MethodPost, "/api/v1/sessions/missing/join", strings.NewReader("{")),
+			status:  http.StatusBadRequest,
+		},
+		{
+			name:    "LAN unauthorized WebSocket",
+			handler: handlers.LAN,
+			request: httptest.NewRequest(http.MethodGet, "/api/v1/sessions/missing/stream", nil),
+			status:  http.StatusUnauthorized,
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			response := httptest.NewRecorder()
+			testCase.handler.ServeHTTP(response, testCase.request)
+			if response.Code != testCase.status {
+				t.Fatalf("expected %d, got %d: %s", testCase.status, response.Code, response.Body.String())
+			}
+			assertProblemContentType(t, response)
+		})
+	}
+}
+
+func TestPortableExportsPreserveTheirMediaTypes(t *testing.T) {
+	server, handlers := newContractTestServer(t)
+	spec := domain.DefaultAdventureSpec()
+	document, err := generator.Generate(spec, 42, time.Date(2026, time.July, 28, 12, 0, 0, 0, time.UTC))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := server.store.SaveAdventure(t.Context(), document, nil, "test"); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, testCase := range []struct {
+		path        string
+		contentType string
+	}{
+		{"/api/v1/packages/" + document.ID, "application/vnd.ddivination+zip"},
+		{"/api/v1/adventures/" + document.ID + "/export.md", "text/markdown; charset=utf-8"},
+		{"/api/v1/adventures/" + document.ID + "/print", "text/html; charset=utf-8"},
+	} {
+		response := httptest.NewRecorder()
+		handlers.Local.ServeHTTP(response, httptest.NewRequest(http.MethodGet, testCase.path, nil))
+		if response.Code != http.StatusOK {
+			t.Fatalf("%s: expected 200, got %d: %s", testCase.path, response.Code, response.Body.String())
+		}
+		if actual := response.Header().Get("Content-Type"); actual != testCase.contentType {
+			t.Errorf("%s: expected %q, got %q", testCase.path, testCase.contentType, actual)
+		}
+		if response.Body.Len() == 0 {
+			t.Errorf("%s returned an empty body", testCase.path)
+		}
+	}
+}
+
+func assertProblemContentType(t *testing.T, response *httptest.ResponseRecorder) {
+	t.Helper()
+	if actual := response.Header().Get("Content-Type"); actual != "application/problem+json" {
+		t.Errorf("expected application/problem+json, got %q", actual)
+	}
+}

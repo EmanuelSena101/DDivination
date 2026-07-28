@@ -51,6 +51,8 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-001-dev-workflow.md](batches/BATCH-001-dev-workflow.md).
 
-## Próxima batch planejada
+## Batch atual
 
 `BATCH-002 — Contratos e fronteiras da API`
+
+Issue: [#8](https://github.com/EmanuelSena101/DDivination/issues/8)

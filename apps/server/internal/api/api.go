@@ -65,10 +65,7 @@ func (s *Server) Handlers() Handlers {
 	config.Info.Description = "Local-first 3D VTT and deterministic 5E-compatible adventure generator."
 	localAPI := humago.New(localMux, config)
 	s.registerREST(localAPI)
-	s.registerShared(localMux)
-	localMux.HandleFunc("GET /api/v1/assets", s.listAssets)
-	localMux.HandleFunc("POST /api/v1/assets", s.importAsset)
-	localMux.HandleFunc("POST /api/v1/ai/enrich", s.enrichWithAI)
+	localMux.HandleFunc("GET /api/v1/sessions/{id}/stream", s.streamSession)
 	localMux.Handle("/", s.staticHandler())
 
 	lanMux := http.NewServeMux()
@@ -77,52 +74,6 @@ func (s *Server) Handlers() Handlers {
 	lanMux.HandleFunc("GET /api/v1/sessions/{id}/stream", s.streamSession)
 	lanMux.Handle("/", s.staticHandler())
 	return Handlers{Local: securityHeaders(localMux), LAN: securityHeaders(lanMux)}
-}
-
-func (s *Server) registerREST(api huma.API) {
-	huma.Get(api, "/api/v1/health", func(_ context.Context, _ *struct{}) (*healthOutput, error) {
-		return &healthOutput{Body: healthBody{
-			Status:           "ok",
-			Version:          "1.0.0-alpha.1",
-			SchemaVersion:    domain.SchemaVersion,
-			GeneratorVersion: domain.GeneratorVersion,
-		}}, nil
-	})
-
-	huma.Get(api, "/api/v1/catalog", func(_ context.Context, _ *struct{}) (*catalogOutput, error) {
-		return &catalogOutput{Body: starterCatalog()}, nil
-	})
-
-	huma.Register(api, huma.Operation{
-		Method:        http.MethodPost,
-		Path:          "/api/v1/generation-runs",
-		OperationID:   "create-generation-run",
-		Summary:       "Generate and persist an adventure",
-		DefaultStatus: http.StatusAccepted,
-	}, s.createGeneration)
-
-	huma.Get(api, "/api/v1/generation-runs/{id}", s.getGeneration)
-	huma.Get(api, "/api/v1/adventures", s.listAdventures)
-	huma.Get(api, "/api/v1/adventures/{id}", s.getAdventure)
-	huma.Put(api, "/api/v1/adventures/{id}", s.updateAdventure)
-	huma.Post(api, "/api/v1/adventures/{id}/checkpoints", s.checkpointAdventure)
-	huma.Delete(api, "/api/v1/adventures/{id}", s.deleteAdventure)
-	huma.Register(api, huma.Operation{
-		Method:      http.MethodPost,
-		Path:        "/api/v1/sessions",
-		OperationID: "create-session",
-		Summary:     "Open a local network VTT session",
-	}, s.createSession)
-}
-
-func (s *Server) registerShared(mux *http.ServeMux) {
-	mux.HandleFunc("POST /api/v1/sessions/{id}/join", s.rawJoinSession)
-	mux.HandleFunc("GET /api/v1/sessions/{id}/stream", s.streamSession)
-	mux.HandleFunc("GET /api/v1/packages/{id}", s.exportPackage)
-	mux.HandleFunc("POST /api/v1/packages", s.importPackage)
-	mux.HandleFunc("GET /api/v1/adventures/{id}/export.md", s.exportMarkdown)
-	mux.HandleFunc("GET /api/v1/adventures/{id}/print", s.exportHTML)
-	mux.HandleFunc("DELETE /api/v1/sessions/{id}", s.closeSession)
 }
 
 type healthBody struct {
@@ -134,6 +85,15 @@ type healthBody struct {
 
 type healthOutput struct {
 	Body healthBody
+}
+
+func (s *Server) getHealth(_ context.Context, _ *struct{}) (*healthOutput, error) {
+	return &healthOutput{Body: healthBody{
+		Status:           "ok",
+		Version:          "1.0.0-alpha.1",
+		SchemaVersion:    domain.SchemaVersion,
+		GeneratorVersion: domain.GeneratorVersion,
+	}}, nil
 }
 
 type CatalogItem struct {
@@ -154,6 +114,10 @@ type Catalog struct {
 
 type catalogOutput struct {
 	Body Catalog
+}
+
+func (s *Server) getCatalog(_ context.Context, _ *struct{}) (*catalogOutput, error) {
+	return &catalogOutput{Body: starterCatalog()}, nil
 }
 
 type generationInput struct {
@@ -389,9 +353,29 @@ func (s *Server) createSession(ctx context.Context, input *createSessionInput) (
 }
 
 type joinRequest struct {
-	Code string `json:"code"`
-	Name string `json:"name"`
-	Role string `json:"role"`
+	Code string `json:"code" minLength:"1"`
+	Name string `json:"name" maxLength:"60"`
+	Role string `json:"role" enum:"player,display"`
+}
+
+type joinSessionInput struct {
+	ID   string `path:"id"`
+	Body joinRequest
+}
+
+type joinSessionOutput struct {
+	Body session.Joined
+}
+
+func (s *Server) joinSession(ctx context.Context, input *joinSessionInput) (*joinSessionOutput, error) {
+	joined, err := s.hub.Join(ctx, input.ID, input.Body.Code, input.Body.Name, input.Body.Role)
+	if errors.Is(err, session.ErrSessionNotFound) {
+		return nil, huma.NewError(http.StatusNotFound, "session not found")
+	}
+	if err != nil {
+		return nil, huma.NewError(http.StatusUnauthorized, "could not join session", err)
+	}
+	return &joinSessionOutput{Body: joined}, nil
 }
 
 func (s *Server) rawJoinSession(w http.ResponseWriter, r *http.Request) {
@@ -400,16 +384,18 @@ func (s *Server) rawJoinSession(w http.ResponseWriter, r *http.Request) {
 		writeProblem(w, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
-	joined, err := s.hub.Join(r.Context(), r.PathValue("id"), request.Code, request.Name, request.Role)
+	output, err := s.joinSession(r.Context(), &joinSessionInput{ID: r.PathValue("id"), Body: request})
 	if err != nil {
 		status := http.StatusUnauthorized
-		if errors.Is(err, session.ErrSessionNotFound) {
+		if statusError, ok := err.(huma.StatusError); ok {
+			status = statusError.GetStatus()
+		} else if errors.Is(err, session.ErrSessionNotFound) {
 			status = http.StatusNotFound
 		}
 		writeProblem(w, status, "Could not join session", err.Error())
 		return
 	}
-	writeJSON(w, http.StatusOK, joined)
+	writeJSON(w, http.StatusOK, output.Body)
 }
 
 func (s *Server) streamSession(w http.ResponseWriter, r *http.Request) {
@@ -470,130 +456,144 @@ func (s *Server) streamSession(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) exportPackage(w http.ResponseWriter, r *http.Request) {
-	doc, err := s.store.GetAdventure(r.Context(), r.PathValue("id"))
+type exportPackageOutput struct {
+	ContentType        string `header:"Content-Type"`
+	ContentDisposition string `header:"Content-Disposition"`
+	Body               []byte
+}
+
+func (s *Server) exportPackage(ctx context.Context, input *idInput) (*exportPackageOutput, error) {
+	doc, err := s.store.GetAdventure(ctx, input.ID)
 	if errors.Is(err, store.ErrNotFound) {
-		writeProblem(w, http.StatusNotFound, "Adventure not found", "")
-		return
+		return nil, huma.NewError(http.StatusNotFound, "adventure not found")
 	}
 	if err != nil {
-		writeProblem(w, http.StatusInternalServerError, "Export failed", err.Error())
-		return
+		return nil, huma.NewError(http.StatusInternalServerError, "could not export adventure")
 	}
 	content, err := packageio.Export(doc)
 	if err != nil {
-		writeProblem(w, http.StatusInternalServerError, "Export failed", err.Error())
-		return
+		return nil, huma.NewError(http.StatusInternalServerError, "could not export adventure", err)
 	}
-	w.Header().Set("Content-Type", "application/vnd.ddivination+zip")
-	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.ddivination"`, safeName(doc.Name.ENUS)))
-	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write(content)
+	return &exportPackageOutput{
+		ContentType:        "application/vnd.ddivination+zip",
+		ContentDisposition: fmt.Sprintf(`attachment; filename="%s.ddivination"`, safeName(doc.Name.ENUS)),
+		Body:               content,
+	}, nil
 }
 
-func (s *Server) importPackage(w http.ResponseWriter, r *http.Request) {
-	r.Body = http.MaxBytesReader(w, r.Body, packageio.MaxPackageSize)
-	content, err := io.ReadAll(r.Body)
-	if err != nil {
-		writeProblem(w, http.StatusRequestEntityTooLarge, "Package too large", err.Error())
-		return
-	}
-	doc, err := packageio.Import(bytes.NewReader(content), int64(len(content)))
-	if err != nil {
-		writeProblem(w, http.StatusUnprocessableEntity, "Invalid package", err.Error())
-		return
-	}
-	if err := s.store.SaveAdventure(r.Context(), doc, nil, "imported"); err != nil {
-		writeProblem(w, http.StatusInternalServerError, "Import failed", err.Error())
-		return
-	}
-	writeJSON(w, http.StatusCreated, doc)
+type importPackageInput struct {
+	RawBody []byte `contentType:"application/vnd.ddivination+zip"`
 }
 
-func (s *Server) exportMarkdown(w http.ResponseWriter, r *http.Request) {
-	doc, err := s.store.GetAdventure(r.Context(), r.PathValue("id"))
+type importPackageOutput struct {
+	Body domain.AdventureDocument
+}
+
+func (s *Server) importPackage(ctx context.Context, input *importPackageInput) (*importPackageOutput, error) {
+	doc, err := packageio.Import(bytes.NewReader(input.RawBody), int64(len(input.RawBody)))
+	if err != nil {
+		return nil, huma.NewError(http.StatusUnprocessableEntity, "invalid package", err)
+	}
+	if err := s.store.SaveAdventure(ctx, doc, nil, "imported"); err != nil {
+		return nil, huma.NewError(http.StatusInternalServerError, "could not import package", err)
+	}
+	return &importPackageOutput{Body: doc}, nil
+}
+
+type textExportOutput struct {
+	ContentType        string `header:"Content-Type"`
+	ContentDisposition string `header:"Content-Disposition"`
+	Body               []byte
+}
+
+func (s *Server) exportMarkdown(ctx context.Context, input *idInput) (*textExportOutput, error) {
+	doc, err := s.store.GetAdventure(ctx, input.ID)
 	if errors.Is(err, store.ErrNotFound) {
-		writeProblem(w, http.StatusNotFound, "Adventure not found", "")
-		return
+		return nil, huma.NewError(http.StatusNotFound, "adventure not found")
 	}
 	if err != nil {
-		writeProblem(w, http.StatusInternalServerError, "Export failed", err.Error())
-		return
+		return nil, huma.NewError(http.StatusInternalServerError, "could not export adventure")
 	}
-	w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
-	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.md"`, safeName(doc.Name.ENUS)))
-	_, _ = w.Write(exporter.Markdown(doc))
+	return &textExportOutput{
+		ContentType:        "text/markdown; charset=utf-8",
+		ContentDisposition: fmt.Sprintf(`attachment; filename="%s.md"`, safeName(doc.Name.ENUS)),
+		Body:               []byte(exporter.Markdown(doc)),
+	}, nil
 }
 
-func (s *Server) exportHTML(w http.ResponseWriter, r *http.Request) {
-	doc, err := s.store.GetAdventure(r.Context(), r.PathValue("id"))
+func (s *Server) exportHTML(ctx context.Context, input *idInput) (*textExportOutput, error) {
+	doc, err := s.store.GetAdventure(ctx, input.ID)
 	if errors.Is(err, store.ErrNotFound) {
-		writeProblem(w, http.StatusNotFound, "Adventure not found", "")
-		return
+		return nil, huma.NewError(http.StatusNotFound, "adventure not found")
 	}
 	if err != nil {
-		writeProblem(w, http.StatusInternalServerError, "Export failed", err.Error())
-		return
+		return nil, huma.NewError(http.StatusInternalServerError, "could not render adventure")
 	}
 	content, err := exporter.HTML(doc)
 	if err != nil {
-		writeProblem(w, http.StatusInternalServerError, "Export failed", err.Error())
-		return
+		return nil, huma.NewError(http.StatusInternalServerError, "could not render adventure", err)
 	}
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, _ = w.Write(content)
+	return &textExportOutput{ContentType: "text/html; charset=utf-8", Body: content}, nil
 }
 
-func (s *Server) closeSession(w http.ResponseWriter, r *http.Request) {
-	token := strings.TrimSpace(strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer "))
+type closeSessionInput struct {
+	ID            string `path:"id"`
+	Authorization string `header:"Authorization"`
+}
+
+func (s *Server) closeSession(ctx context.Context, input *closeSessionInput) (*emptyOutput, error) {
+	token := strings.TrimSpace(strings.TrimPrefix(input.Authorization, "Bearer "))
 	if token == "" {
-		writeProblem(w, http.StatusUnauthorized, "Missing session token", "")
-		return
+		return nil, huma.NewError(http.StatusUnauthorized, "missing session token")
 	}
-	if err := s.hub.Close(r.Context(), r.PathValue("id"), token); errors.Is(err, session.ErrSessionNotFound) {
-		writeProblem(w, http.StatusNotFound, "Session not found", "")
-		return
+	if err := s.hub.Close(ctx, input.ID, token); errors.Is(err, session.ErrSessionNotFound) {
+		return nil, huma.NewError(http.StatusNotFound, "session not found")
 	} else if err != nil {
-		writeProblem(w, http.StatusForbidden, "Could not close session", err.Error())
-		return
+		return nil, huma.NewError(http.StatusForbidden, "could not close session", err)
 	}
-	w.WriteHeader(http.StatusNoContent)
+	return &emptyOutput{}, nil
 }
 
-func (s *Server) listAssets(w http.ResponseWriter, r *http.Request) {
-	assets, err := s.store.ListAssets(r.Context())
-	if err != nil {
-		writeProblem(w, http.StatusInternalServerError, "Could not list assets", err.Error())
-		return
-	}
-	writeJSON(w, http.StatusOK, assets)
+type listAssetsOutput struct {
+	Body []domain.AssetRef
 }
 
-func (s *Server) importAsset(w http.ResponseWriter, r *http.Request) {
-	r.Body = http.MaxBytesReader(w, r.Body, asset.MaxGLBSize+(1<<20))
-	if err := r.ParseMultipartForm(asset.MaxGLBSize); err != nil {
-		writeProblem(w, http.StatusBadRequest, "Invalid asset upload", err.Error())
-		return
-	}
-	defer r.MultipartForm.RemoveAll()
-	file, header, err := r.FormFile("file")
+func (s *Server) listAssets(ctx context.Context, _ *struct{}) (*listAssetsOutput, error) {
+	assets, err := s.store.ListAssets(ctx)
 	if err != nil {
-		writeProblem(w, http.StatusBadRequest, "Missing asset file", err.Error())
-		return
+		return nil, huma.NewError(http.StatusInternalServerError, "could not list assets", err)
 	}
-	defer file.Close()
+	return &listAssetsOutput{Body: assets}, nil
+}
+
+type assetUploadForm struct {
+	File    huma.FormFile `form:"file" required:"true"`
+	Creator string        `form:"creator" required:"false"`
+	License string        `form:"license" required:"false"`
+}
+
+type importAssetInput struct {
+	RawBody huma.MultipartFormFiles[assetUploadForm]
+}
+
+type importAssetOutput struct {
+	Body domain.AssetRef
+}
+
+func (s *Server) importAsset(ctx context.Context, input *importAssetInput) (*importAssetOutput, error) {
+	form := input.RawBody.Data()
+	defer form.File.Close()
 	ref, err := s.assets.Import(
-		r.Context(),
-		header.Filename,
-		file,
-		r.FormValue("creator"),
-		r.FormValue("license"),
+		ctx,
+		form.File.Filename,
+		form.File,
+		form.Creator,
+		form.License,
 	)
 	if err != nil {
-		writeProblem(w, http.StatusUnprocessableEntity, "Invalid asset", err.Error())
-		return
+		return nil, huma.NewError(http.StatusUnprocessableEntity, "invalid asset", err)
 	}
-	writeJSON(w, http.StatusCreated, ref)
+	return &importAssetOutput{Body: ref}, nil
 }
 
 type aiEnrichRequest struct {
@@ -601,23 +601,25 @@ type aiEnrichRequest struct {
 	Model string               `json:"model,omitempty"`
 }
 
-func (s *Server) enrichWithAI(w http.ResponseWriter, r *http.Request) {
-	var request aiEnrichRequest
-	if err := decodeJSON(w, r, &request, 1<<20); err != nil {
-		writeProblem(w, http.StatusBadRequest, "Invalid AI enrichment request", err.Error())
-		return
-	}
-	key := strings.TrimSpace(r.Header.Get("X-OpenAI-API-Key"))
+type aiEnrichInput struct {
+	OpenAIKey string `header:"X-OpenAI-API-Key"`
+	Body      aiEnrichRequest
+}
+
+type aiEnrichOutput struct {
+	Body ai.Result
+}
+
+func (s *Server) enrichWithAI(ctx context.Context, input *aiEnrichInput) (*aiEnrichOutput, error) {
+	key := strings.TrimSpace(input.OpenAIKey)
 	if key == "" {
-		writeProblem(w, http.StatusBadRequest, "Missing API key", "The key is required for this request and is not persisted.")
-		return
+		return nil, huma.NewError(http.StatusBadRequest, "missing API key: the key is required and is not persisted")
 	}
-	result, err := ai.NewOpenAI(key, request.Model).Enrich(r.Context(), request.Spec)
+	result, err := ai.NewOpenAI(key, input.Body.Model).Enrich(ctx, input.Body.Spec)
 	if err != nil {
-		writeProblem(w, http.StatusBadGateway, "AI enrichment failed", err.Error())
-		return
+		return nil, huma.NewError(http.StatusBadGateway, "AI enrichment failed", err)
 	}
-	writeJSON(w, http.StatusOK, result)
+	return &aiEnrichOutput{Body: result}, nil
 }
 
 func (s *Server) rawHealth(w http.ResponseWriter, _ *http.Request) {
@@ -726,7 +728,9 @@ func writeJSON(w http.ResponseWriter, status int, value any) {
 }
 
 func writeProblem(w http.ResponseWriter, status int, title, detail string) {
-	writeJSON(w, status, map[string]any{
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(status)
+	_ = json.NewEncoder(w).Encode(map[string]any{
 		"type":   "about:blank",
 		"title":  title,
 		"status": status,

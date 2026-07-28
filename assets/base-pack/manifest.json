@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0.0",
+  "packId": "ddivination-base",
+  "version": "0.1.0",
+  "name": {
+    "pt-BR": "Pacote Base DDivination",
+    "en-US": "DDivination Base Pack"
+  },
+  "license": "CC0-1.0",
+  "assets": [
+    {
+      "id": "procedural-stone-floor",
+      "type": "material",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
+      "id": "procedural-stone-wall",
+      "type": "material",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
+      "id": "procedural-token",
+      "type": "token",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    }
+  ]
+}

@@ -809,6 +809,110 @@ button.secondary {
   box-shadow: 0 0 8px #5bd08c;
 }
 
+.diagnostics-panel {
+  width: min(310px, calc(100% - 24px));
+  max-height: calc(100% - 96px);
+  padding: 14px;
+  overflow-y: auto;
+  position: absolute;
+  top: 76px;
+  right: 12px;
+  z-index: 14;
+  color: #c7c3d1;
+  border: 1px solid rgba(118, 87, 247, 0.34);
+  border-radius: 7px;
+  background: rgba(9, 10, 16, 0.92);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(16px);
+}
+
+.diagnostics-panel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.diagnostics-panel header small,
+.diagnostics-panel h3 {
+  color: #777381;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.diagnostics-panel h2 {
+  margin: 2px 0 0;
+  font-size: 17px;
+}
+
+.diagnostics-panel header i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #77717e;
+}
+
+.diagnostics-panel header i.online {
+  background: #5bd08c;
+  box-shadow: 0 0 9px #5bd08c;
+}
+
+.diagnostics-panel section {
+  padding: 11px 0;
+  border-top: 1px solid var(--line);
+}
+
+.diagnostics-panel section:first-of-type {
+  margin-top: 12px;
+}
+
+.diagnostics-panel h3 {
+  margin: 0 0 8px;
+}
+
+.diagnostic-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.diagnostic-metric {
+  min-width: 0;
+  padding: 6px 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.diagnostic-metric span,
+.diagnostic-metric strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.diagnostic-metric span {
+  color: #777381;
+  font-size: 7px;
+  text-transform: uppercase;
+}
+
+.diagnostic-metric strong {
+  margin-top: 2px;
+  color: #e4dff0;
+  font: 600 11px "Inter", sans-serif;
+}
+
+.diagnostics-download {
+  width: 100%;
+  min-height: 34px;
+  color: #d5ccff;
+  border: 1px solid rgba(118, 87, 247, 0.3);
+  border-radius: 4px;
+  background: rgba(118, 87, 247, 0.1);
+  cursor: pointer;
+}
+
 .floor-caption {
   padding: 10px 14px;
   display: flex;

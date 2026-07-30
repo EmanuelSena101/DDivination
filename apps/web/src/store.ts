@@ -1,5 +1,10 @@
 import { create } from "zustand";
 import { sessionWebSocketURL } from "./api";
+import {
+  createConnectionTelemetry,
+  reduceConnectionTelemetry,
+  type ConnectionTelemetry,
+} from "./telemetry";
 import type {
   AdventureDocument,
   DiceRoll,
@@ -29,6 +34,7 @@ interface AppState {
   selectedTokenId: string | null;
   latestRoll: DiceRoll | null;
   latestPing: (GridPosition & { floorId: string; revision: number }) | null;
+  connectionTelemetry: ConnectionTelemetry;
   error: string | null;
   socket: WebSocket | null;
   setLanguage: (language: Language) => void;
@@ -43,6 +49,7 @@ interface AppState {
     role: "gm" | "player" | "display";
     state: SessionState;
     adventure: AdventureDocument;
+    reconnecting?: boolean;
   }) => void;
   disconnect: () => void;
   send: (type: string, payload: Record<string, unknown>) => void;
@@ -113,6 +120,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   selectedTokenId: null,
   latestRoll: null,
   latestPing: null,
+  connectionTelemetry: createConnectionTelemetry(),
   error: null,
   socket: null,
 
@@ -144,6 +152,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       selectedTokenId: null,
       latestRoll: null,
       latestPing: null,
+      connectionTelemetry: createConnectionTelemetry(),
       socket: null,
     });
   },
@@ -154,13 +163,26 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
   setSelectedToken: (selectedTokenId) => set({ selectedTokenId }),
-  connect: ({ sessionId, participantId, token, role, state, adventure }) => {
+  connect: ({ sessionId, participantId, token, role, state, adventure, reconnecting = false }) => {
     get().socket?.close();
     const socket = new WebSocket(sessionWebSocketURL(sessionId, token));
-    socket.onopen = () => set({ connected: true, error: null });
+    const initialConnectionTelemetry = reconnecting
+      ? reduceConnectionTelemetry(get().connectionTelemetry, { type: "connect" })
+      : reduceConnectionTelemetry(createConnectionTelemetry(), { type: "connect" });
+    socket.onopen = () =>
+      set((current) => ({
+        connected: true,
+        error: null,
+        connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, { type: "open" }),
+      }));
     socket.onclose = () => {
       if (get().socket !== socket) return;
-      set({ connected: false });
+      set((current) => ({
+        connected: false,
+        connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, {
+          type: "reconnect",
+        }),
+      }));
       window.setTimeout(() => {
         const current = get();
         if (
@@ -168,32 +190,64 @@ export const useAppStore = create<AppState>((set, get) => ({
           current.sessionId === sessionId &&
           current.token === token
         ) {
-          current.connect({ sessionId, participantId, token, role, state, adventure });
+          current.connect({
+            sessionId,
+            participantId,
+            token,
+            role,
+            state,
+            adventure,
+            reconnecting: true,
+          });
         }
       }, 1500);
     };
-    socket.onerror = () => set({ error: "WebSocket connection failed" });
+    socket.onerror = () =>
+      set((current) => ({
+        error: "WebSocket connection failed",
+        connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, {
+          type: "error",
+        }),
+      }));
     socket.onmessage = (message) => {
       const data = JSON.parse(String(message.data)) as SessionSnapshotMessage | SessionEvent | {
         type: "command.rejected";
         detail: string;
       };
       if (data.type === "session.snapshot" && "state" in data && "adventure" in data) {
-        set({
+        set((current) => ({
           adventure: data.adventure,
           session: data.state,
           floorId: data.state.activeFloorId,
-        });
+          connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, {
+            type: "snapshot",
+            revision: data.state.revision,
+          }),
+        }));
         return;
       }
       if (data.type === "command.rejected" && "detail" in data) {
-        set({ error: data.detail });
+        set((current) => ({
+          error: data.detail,
+          connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, {
+            type: "rejected",
+          }),
+        }));
         return;
       }
       const event = data as SessionEvent;
+      const occurredAt = Date.parse(event.occurredAt);
+      const latencyMs = Number.isFinite(occurredAt) ? Date.now() - occurredAt : 0;
+      set((current) => ({
+        connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, {
+          type: "event",
+          revision: event.revision,
+          latencyMs,
+        }),
+      }));
       if (event.type === "session.closed") {
         socket.close();
-        set({
+        set((current) => ({
           socket: null,
           connected: false,
           session: null,
@@ -201,7 +255,10 @@ export const useAppStore = create<AppState>((set, get) => ({
           participantId: null,
           token: null,
           error: "The game master closed this table",
-        });
+          connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, {
+            type: "closed",
+          }),
+        }));
         return;
       }
       set((current) => {
@@ -233,6 +290,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       adventure,
       floorId: state.activeFloorId || adventure.floors[0]?.id || null,
       connected: false,
+      connectionTelemetry: initialConnectionTelemetry,
       error: null,
     });
   },
@@ -247,6 +305,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       role: "gm",
       connected: false,
       selectedTokenId: null,
+      connectionTelemetry: createConnectionTelemetry(),
     });
   },
   send: (type, payload) => {
@@ -262,6 +321,11 @@ export const useAppStore = create<AppState>((set, get) => ({
       payload,
     };
     socket.send(JSON.stringify(command));
+    set((current) => ({
+      connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, {
+        type: "command-sent",
+      }),
+    }));
   },
   clearError: () => set({ error: null }),
 }));

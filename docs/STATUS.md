@@ -1,6 +1,6 @@
 # Estado do DDivination
 
-Última atualização: 2026-07-28
+Última atualização: 2026-07-30
 
 ## Estado atual
 
@@ -51,6 +51,12 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-002-api-contracts.md](batches/BATCH-002-api-contracts.md).
 
-## Próxima batch planejada
+## Batch em validação
 
 `BATCH-003 — Instrumentação do VTT`
+
+Esta batch mede frames, renderer, carga semântica da cena e saúde da conexão
+WebSocket antes das otimizações planejadas para a BATCH-004. A implementação e
+a suíte local estão aprovadas; falta a validação do CI e a integração da PR.
+Consulte
+[BATCH-003-vtt-instrumentation.md](batches/BATCH-003-vtt-instrumentation.md).

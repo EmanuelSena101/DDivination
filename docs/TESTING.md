@@ -58,6 +58,22 @@ Orval; executa TypeScript strict, Vitest, build Vite e, por padrão, Playwright.
 
 O E2E exige a porta 8080 livre porque inicia um servidor isolado.
 
+Se o ambiente de desenvolvimento estiver aberto, encerre-o antes:
+
+```powershell
+.\scripts\stop.ps1
+```
+
+## Instrumentação do VTT
+
+Vitest cobre os cálculos de frame time, percentil, janela limitada, contagens
+semânticas, estado da conexão e sanitização do relatório. O E2E ativa o painel,
+aguarda amostras e valida o relatório durante o fluxo GM/jogador.
+
+As métricas observadas em modo headless validam o instrumento, mas não definem
+o budget de produto. Para medições manuais e interpretação, consulte
+[VTT_DIAGNOSTICS.md](VTT_DIAGNOSTICS.md).
+
 ## Contrato da API
 
 Regenerar OpenAPI e cliente TypeScript:

@@ -1,6 +1,6 @@
-import { Html, Line, OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
+import { Grid, Html, Line, OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
 import { Canvas, type ThreeEvent, useFrame } from "@react-three/fiber";
-import { lazy, Suspense, useEffect, useMemo, useRef } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
   Color,
   DynamicDrawUsage,
@@ -14,6 +14,18 @@ import {
   selectSceneQualityProfile,
   type SceneQualityProfile,
 } from "../scenePerformance";
+import {
+  isWallEditorTool,
+  type GridEdgeDirection,
+  type GridEditorTool,
+} from "../gridEditor";
+import {
+  proceduralPropFamily,
+  propColor,
+  tilePalette,
+  wallColor,
+  type ProceduralPropFamily,
+} from "../proceduralAssets";
 import {
   FrameSampler,
   rendererTelemetry,
@@ -51,6 +63,8 @@ interface Props {
   measureMode: boolean;
   measureStart: GridPosition | null;
   measureEnd: GridPosition | null;
+  editorEnabled: boolean;
+  editorTool: GridEditorTool;
   telemetryEnabled: boolean;
   onTelemetry: (telemetry: RenderTelemetry) => void;
   onSelectToken: (tokenId: string | null) => void;
@@ -58,6 +72,7 @@ interface Props {
   onFog: (floorId: string, position: GridPosition, revealed: boolean) => void;
   onPing: (floorId: string, position: GridPosition) => void;
   onMeasure: (position: GridPosition) => void;
+  onEdit: (position: GridPosition, direction?: GridEdgeDirection) => void;
 }
 
 function TelemetryProbe({
@@ -107,29 +122,36 @@ function TileInstances({
   onTile: (tile: Tile) => void;
   shadows: boolean;
 }) {
-  const mesh = useRef<InstancedMesh>(null);
+  const slabs = useRef<InstancedMesh>(null);
+  const insets = useRef<InstancedMesh>(null);
   const helper = useMemo(() => new Object3D(), []);
   const color = useMemo(() => new Color(), []);
   useEffect(() => {
-    if (!mesh.current) return;
+    if (!slabs.current || !insets.current) return;
     floor.tiles.forEach((tile, index) => {
       const [x, , z] = worldPosition(floor, tile);
-      helper.position.set(x, tile.kind === "stairs" ? 0.06 : 0, z);
+      const palette = tilePalette(tile.kind);
+
+      helper.position.set(x, 0, z);
       helper.rotation.set(0, 0, 0);
-      helper.scale.set(0.96, tile.kind === "stairs" ? 0.18 : 0.12, 0.96);
+      helper.scale.set(0.98, 0.12, 0.98);
       helper.updateMatrix();
-      mesh.current?.setMatrixAt(index, helper.matrix);
-      const tileColor =
-        tile.kind === "stairs"
-          ? "#dfaa55"
-          : tile.kind === "corridor"
-            ? "#696e80"
-            : "#858a9f";
-      mesh.current?.setColorAt(index, color.set(tileColor));
+      slabs.current!.setMatrixAt(index, helper.matrix);
+      slabs.current!.setColorAt(index, color.set(palette.base));
+
+      helper.position.set(x, 0.075, z);
+      const insetScale = tile.kind === "corridor" ? 0.58 : 0.84;
+      helper.scale.set(insetScale, 0.035, insetScale);
+      helper.rotation.set(0, tile.kind === "corridor" ? Math.PI / 4 : 0, 0);
+      helper.updateMatrix();
+      insets.current!.setMatrixAt(index, helper.matrix);
+      insets.current!.setColorAt(index, color.set(palette.detail));
     });
-    mesh.current.instanceMatrix.needsUpdate = true;
-    if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true;
-    mesh.current.computeBoundingSphere();
+    for (const mesh of [slabs.current, insets.current]) {
+      mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+      mesh.computeBoundingSphere();
+    }
   }, [color, floor, helper]);
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
@@ -139,52 +161,240 @@ function TileInstances({
   };
 
   return (
+    <>
+      <instancedMesh
+        ref={slabs}
+        args={[undefined, undefined, floor.tiles.length]}
+        receiveShadow={shadows}
+        onClick={handleClick}
+      >
+        <boxGeometry args={[TILE_SIZE, 1, TILE_SIZE]} />
+        <meshStandardMaterial
+          roughness={0.9}
+          metalness={0.04}
+          emissive="#292e40"
+          emissiveIntensity={0.62}
+          vertexColors
+        />
+      </instancedMesh>
+      <instancedMesh
+        ref={insets}
+        args={[undefined, undefined, floor.tiles.length]}
+        receiveShadow={shadows}
+        onClick={handleClick}
+      >
+        <boxGeometry args={[TILE_SIZE, 1, TILE_SIZE]} />
+        <meshStandardMaterial
+          roughness={0.68}
+          metalness={0.1}
+          emissive="#30283a"
+          emissiveIntensity={0.58}
+          vertexColors
+        />
+      </instancedMesh>
+      <StairInstances floor={floor} shadows={shadows} />
+    </>
+  );
+}
+
+function StairInstances({ floor, shadows }: { floor: FloorMap; shadows: boolean }) {
+  const stairs = useMemo(
+    () => floor.tiles.filter((tile) => tile.kind === "stairs"),
+    [floor.tiles],
+  );
+  const mesh = useRef<InstancedMesh>(null);
+  const helper = useMemo(() => new Object3D(), []);
+
+  useEffect(() => {
+    if (!mesh.current) return;
+    let instance = 0;
+    for (const tile of stairs) {
+      const [x, , z] = worldPosition(floor, tile);
+      for (let step = 0; step < 4; step += 1) {
+        helper.position.set(x, 0.13 + step * 0.07, z - 0.3 + step * 0.2);
+        helper.rotation.set(0, 0, 0);
+        helper.scale.set(0.76, 0.07, 0.19);
+        helper.updateMatrix();
+        mesh.current.setMatrixAt(instance, helper.matrix);
+        instance += 1;
+      }
+    }
+    mesh.current.instanceMatrix.needsUpdate = true;
+    mesh.current.computeBoundingSphere();
+  }, [floor, helper, stairs]);
+
+  if (stairs.length === 0) return null;
+  return (
     <instancedMesh
       ref={mesh}
-      args={[undefined, undefined, floor.tiles.length]}
+      args={[undefined, undefined, stairs.length * 4]}
+      castShadow={shadows}
       receiveShadow={shadows}
-      onClick={handleClick}
     >
-      <boxGeometry args={[TILE_SIZE, 1, TILE_SIZE]} />
-      <meshStandardMaterial
-        roughness={0.82}
-        metalness={0.08}
-        emissive="#292d3d"
-        emissiveIntensity={0.72}
-        vertexColors
-      />
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="#c49a58" roughness={0.62} metalness={0.12} />
     </instancedMesh>
   );
 }
 
 function WallInstances({ floor, shadows }: { floor: FloorMap; shadows: boolean }) {
-  const mesh = useRef<InstancedMesh>(null);
+  const solidWalls = useMemo(
+    () => floor.walls.filter((wall) => wall.kind !== "door"),
+    [floor.walls],
+  );
+  const walls = useRef<InstancedMesh>(null);
+  const caps = useRef<InstancedMesh>(null);
   const helper = useMemo(() => new Object3D(), []);
+  const color = useMemo(() => new Color(), []);
   useEffect(() => {
-    if (!mesh.current) return;
-    floor.walls.forEach((wall, index) => {
+    if (!walls.current || !caps.current) return;
+    solidWalls.forEach((wall, index) => {
       const [baseX, , baseZ] = worldPosition(floor, wall);
       const transform = wallTransform(baseX, baseZ, wall);
       helper.position.set(transform.x, WALL_HEIGHT / 2, transform.z);
       helper.rotation.set(0, transform.rotation, 0);
       helper.scale.set(1, 1, 1);
       helper.updateMatrix();
-      mesh.current?.setMatrixAt(index, helper.matrix);
+      walls.current!.setMatrixAt(index, helper.matrix);
+      walls.current!.setColorAt(index, color.set(wallColor(wall.kind)));
+
+      helper.position.set(transform.x, WALL_HEIGHT + 0.035, transform.z);
+      helper.scale.set(1.06, 0.08, 1.3);
+      helper.updateMatrix();
+      caps.current!.setMatrixAt(index, helper.matrix);
+      caps.current!.setColorAt(
+        index,
+        color.set(wall.kind === "secret-door" ? "#a487be" : "#777b87"),
+      );
     });
-    mesh.current.instanceMatrix.needsUpdate = true;
-    mesh.current.computeBoundingSphere();
-  }, [floor, helper]);
+    for (const mesh of [walls.current, caps.current]) {
+      mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+      mesh.computeBoundingSphere();
+    }
+  }, [caps, color, floor, helper, solidWalls]);
 
   return (
-    <instancedMesh
-      ref={mesh}
-      args={[undefined, undefined, floor.walls.length]}
-      castShadow={shadows}
-      receiveShadow={shadows}
-    >
-      <boxGeometry args={[1.04, WALL_HEIGHT, 0.14]} />
-      <meshStandardMaterial color="#515668" roughness={0.72} metalness={0.18} />
-    </instancedMesh>
+    <>
+      {solidWalls.length > 0 && (
+        <>
+          <instancedMesh
+            ref={walls}
+            args={[undefined, undefined, solidWalls.length]}
+            castShadow={shadows}
+            receiveShadow={shadows}
+          >
+            <boxGeometry args={[1.04, WALL_HEIGHT, 0.16]} />
+            <meshStandardMaterial
+              vertexColors
+              roughness={0.78}
+              metalness={0.1}
+              emissive="#292b38"
+              emissiveIntensity={0.42}
+            />
+          </instancedMesh>
+          <instancedMesh
+            ref={caps}
+            args={[undefined, undefined, solidWalls.length]}
+            castShadow={shadows}
+          >
+            <boxGeometry args={[1.04, 1, 0.14]} />
+            <meshStandardMaterial vertexColors roughness={0.55} metalness={0.25} />
+          </instancedMesh>
+        </>
+      )}
+      <DoorInstances
+        floor={floor}
+        doors={floor.walls.filter((wall) => wall.kind === "door")}
+        shadows={shadows}
+      />
+    </>
+  );
+}
+
+function DoorInstances({
+  floor,
+  doors,
+  shadows,
+}: {
+  floor: FloorMap;
+  doors: WallEdge[];
+  shadows: boolean;
+}) {
+  const frames = useRef<InstancedMesh>(null);
+  const leaves = useRef<InstancedMesh>(null);
+  const helper = useMemo(() => new Object3D(), []);
+  const color = useMemo(() => new Color(), []);
+
+  useEffect(() => {
+    if (!frames.current || !leaves.current) return;
+    let frameIndex = 0;
+    doors.forEach((door, index) => {
+      const [baseX, , baseZ] = worldPosition(floor, door);
+      const transform = wallTransform(baseX, baseZ, door);
+      const alongX = Math.cos(transform.rotation);
+      const alongZ = -Math.sin(transform.rotation);
+
+      for (const side of [-1, 1]) {
+        helper.position.set(
+          transform.x + alongX * side * 0.43,
+          0.78,
+          transform.z + alongZ * side * 0.43,
+        );
+        helper.rotation.set(0, transform.rotation, 0);
+        helper.scale.set(0.14, 1.56, 1);
+        helper.updateMatrix();
+        frames.current!.setMatrixAt(frameIndex, helper.matrix);
+        frameIndex += 1;
+      }
+      helper.position.set(transform.x, 1.56, transform.z);
+      helper.scale.set(1, 0.15, 1);
+      helper.updateMatrix();
+      frames.current!.setMatrixAt(frameIndex, helper.matrix);
+      frameIndex += 1;
+
+      helper.position.set(transform.x, 0.73, transform.z);
+      helper.rotation.set(
+        0,
+        transform.rotation + (door.open ? Math.PI * 0.42 : 0),
+        0,
+      );
+      helper.scale.set(0.72, 1.34, 0.65);
+      helper.updateMatrix();
+      leaves.current!.setMatrixAt(index, helper.matrix);
+      leaves.current!.setColorAt(
+        index,
+        color.set(door.locked ? "#c49a58" : "#77502f"),
+      );
+    });
+
+    for (const mesh of [frames.current, leaves.current]) {
+      mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+      mesh.computeBoundingSphere();
+    }
+  }, [color, doors, floor, helper]);
+
+  if (doors.length === 0) return null;
+  return (
+    <>
+      <instancedMesh
+        ref={frames}
+        args={[undefined, undefined, doors.length * 3]}
+        castShadow={shadows}
+      >
+        <boxGeometry args={[1, 1, 0.2]} />
+        <meshStandardMaterial color="#34323a" roughness={0.55} metalness={0.4} />
+      </instancedMesh>
+      <instancedMesh
+        ref={leaves}
+        args={[undefined, undefined, doors.length]}
+        castShadow={shadows}
+      >
+        <boxGeometry args={[1, 1, 0.14]} />
+        <meshStandardMaterial vertexColors roughness={0.72} metalness={0.18} />
+      </instancedMesh>
+    </>
   );
 }
 
@@ -201,6 +411,154 @@ function wallTransform(x: number, z: number, wall: WallEdge) {
   }
 }
 
+interface EditorHover {
+  position: GridPosition;
+  direction?: GridEdgeDirection;
+}
+
+function EditorSurface({
+  floor,
+  tool,
+  onEdit,
+}: {
+  floor: FloorMap;
+  tool: GridEditorTool;
+  onEdit: (position: GridPosition, direction?: GridEdgeDirection) => void;
+}) {
+  const [hover, setHover] = useState<EditorHover | null>(null);
+  const wallTool = isWallEditorTool(tool);
+
+  const targetFromEvent = (event: ThreeEvent<PointerEvent | MouseEvent>): EditorHover | null => {
+    const position = {
+      x: Math.floor(event.point.x + floor.width / 2 + 0.5),
+      z: Math.floor(event.point.z + floor.height / 2 + 0.5),
+    };
+    if (
+      position.x < 0 ||
+      position.z < 0 ||
+      position.x >= floor.width ||
+      position.z >= floor.height
+    ) {
+      return null;
+    }
+    if (!wallTool) return { position };
+    const center = worldPosition(floor, position);
+    const offsetX = event.point.x - center[0];
+    const offsetZ = event.point.z - center[2];
+    const direction: GridEdgeDirection =
+      Math.abs(offsetX) > Math.abs(offsetZ)
+        ? offsetX >= 0
+          ? "east"
+          : "west"
+        : offsetZ >= 0
+          ? "south"
+          : "north";
+    return { position, direction };
+  };
+
+  const previewColor =
+    tool === "tile-lava"
+      ? "#ff5a32"
+      : tool === "tile-water"
+        ? "#42a5d9"
+        : tool.includes("erase")
+          ? "#d04f62"
+          : tool.includes("door")
+            ? "#d8ad61"
+            : "#8b70ff";
+
+  return (
+    <>
+      <Grid
+        args={[floor.width, floor.height]}
+        position={[-0.5, 0.135, -0.5]}
+        cellSize={1}
+        cellThickness={0.6}
+        cellColor="#7b6fa1"
+        sectionSize={5}
+        sectionThickness={1}
+        sectionColor="#c49d57"
+        fadeDistance={Math.max(floor.width, floor.height) * 1.2}
+        infiniteGrid={false}
+      />
+      <mesh
+        position={[-0.5, 0.16, -0.5]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        renderOrder={20}
+        onPointerMove={(event) => {
+          event.stopPropagation();
+          setHover(targetFromEvent(event));
+        }}
+        onPointerLeave={() => setHover(null)}
+        onClick={(event) => {
+          event.stopPropagation();
+          const target = targetFromEvent(event);
+          if (target) onEdit(target.position, target.direction);
+        }}
+      >
+        <planeGeometry args={[floor.width, floor.height]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
+      {hover && wallTool && hover.direction ? (
+        <EditorEdgePreview
+          floor={floor}
+          position={hover.position}
+          direction={hover.direction}
+          color={previewColor}
+        />
+      ) : hover ? (
+        <mesh
+          position={[
+            worldPosition(floor, hover.position)[0],
+            0.19,
+            worldPosition(floor, hover.position)[2],
+          ]}
+          renderOrder={19}
+        >
+          <boxGeometry args={[0.9, 0.07, 0.9]} />
+          <meshBasicMaterial
+            color={previewColor}
+            transparent
+            opacity={0.58}
+            depthWrite={false}
+          />
+        </mesh>
+      ) : null}
+    </>
+  );
+}
+
+function EditorEdgePreview({
+  floor,
+  position,
+  direction,
+  color,
+}: {
+  floor: FloorMap;
+  position: GridPosition;
+  direction: GridEdgeDirection;
+  color: string;
+}) {
+  const [x, , z] = worldPosition(floor, position);
+  const transform = wallTransform(x, z, {
+    ...position,
+    direction,
+    kind: "wall",
+    open: false,
+    locked: false,
+  });
+  return (
+    <mesh
+      position={[transform.x, 0.28, transform.z]}
+      rotation={[0, transform.rotation, 0]}
+      renderOrder={19}
+    >
+      <boxGeometry args={[1.02, 0.35, 0.1]} />
+      <meshBasicMaterial color={color} transparent opacity={0.78} depthWrite={false} />
+    </mesh>
+  );
+}
+
 function PropInstances({
   floor,
   entities,
@@ -210,45 +568,216 @@ function PropInstances({
   entities: SceneEntity[];
   shadows: boolean;
 }) {
-  const mesh = useRef<InstancedMesh>(null);
-  const helper = useMemo(() => new Object3D(), []);
-  const color = useMemo(() => new Color(), []);
-  useEffect(() => {
-    if (!mesh.current) return;
-    entities.forEach((entity, index) => {
-      const [x, , z] = worldPosition(floor, entity.position);
-      const column = entity.assetId?.includes("column");
-      helper.position.set(x, column ? 0.8 : 0.32, z);
-      helper.rotation.set(0, (index % 4) * (Math.PI / 2), 0);
-      helper.scale.set(column ? 0.55 : 0.58, column ? 1.6 : 0.62, column ? 0.55 : 0.58);
-      helper.updateMatrix();
-      mesh.current?.setMatrixAt(index, helper.matrix);
-      const propColor =
-        entity.kind === "key"
-          ? "#dcae52"
-          : entity.assetId?.includes("brazier")
-            ? "#e66a3e"
-            : entity.assetId?.includes("column")
-              ? "#707481"
-              : "#8b684e";
-      mesh.current?.setColorAt(index, color.set(propColor));
-    });
-    mesh.current.instanceMatrix.needsUpdate = true;
-    if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true;
-    mesh.current.computeBoundingSphere();
-  }, [color, entities, floor, helper]);
+  const groups = useMemo(() => {
+    const next = new Map<ProceduralPropFamily, SceneEntity[]>();
+    for (const entity of entities) {
+      const family = proceduralPropFamily(entity);
+      next.set(family, [...(next.get(family) ?? []), entity]);
+    }
+    return next;
+  }, [entities]);
+  const braziers = groups.get("brazier") ?? [];
+
   if (entities.length === 0) return null;
   return (
-    <instancedMesh
-      ref={mesh}
-      args={[undefined, undefined, entities.length]}
-      castShadow={shadows}
-      receiveShadow={shadows}
-    >
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial roughness={0.68} metalness={0.12} vertexColors />
-    </instancedMesh>
+    <>
+      {[...groups.entries()].map(([family, familyEntities]) => (
+        <PropFamilyInstances
+          key={family}
+          family={family}
+          floor={floor}
+          entities={familyEntities}
+          shadows={shadows}
+        />
+      ))}
+      {braziers.slice(0, 6).map((entity) => {
+        const [x, , z] = worldPosition(floor, entity.position);
+        return (
+          <pointLight
+            key={`brazier-light-${entity.id}`}
+            color="#ff8a42"
+            intensity={5}
+            distance={5}
+            decay={2}
+            position={[x, 1.05, z]}
+          />
+        );
+      })}
+    </>
   );
+}
+
+function PropFamilyInstances({
+  floor,
+  entities,
+  family,
+  shadows,
+}: {
+  floor: FloorMap;
+  entities: SceneEntity[];
+  family: ProceduralPropFamily;
+  shadows: boolean;
+}) {
+  const primary = useRef<InstancedMesh>(null);
+  const accents = useRef<InstancedMesh>(null);
+  const helper = useMemo(() => new Object3D(), []);
+  const color = useMemo(() => new Color(), []);
+
+  useEffect(() => {
+    if (!primary.current || !accents.current) return;
+    entities.forEach((entity, index) => {
+      const [x, , z] = worldPosition(floor, entity.position);
+      const rotation = (index % 4) * (Math.PI / 2);
+      const transform = propTransform(family, "primary");
+      helper.position.set(x, transform.y, z);
+      helper.rotation.set(0, rotation + transform.rotation, 0);
+      helper.scale.set(...transform.scale);
+      helper.updateMatrix();
+      primary.current!.setMatrixAt(index, helper.matrix);
+      primary.current!.setColorAt(index, color.set(propColor(family, entity)));
+
+      const accent = propTransform(family, "accent");
+      helper.position.set(x, accent.y, z);
+      helper.rotation.set(0, rotation + accent.rotation, 0);
+      helper.scale.set(...accent.scale);
+      helper.updateMatrix();
+      accents.current!.setMatrixAt(index, helper.matrix);
+      accents.current!.setColorAt(index, color.set(propAccentColor(family, entity)));
+    });
+
+    for (const mesh of [primary.current, accents.current]) {
+      mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+      mesh.computeBoundingSphere();
+    }
+  }, [color, entities, family, floor, helper]);
+
+  return (
+    <>
+      <instancedMesh
+        ref={primary}
+        args={[undefined, undefined, entities.length]}
+        castShadow={shadows}
+        receiveShadow={shadows}
+      >
+        <PropGeometry family={family} accent={false} />
+        <meshStandardMaterial
+          roughness={family === "marker" ? 0.42 : 0.72}
+          metalness={family === "brazier" || family === "chest" ? 0.28 : 0.1}
+          vertexColors
+        />
+      </instancedMesh>
+      <instancedMesh
+        ref={accents}
+        args={[undefined, undefined, entities.length]}
+        castShadow={shadows}
+      >
+        <PropGeometry family={family} accent />
+        <meshStandardMaterial
+          vertexColors
+          roughness={family === "brazier" ? 0.25 : 0.52}
+          metalness={family === "brazier" || family === "chest" ? 0.45 : 0.16}
+          emissive={family === "brazier" ? "#d84514" : "#151119"}
+          emissiveIntensity={family === "brazier" ? 2.2 : 0.15}
+        />
+      </instancedMesh>
+    </>
+  );
+}
+
+function PropGeometry({
+  family,
+  accent,
+}: {
+  family: ProceduralPropFamily;
+  accent: boolean;
+}) {
+  if (family === "column") {
+    return accent ? (
+      <cylinderGeometry args={[0.5, 0.5, 1, 8]} />
+    ) : (
+      <cylinderGeometry args={[0.38, 0.44, 1, 10]} />
+    );
+  }
+  if (family === "brazier") {
+    return accent ? (
+      <coneGeometry args={[0.26, 0.7, 7]} />
+    ) : (
+      <cylinderGeometry args={[0.42, 0.28, 1, 8]} />
+    );
+  }
+  if (family === "marker") {
+    return accent ? (
+      <torusGeometry args={[0.31, 0.06, 6, 16]} />
+    ) : (
+      <octahedronGeometry args={[0.5, 0]} />
+    );
+  }
+  if (family === "generic") {
+    return accent ? (
+      <cylinderGeometry args={[0.44, 0.44, 0.12, 12]} />
+    ) : (
+      <dodecahedronGeometry args={[0.5, 0]} />
+    );
+  }
+  return <boxGeometry args={[1, 1, 1]} />;
+}
+
+function propTransform(
+  family: ProceduralPropFamily,
+  layer: "primary" | "accent",
+): { y: number; rotation: number; scale: [number, number, number] } {
+  const transforms: Record<
+    ProceduralPropFamily,
+    Record<"primary" | "accent", { y: number; rotation: number; scale: [number, number, number] }>
+  > = {
+    column: {
+      primary: { y: 0.75, rotation: 0, scale: [0.82, 1.38, 0.82] },
+      accent: { y: 1.49, rotation: Math.PI / 8, scale: [1.08, 0.15, 1.08] },
+    },
+    crate: {
+      primary: { y: 0.31, rotation: 0, scale: [0.62, 0.62, 0.62] },
+      accent: { y: 0.63, rotation: Math.PI / 4, scale: [0.5, 0.08, 0.5] },
+    },
+    brazier: {
+      primary: { y: 0.38, rotation: 0, scale: [0.74, 0.66, 0.74] },
+      accent: { y: 0.96, rotation: 0, scale: [0.7, 0.82, 0.7] },
+    },
+    chest: {
+      primary: { y: 0.27, rotation: 0, scale: [0.68, 0.42, 0.48] },
+      accent: { y: 0.54, rotation: 0.08, scale: [0.7, 0.16, 0.5] },
+    },
+    marker: {
+      primary: { y: 0.3, rotation: Math.PI / 4, scale: [0.42, 0.55, 0.42] },
+      accent: { y: 0.08, rotation: Math.PI / 2, scale: [1, 1, 1] },
+    },
+    generic: {
+      primary: { y: 0.36, rotation: 0, scale: [0.68, 0.68, 0.68] },
+      accent: { y: 0.08, rotation: 0, scale: [0.9, 0.9, 0.9] },
+    },
+  };
+  return transforms[family][layer];
+}
+
+function propAccentColor(
+  family: ProceduralPropFamily,
+  entity: SceneEntity,
+): string {
+  if (entity.kind === "key") return "#f0cf6b";
+  switch (family) {
+    case "column":
+      return "#9296a3";
+    case "crate":
+      return "#b88852";
+    case "brazier":
+      return "#ff8a3c";
+    case "chest":
+      return "#d1a44e";
+    case "marker":
+      return entity.kind === "trap" ? "#e75b5c" : "#a68bff";
+    case "generic":
+      return "#aa82ad";
+  }
 }
 
 interface TokenRenderItem {
@@ -288,7 +817,7 @@ function TokenInstances({
       const boss = token.entity.kind === "boss";
       const scale = boss ? 1.27 : 1;
 
-      helper.position.set(x, 0.28, z);
+      helper.position.set(x, boss ? 0.55 : 0.49, z);
       helper.rotation.set(0, 0, 0);
       helper.scale.set(scale, boss ? 1.25 : 1, scale);
       helper.updateMatrix();
@@ -298,7 +827,7 @@ function TokenInstances({
         color.set(token.selected ? "#f3c969" : boss ? "#b33b4a" : "#7a5cff"),
       );
 
-      helper.position.set(x, boss ? 0.86 : 0.74, z);
+      helper.position.set(x, boss ? 1.05 : 0.91, z);
       helper.scale.setScalar(boss ? 1.26 : 1);
       helper.updateMatrix();
       heads.current!.setMatrixAt(index, helper.matrix);
@@ -334,13 +863,13 @@ function TokenInstances({
         castShadow={shadows}
         onClick={handleClick}
       >
-        <cylinderGeometry args={[0.3, 0.36, 0.68, 16]} />
+        <capsuleGeometry args={[0.28, 0.42, 6, 12]} />
         <meshStandardMaterial
           vertexColors
           emissive="#241860"
           emissiveIntensity={0.42}
-          roughness={0.38}
-          metalness={0.35}
+          roughness={0.34}
+          metalness={0.26}
         />
       </instancedMesh>
       <instancedMesh
@@ -349,7 +878,7 @@ function TokenInstances({
         castShadow={shadows}
         onClick={handleClick}
       >
-        <sphereGeometry args={[0.19, 16, 12]} />
+        <sphereGeometry args={[0.2, 16, 12]} />
         <meshStandardMaterial
           vertexColors
           emissive="#211b42"
@@ -463,12 +992,15 @@ function BattleScene(props: Props & { quality: SceneQualityProfile }) {
     measureMode,
     measureStart,
     measureEnd,
+    editorEnabled,
+    editorTool,
     quality,
     onSelectToken,
     onMoveToken,
     onFog,
     onPing,
     onMeasure,
+    onEdit,
   } = props;
   const revealed = session?.revealedCells[floor.id] || floor.tiles.map(({ x, z }) => ({ x, z }));
   const entities = useMemo(
@@ -485,6 +1017,7 @@ function BattleScene(props: Props & { quality: SceneQualityProfile }) {
   );
 
   const handleTile = (tile: Tile) => {
+    if (editorEnabled) return;
     if (pingMode && session) {
       onPing(floor.id, tile);
       return;
@@ -546,17 +1079,22 @@ function BattleScene(props: Props & { quality: SceneQualityProfile }) {
         maxPolarAngle={Math.PI / 2.08}
         enableDamping
       />
-      <ambientLight intensity={2.8} color="#d2d6ef" />
-      <hemisphereLight color="#b8b4ff" groundColor="#34394c" intensity={1.6} />
+      <ambientLight intensity={3.8} color="#e2e4f5" />
+      <hemisphereLight color="#c9c4ff" groundColor="#444b61" intensity={2.15} />
       <directionalLight
         castShadow={quality.shadows}
         color="#d8d4ff"
-        intensity={3.4}
+        intensity={4.5}
         position={[12, 24, 8]}
         shadow-mapSize-width={quality.shadowMapSize}
         shadow-mapSize-height={quality.shadowMapSize}
       />
-      <pointLight color="#765aff" intensity={24} distance={42} position={[-12, 8, -8]} />
+      <directionalLight
+        color="#78a9d9"
+        intensity={2.1}
+        position={[-16, 12, -10]}
+      />
+      <pointLight color="#765aff" intensity={22} distance={42} position={[-12, 8, -8]} />
       {quality.starCount > 0 && (
         <Stars
           radius={75}
@@ -571,7 +1109,12 @@ function BattleScene(props: Props & { quality: SceneQualityProfile }) {
       <group>
         <mesh position={[0, -0.2, 0]} receiveShadow={quality.shadows}>
           <boxGeometry args={[floor.width + 8, 0.25, floor.height + 8]} />
-          <meshStandardMaterial color="#151822" roughness={1} />
+          <meshStandardMaterial
+            color="#222738"
+            emissive="#111521"
+            emissiveIntensity={0.5}
+            roughness={1}
+          />
         </mesh>
         <TileInstances floor={floor} onTile={handleTile} shadows={quality.shadows} />
         <WallInstances floor={floor} shadows={quality.shadows} />
@@ -594,6 +1137,9 @@ function BattleScene(props: Props & { quality: SceneQualityProfile }) {
           <PingMarker key={latestPing.revision} floor={floor} position={latestPing} />
         )}
         {measureStart && measureEnd && <Measurement floor={floor} start={measureStart} end={measureEnd} />}
+        {editorEnabled && (
+          <EditorSurface floor={floor} tool={editorTool} onEdit={onEdit} />
+        )}
       </group>
       <Html position={[-floor.width / 2, 0.8, -floor.height / 2]} transform>
         <div className="scene-label">{adventure.name["en-US"]}</div>
@@ -613,6 +1159,9 @@ export function DungeonScene(props: Props) {
       className="scene-shell"
       data-testid="scene-shell"
       data-render-profile={quality.name}
+      data-editor-enabled={props.editorEnabled}
+      data-tile-count={props.floor.tiles.length}
+      data-wall-count={props.floor.walls.length}
     >
       <Canvas
         shadows={quality.shadows}

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { applySessionEvent } from "./store";
-import type { SessionEvent, SessionState } from "./types";
+import { applySessionEvent, useAppStore } from "./store";
+import { createSceneBenchmarkFloor } from "./testFixtures/sceneBenchmark";
+import type { AdventureDocument, SessionEvent, SessionState } from "./types";
 
 function state(): SessionState {
   return {
@@ -60,3 +61,80 @@ describe("session event projection", () => {
     expect(hidden.revealedCells["floor-1"]).toEqual([]);
   });
 });
+
+describe("local grid history", () => {
+  it("undoes and redoes grid changes exactly", () => {
+    const before = adventure();
+    useAppStore.getState().setAdventure(before);
+    useAppStore.getState().editGrid({
+      floorId: "benchmark-64",
+      tool: "tile-lava",
+      position: { x: 4, z: 4 },
+    });
+    const edited = useAppStore.getState().adventure!;
+
+    expect(useAppStore.getState().editorDirty).toBe(true);
+    expect(tileKind(edited, 4, 4)).toBe("lava");
+
+    useAppStore.getState().undoGridEdit();
+    expect(useAppStore.getState().adventure).toEqual(before);
+    expect(useAppStore.getState().editorDirty).toBe(false);
+
+    useAppStore.getState().redoGridEdit();
+    expect(useAppStore.getState().adventure).toEqual(edited);
+    expect(useAppStore.getState().editorDirty).toBe(true);
+  });
+});
+
+function tileKind(document: AdventureDocument, x: number, z: number) {
+  return document.floors[0].tiles.find((tile) => tile.x === x && tile.z === z)?.kind;
+}
+
+function adventure(): AdventureDocument {
+  return {
+    id: "adventure-1",
+    schemaVersion: "1.0.0",
+    generatorVersion: "test",
+    version: 1,
+    seed: 1,
+    name: localized("Adventure"),
+    spec: {
+      partySize: 4,
+      partyLevel: 5,
+      durationHours: 4,
+      difficulty: "medium",
+      theme: "test",
+      biome: "test",
+      floorCount: 1,
+      objective: "test",
+      antagonist: "test",
+      structureStyle: "branching",
+      treasureQuality: "standard",
+      useAI: false,
+    },
+    summary: localized("Summary"),
+    narrative: {
+      hook: localized("Hook"),
+      objective: localized("Objective"),
+      antagonist: localized("Antagonist"),
+      atmosphere: localized("Atmosphere"),
+    },
+    floors: [createSceneBenchmarkFloor({ size: 64, tokenCount: 0, propCount: 0 })],
+    encounters: [],
+    analysis: {
+      totalRooms: 1,
+      totalFloors: 1,
+      criticalPath: [],
+      deadEnds: [],
+      estimatedDifficulty: "medium",
+      invariants: [],
+    },
+    attributions: [],
+    createdAt: "2026-07-30T00:00:00.000Z",
+    updatedAt: "2026-07-30T00:00:00.000Z",
+  };
+}
+
+function localized(value: string) {
+  return { "pt-BR": value, "en-US": value };
+}

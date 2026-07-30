@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "packId": "ddivination-base",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "name": {
     "pt-BR": "Pacote Base DDivination",
     "en-US": "DDivination Base Pack"
@@ -16,6 +16,34 @@
       "implementation": "procedural"
     },
     {
+      "id": "procedural-corridor-floor",
+      "type": "material",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
+      "id": "procedural-stairs",
+      "type": "prop",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
+      "id": "procedural-water-floor",
+      "type": "material",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
+      "id": "procedural-lava-floor",
+      "type": "material",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
       "id": "procedural-stone-wall",
       "type": "material",
       "source": "built-in",
@@ -23,7 +51,63 @@
       "implementation": "procedural"
     },
     {
-      "id": "procedural-token",
+      "id": "procedural-door",
+      "type": "prop",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
+      "id": "procedural-secret-door",
+      "type": "prop",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
+      "id": "procedural-column",
+      "type": "prop",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
+      "id": "procedural-crate",
+      "type": "prop",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
+      "id": "procedural-chest",
+      "type": "prop",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
+      "id": "procedural-brazier",
+      "type": "light",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
+      "id": "procedural-marker",
+      "type": "prop",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
+      "id": "procedural-party-token",
+      "type": "token",
+      "source": "built-in",
+      "license": "CC0-1.0",
+      "implementation": "procedural"
+    },
+    {
+      "id": "procedural-boss-token",
       "type": "token",
       "source": "built-in",
       "license": "CC0-1.0",

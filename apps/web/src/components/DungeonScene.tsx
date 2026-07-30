@@ -1162,6 +1162,7 @@ export function DungeonScene(props: Props) {
       data-editor-enabled={props.editorEnabled}
       data-tile-count={props.floor.tiles.length}
       data-wall-count={props.floor.walls.length}
+      data-entity-count={props.floor.entities.length}
     >
       <Canvas
         shadows={quality.shadows}

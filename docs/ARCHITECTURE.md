@@ -21,9 +21,9 @@ entram pela rede local somente depois que o mestre abre uma sessão.
 - SQLite é a fonte local de persistência.
 - O servidor é autoritativo para permissões, movimento, fog e dados.
 - O frontend deriva meshes a partir do documento semântico.
-- O editor de grid altera uma cópia imutável local do documento e mantém
-  histórico limitado de undo/redo; persistência editorial ainda não faz parte
-  dessa fronteira.
+- O editor altera uma cópia imutável local do documento semântico. Grid,
+  conteúdo bilíngue e entidades compartilham o mesmo histórico limitado de
+  undo/redo; persistência editorial ainda não faz parte dessa fronteira.
 - A cena instancia geometrias repetidas e escolhe um perfil de qualidade pela
   carga semântica do andar.
 - O pack procedural agrupa props por família, limita luzes locais e mantém

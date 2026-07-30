@@ -3,6 +3,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { closeSession, createSession, generateAdventure, joinSession, markdownURL, packageURL, printURL } from "./api";
+import { ContentEditorPanel } from "./components/ContentEditorPanel";
 import { GridEditorPanel } from "./components/GridEditorPanel";
 import { VTTDiagnosticsPanel } from "./components/VTTDiagnosticsPanel";
 import type { GridEditorTool } from "./gridEditor";
@@ -302,6 +303,10 @@ function VTT() {
   const connect = useAppStore((state) => state.connect);
   const clearAdventure = useAppStore((state) => state.clearAdventure);
   const editGrid = useAppStore((state) => state.editGrid);
+  const editContent = useAppStore((state) => state.editContent);
+  const addEntity = useAppStore((state) => state.addEntity);
+  const updateEntity = useAppStore((state) => state.updateEntity);
+  const removeEntity = useAppStore((state) => state.removeEntity);
   const undoGridEdit = useAppStore((state) => state.undoGridEdit);
   const redoGridEdit = useAppStore((state) => state.redoGridEdit);
   const discardGridEdits = useAppStore((state) => state.discardGridEdits);
@@ -319,6 +324,7 @@ function VTT() {
   const [initiativeScores, setInitiativeScores] = useState<Record<string, number>>({});
   const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
+  const [editorMode, setEditorMode] = useState<"grid" | "content">("grid");
   const [editorTool, setEditorTool] = useState<GridEditorTool>("tile-floor");
   const [renderTelemetry, setRenderTelemetry] = useState<RenderTelemetry>(() => emptyRenderTelemetry());
 
@@ -629,7 +635,7 @@ function VTT() {
             measureMode={measureMode}
             measureStart={measureStart}
             measureEnd={measureEnd}
-            editorEnabled={editorOpen}
+            editorEnabled={editorOpen && editorMode === "grid"}
             editorTool={editorTool}
             telemetryEnabled={diagnosticsOpen}
             onTelemetry={updateRenderTelemetry}
@@ -667,13 +673,31 @@ function VTT() {
           />
         </Suspense>
 
-        {editorOpen && (
+        {editorOpen && editorMode === "grid" && (
           <GridEditorPanel
             tool={editorTool}
             canUndo={editorPast.length > 0}
             canRedo={editorFuture.length > 0}
             dirty={editorDirty}
+            onContentMode={() => setEditorMode("content")}
             onTool={setEditorTool}
+            onUndo={undoGridEdit}
+            onRedo={redoGridEdit}
+            onDiscard={discardGridEdits}
+          />
+        )}
+        {editorOpen && editorMode === "content" && (
+          <ContentEditorPanel
+            adventure={adventure}
+            floor={floor}
+            canUndo={editorPast.length > 0}
+            canRedo={editorFuture.length > 0}
+            dirty={editorDirty}
+            onGridMode={() => setEditorMode("grid")}
+            onContent={editContent}
+            onAddEntity={(entity) => addEntity(floor.id, entity)}
+            onUpdateEntity={(entity) => updateEntity(floor.id, entity)}
+            onRemoveEntity={(entityId) => removeEntity(floor.id, entityId)}
             onUndo={undoGridEdit}
             onRedo={redoGridEdit}
             onDiscard={discardGridEdits}

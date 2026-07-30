@@ -6,6 +6,7 @@ interface Props {
   canUndo: boolean;
   canRedo: boolean;
   dirty: boolean;
+  onContentMode: () => void;
   onTool: (tool: GridEditorTool) => void;
   onUndo: () => void;
   onRedo: () => void;
@@ -33,6 +34,7 @@ export function GridEditorPanel({
   canUndo,
   canRedo,
   dirty,
+  onContentMode,
   onTool,
   onUndo,
   onRedo,
@@ -52,6 +54,19 @@ export function GridEditorPanel({
         </div>
         {dirty && <i title={t("editorUnsaved")} />}
       </header>
+
+      <nav className="editor-mode-tabs" aria-label={t("editorModes")}>
+        <button
+          data-testid="editor-mode-grid"
+          className="active"
+          aria-pressed
+        >
+          {t("editorGridMode")}
+        </button>
+        <button data-testid="editor-mode-content" onClick={onContentMode}>
+          {t("editorContentMode")}
+        </button>
+      </nav>
 
       <ToolGroup
         title={t("editorTiles")}

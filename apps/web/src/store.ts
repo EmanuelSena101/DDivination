@@ -1,5 +1,13 @@
 import { create } from "zustand";
 import { sessionWebSocketURL } from "./api";
+import {
+  addSceneEntity,
+  applyAdventureContentEdit,
+  removeSceneEntity,
+  updateSceneEntity,
+  type AdventureContentEdit,
+  type ContentEditRejection,
+} from "./contentEditor";
 import { applyGridEdit, type GridEdit } from "./gridEditor";
 import {
   createConnectionTelemetry,
@@ -11,6 +19,7 @@ import type {
   DiceRoll,
   GridPosition,
   Language,
+  SceneEntity,
   SessionCommand,
   SessionEvent,
   SessionState,
@@ -47,6 +56,10 @@ interface AppState {
   setFloor: (floorId: string) => void;
   setSelectedToken: (tokenId: string | null) => void;
   editGrid: (edit: GridEdit) => void;
+  editContent: (edit: AdventureContentEdit) => void;
+  addEntity: (floorId: string, entity: SceneEntity) => void;
+  updateEntity: (floorId: string, entity: SceneEntity) => void;
+  removeEntity: (floorId: string, entityId: string) => void;
   undoGridEdit: () => void;
   redoGridEdit: () => void;
   discardGridEdits: () => void;
@@ -194,14 +207,63 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
       return;
     }
-    set({
-      adventure: result.document,
-      editorPast: [...current.editorPast, current.adventure].slice(-40),
-      editorFuture: [],
-      editorDirty: true,
-      error: null,
-      selectedTokenId: null,
-    });
+    set(editorChange(current, result.document));
+  },
+  editContent: (edit) => {
+    const current = get();
+    if (!current.adventure) return;
+    if (current.session) {
+      set({ error: "Content editing is unavailable while a table is open" });
+      return;
+    }
+    const result = applyAdventureContentEdit(current.adventure, edit);
+    if (!result.changed) {
+      if (result.rejection) set({ error: contentEditError(result.rejection) });
+      return;
+    }
+    set(editorChange(current, result.document));
+  },
+  addEntity: (floorId, entity) => {
+    const current = get();
+    if (!current.adventure) return;
+    if (current.session) {
+      set({ error: "Entity editing is unavailable while a table is open" });
+      return;
+    }
+    const result = addSceneEntity(current.adventure, floorId, entity);
+    if (!result.changed) {
+      if (result.rejection) set({ error: contentEditError(result.rejection) });
+      return;
+    }
+    set(editorChange(current, result.document));
+  },
+  updateEntity: (floorId, entity) => {
+    const current = get();
+    if (!current.adventure) return;
+    if (current.session) {
+      set({ error: "Entity editing is unavailable while a table is open" });
+      return;
+    }
+    const result = updateSceneEntity(current.adventure, floorId, entity);
+    if (!result.changed) {
+      if (result.rejection) set({ error: contentEditError(result.rejection) });
+      return;
+    }
+    set(editorChange(current, result.document));
+  },
+  removeEntity: (floorId, entityId) => {
+    const current = get();
+    if (!current.adventure) return;
+    if (current.session) {
+      set({ error: "Entity editing is unavailable while a table is open" });
+      return;
+    }
+    const result = removeSceneEntity(current.adventure, floorId, entityId);
+    if (!result.changed) {
+      if (result.rejection) set({ error: contentEditError(result.rejection) });
+      return;
+    }
+    set(editorChange(current, result.document));
   },
   undoGridEdit: () => {
     const current = get();
@@ -424,5 +486,34 @@ function gridEditError(rejection: NonNullable<ReturnType<typeof applyGridEdit>["
       return "Select a valid grid edge";
     case "floor-not-found":
       return "The selected floor no longer exists";
+  }
+}
+
+function editorChange(
+  current: AppState,
+  adventure: AdventureDocument,
+): Partial<AppState> {
+  return {
+    adventure,
+    editorPast: [...current.editorPast, current.adventure!].slice(-40),
+    editorFuture: [],
+    editorDirty: true,
+    error: null,
+    selectedTokenId: null,
+  };
+}
+
+function contentEditError(rejection: ContentEditRejection): string {
+  switch (rejection) {
+    case "floor-not-found":
+      return "The selected floor no longer exists";
+    case "entity-not-found":
+      return "The selected entity no longer exists";
+    case "duplicate-entity":
+      return "An entity with this identifier already exists";
+    case "out-of-bounds":
+      return "Entity coordinates are outside the active floor";
+    case "missing-tile":
+      return "Entities must be placed on an existing tile";
   }
 }

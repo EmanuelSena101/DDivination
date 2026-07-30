@@ -56,9 +56,15 @@ Playwright, suíte Go, contratos, budgets, QA visual e todos os sete jobs do CI.
 Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-005-grid-editor-visual-pack.md](batches/BATCH-005-grid-editor-visual-pack.md).
 
-## Próxima batch planejada
+## Batch em validação
 
 `BATCH-006 — Editor de entidades e conteúdo`
+
+A implementação adiciona edição local de narrativa bilíngue, metadados do andar
+e entidades da cena, compartilhando undo/redo com o editor de grid. A validação
+local aprovou 22 testes Vitest, 4 cenários Playwright, suíte Go, contratos,
+budgets, build e QA visual sem erros no console. Falta apenas a validação do CI
+e o merge para concluir a batch.
 
 Persistência editorial continua reservada à BATCH-007 e o pipeline completo de
 GLB à BATCH-014.

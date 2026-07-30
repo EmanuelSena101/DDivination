@@ -1,6 +1,6 @@
 # BATCH-005 — Editor de grid e revisão visual do pack base
 
-Estado: `VALIDATING`
+Estado: `DONE`
 
 Issue: [#17](https://github.com/EmanuelSena101/DDivination/issues/17)
 
@@ -76,7 +76,7 @@ para as próximas ferramentas da VTT.
 - [x] edição fica indisponível durante sessão LAN;
 - [x] pisos, arestas e props principais possuem silhuetas distinguíveis;
 - [x] o pack base documenta todos os assets procedurais;
-- [ ] testes, documentação, QA visual e CI são aprovados.
+- [x] testes, documentação, QA visual e CI são aprovados.
 
 ## Testes obrigatórios
 
@@ -134,6 +134,15 @@ para as próximas ferramentas da VTT.
 - QA visual identificou baixo contraste inicial; paleta, luz de preenchimento e
   materiais foram corrigidos e reinspecionados;
 - nenhum erro da aplicação no console.
+
+### 2026-07-30 — conclusão
+
+- PR #18 aprovado pelos sete jobs do CI do projeto e integrado em `main`;
+- issue #17 encerrada automaticamente pelo merge;
+- preview externo da Vercel falhou por não representar o runtime Go local-first
+  e não faz parte dos gates definidos para a batch;
+- BATCH-005 marcada como `DONE`; BATCH-006 permanece como próxima batch
+  planejada.
 
 ## Resultado
 

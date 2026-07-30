@@ -4,7 +4,9 @@ Estado: `DONE`
 
 Issue: [#22](https://github.com/EmanuelSena101/DDivination/issues/22)
 
-Pull Request: [#23](https://github.com/EmanuelSena101/DDivination/pull/23)
+Pull Requests:
+[implementação #23](https://github.com/EmanuelSena101/DDivination/pull/23) e
+[encerramento #24](https://github.com/EmanuelSena101/DDivination/pull/24)
 
 ## Contexto
 
@@ -52,6 +54,96 @@ ativo, mantendo o documento semântico como fonte da cena 3D.
 - Uma entidade só pode ocupar coordenadas dentro do mapa que possuam tile.
 - Identificadores novos são gerados no cliente para o rascunho e serão
   substituídos por uma estratégia persistente na BATCH-007.
+
+## O que foi entregue
+
+### Narrativa e metadados
+
+No modo **Conteúdo > História**, o mestre pode editar:
+
+- nome da aventura;
+- nome do andar ativo;
+- resumo;
+- gancho;
+- objetivo;
+- antagonista;
+- atmosfera.
+
+Cada valor possui versões independentes em `pt-BR` e `en-US`. As alterações só
+entram no documento ao selecionar **Aplicar alterações**, evitando um item de
+histórico por tecla digitada.
+
+### Entidades da cena
+
+No modo **Conteúdo > Entidades**, o mestre pode:
+
+- criar `prop`, `light`, `trap`, `marker`, `token` e `boss`;
+- selecionar uma entidade existente;
+- alterar nome, tipo, família visual, coordenadas e flags;
+- definir se ela bloqueia movimento ou começa oculta;
+- remover a entidade após confirmação.
+
+O frontend escolhe uma célula caminhável e desocupada ao criar a entidade. Uma
+edição só é aceita quando `x` e `z` são inteiros, estão dentro do mapa e apontam
+para um tile existente.
+
+### Histórico compartilhado
+
+Grid, narrativa e entidades modificam o mesmo `AdventureDocument` local. Cada
+aplicação válida adiciona um documento imutável ao histórico, preservando:
+
+- até 40 estados anteriores;
+- undo e redo na ordem real das operações;
+- descarte completo para o documento originalmente carregado;
+- bloqueio de abertura de mesa enquanto houver rascunho local.
+
+## Fluxo técnico
+
+```mermaid
+flowchart LR
+  Panel["ContentEditorPanel"] -->|"aplica alteração"| Store["Zustand store"]
+  Store --> Pure["contentEditor.ts"]
+  Pure -->|"documento imutável ou rejeição"| Store
+  Store --> History["Histórico compartilhado"]
+  Store --> Scene["DungeonScene 3D"]
+```
+
+O documento semântico continua sendo a fonte de verdade. A Batch 6 não
+persiste meshes, geometrias ou buffers WebGL.
+
+## Mapa da implementação
+
+| Arquivo | Responsabilidade |
+| --- | --- |
+| `apps/web/src/contentEditor.ts` | Operações puras, imutáveis e validação de conteúdo/entidades. |
+| `apps/web/src/components/ContentEditorPanel.tsx` | Interface de história, entidades e troca de modo. |
+| `apps/web/src/store.ts` | Integração das operações ao rascunho e histórico compartilhado. |
+| `apps/web/src/App.tsx` | Orquestração entre os modos Grid e Conteúdo. |
+| `apps/web/src/components/DungeonScene.tsx` | Projeção imediata da quantidade e modelos de entidades. |
+| `apps/web/src/i18n.ts` | Textos do editor em `pt-BR` e `en-US`. |
+| `apps/web/src/contentEditor.test.ts` | Testes unitários das operações puras. |
+| `apps/web/src/store.test.ts` | Testes do histórico combinado. |
+| `apps/web/e2e/content-editor.spec.ts` | Jornada real do mestre no navegador. |
+
+## Como testar manualmente
+
+1. Inicie o projeto com `.\scripts\dev.ps1`.
+2. Abra `http://127.0.0.1:5173` e gere uma aventura.
+3. Selecione **Editar mapa** e depois **Conteúdo**.
+4. Em **História**, altere valores nos dois idiomas e aplique.
+5. Em **Entidades**, crie uma entidade, altere seu tipo e posição e aplique.
+6. Confirme a mudança de nome na interface e a entidade na cena 3D.
+7. Use **Desfazer** e **Refazer** para verificar o histórico compartilhado.
+8. Use **Descartar** e confirme o retorno ao documento carregado.
+9. Encerre com `.\scripts\stop.ps1`.
+
+Para a validação automatizada completa:
+
+```powershell
+.\scripts\test.ps1 -SkipInstall
+```
+
+Consulte também o [manual do editor](../GRID_EDITOR.md).
 
 ## Critérios de aceitação
 
@@ -117,6 +209,7 @@ ativo, mantendo o documento semântico como fonte da cena 3D.
 - A falha externa da Vercel não é gate do projeto: o DDivination é uma
   aplicação local-first distribuída com servidor Go.
 - Pull Request #23 integrada à `main`.
+- Pull Request #24 integrou o registro final de conclusão à `main`.
 - Issue #22 encerrada pela integração.
 
 ## Resultado
@@ -131,6 +224,9 @@ undo/redo usado pelo grid.
   intencionalmente para não reduzir a área útil da cena.
 - O rascunho ainda não sobrevive a recarregamento ou encerramento. A correção
   pertence à BATCH-007.
+- Edição completa de salas, encontros, tesouros e análise não foi incorporada
+  silenciosamente; continua fora do escopo desta batch.
+- Upload e pipeline completo de GLB continuam reservados à BATCH-014.
 
 ## Documentação atualizada
 

@@ -59,5 +59,8 @@ As alterações são um rascunho local e não são salvas no SQLite. Persistênc
 autosave, checkpoints, validação semântica do documento completo e resolução de
 conflitos pertencem à BATCH-007.
 
-Até essas batches serem concluídas, use **Descartar** para retornar ao documento
+Até a BATCH-007 ser concluída, use **Descartar** para retornar ao documento
 carregado antes de abrir uma mesa.
+
+As decisões, arquivos modificados, critérios e evidências da edição de conteúdo
+estão no [diário da BATCH-006](batches/BATCH-006-content-entity-editor.md).

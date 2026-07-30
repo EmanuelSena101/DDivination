@@ -6,6 +6,8 @@ Issue: [#14](https://github.com/EmanuelSena101/DDivination/issues/14)
 
 Pull Request: [#15](https://github.com/EmanuelSena101/DDivination/pull/15)
 
+Finalização documental: [#16](https://github.com/EmanuelSena101/DDivination/pull/16)
+
 ## Contexto
 
 A BATCH-003 tornou o custo da VTT observável. A cena 64×64 atual mantém poucos

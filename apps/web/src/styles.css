@@ -963,6 +963,172 @@ button.secondary {
   cursor: not-allowed;
 }
 
+.content-editor-panel {
+  width: min(390px, calc(100% - 24px));
+}
+
+.editor-mode-tabs,
+.content-section-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.editor-mode-tabs button,
+.content-section-tabs button {
+  min-height: 32px;
+  color: #918b99;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+}
+
+.editor-mode-tabs button.active,
+.content-section-tabs button.active {
+  color: #f3ead6;
+  border-color: rgba(243, 201, 105, 0.46);
+  background: rgba(243, 201, 105, 0.1);
+}
+
+.content-section-tabs {
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.content-editor-form {
+  display: grid;
+  gap: 10px;
+}
+
+.localized-field {
+  margin: 0;
+  padding: 9px;
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+}
+
+.localized-field legend,
+.content-editor-form > label > span,
+.coordinate-fields label > span {
+  padding: 0 4px;
+  color: #918b99;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.localized-field label {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: start;
+  gap: 6px;
+}
+
+.localized-field label > span {
+  padding-top: 8px;
+  color: #c7a85e;
+  font-size: 9px;
+}
+
+.content-editor-form input,
+.content-editor-form textarea,
+.content-editor-form select,
+.entity-editor-picker select {
+  width: 100%;
+  min-height: 32px;
+  padding: 7px 9px;
+  color: #eee8f4;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  outline: none;
+  background: rgba(4, 5, 10, 0.74);
+}
+
+.content-editor-form textarea {
+  min-height: 58px;
+  resize: vertical;
+}
+
+.content-editor-form input:focus,
+.content-editor-form textarea:focus,
+.content-editor-form select:focus,
+.entity-editor-picker select:focus {
+  border-color: rgba(139, 112, 255, 0.65);
+}
+
+.content-editor-form > label {
+  display: grid;
+  gap: 5px;
+}
+
+.editor-apply,
+.entity-actions button,
+.entity-editor-picker button {
+  min-height: 34px;
+  border: 1px solid rgba(139, 112, 255, 0.42);
+  border-radius: 4px;
+  color: #eee9ff;
+  background: rgba(102, 75, 218, 0.22);
+  cursor: pointer;
+}
+
+.entity-editor {
+  display: grid;
+  gap: 10px;
+}
+
+.entity-editor-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+.entity-editor-picker button {
+  padding: 0 11px;
+}
+
+.coordinate-fields,
+.entity-flags,
+.entity-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.coordinate-fields label {
+  display: grid;
+  gap: 5px;
+}
+
+.entity-flags {
+  padding: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+}
+
+.entity-flags label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #b7b1bd;
+  font-size: 10px;
+}
+
+.entity-flags input {
+  width: 14px;
+  min-height: 14px;
+}
+
+.entity-actions .danger {
+  color: #dfa0a0;
+  border-color: rgba(190, 74, 82, 0.36);
+  background: rgba(128, 38, 45, 0.18);
+}
+
 .diagnostics-panel header {
   display: flex;
   align-items: center;

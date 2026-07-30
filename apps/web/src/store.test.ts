@@ -62,7 +62,7 @@ describe("session event projection", () => {
   });
 });
 
-describe("local grid history", () => {
+describe("local editor history", () => {
   it("undoes and redoes grid changes exactly", () => {
     const before = adventure();
     useAppStore.getState().setAdventure(before);
@@ -83,6 +83,43 @@ describe("local grid history", () => {
     useAppStore.getState().redoGridEdit();
     expect(useAppStore.getState().adventure).toEqual(edited);
     expect(useAppStore.getState().editorDirty).toBe(true);
+  });
+
+  it("shares history between content and entity changes", () => {
+    const before = adventure();
+    useAppStore.getState().setAdventure(before);
+    useAppStore.getState().editContent({
+      floorId: "benchmark-64",
+      name: localized("Aventura revisada"),
+      summary: before.summary,
+      hook: before.narrative.hook,
+      objective: before.narrative.objective,
+      antagonist: before.narrative.antagonist,
+      atmosphere: before.narrative.atmosphere,
+      floorName: before.floors[0].name,
+    });
+    useAppStore.getState().addEntity("benchmark-64", {
+      id: "draft-prop",
+      kind: "prop",
+      name: localized("Nova caixa"),
+      position: { x: 10, z: 10 },
+      assetId: "procedural-crate",
+      blocksMovement: true,
+      hidden: false,
+    });
+
+    expect(useAppStore.getState().editorPast).toHaveLength(2);
+    expect(useAppStore.getState().adventure?.floors[0].entities).toHaveLength(1);
+
+    useAppStore.getState().undoGridEdit();
+    expect(useAppStore.getState().adventure?.floors[0].entities).toHaveLength(0);
+    expect(useAppStore.getState().adventure?.name["pt-BR"]).toBe(
+      "Aventura revisada",
+    );
+
+    useAppStore.getState().undoGridEdit();
+    expect(useAppStore.getState().adventure).toEqual(before);
+    expect(useAppStore.getState().editorDirty).toBe(false);
   });
 });
 

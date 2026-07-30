@@ -36,9 +36,9 @@
 
 > [!IMPORTANT]
 > O DDivination ainda está em desenvolvimento. O vertical slice é funcional,
-> mas não existe instalador oficial. O editor de grid já funciona como
-> rascunho local; salvamento editorial e edição de conteúdo ainda não estão
-> prontos.
+> mas não existe instalador oficial. O editor de mapa, conteúdo bilíngue e
+> entidades já funciona como rascunho local; o salvamento editorial ainda não
+> está pronto.
 > O fluxo recomendado neste momento é Windows + PowerShell.
 
 ## O que já funciona
@@ -47,7 +47,8 @@
 - dungeons com vários andares, salas, corredores, paredes e portais;
 - visualizador 3D com câmera orbital, grid, fog manual e tokens;
 - pack visual procedural com pisos, portas, props, luzes e tokens distinguíveis;
-- editor local de tiles, paredes e portas com desfazer/refazer;
+- editor local de tiles, paredes, portas, narrativa bilíngue e entidades com
+  desfazer/refazer compartilhado;
 - mesa pela rede local com papéis de mestre, jogador e display;
 - movimento autoritativo, ping, medição e iniciativa simples;
 - dados 3D `d4`, `d6`, `d8`, `d10`, `d12`, `d20` e `d100`;
@@ -147,6 +148,7 @@ paredes, entidades e portais; meshes e buffers gráficos não entram no banco.
 | **Ping** | Marca uma posição para os participantes conectados. |
 | **Dados** | Rola uma expressão como `1d20`, com resultado do servidor. |
 | **Exportar** | Gera pacote, Markdown, página imprimível ou screenshot. |
+| **Editar mapa** | Abre os modos Grid e Conteúdo para alterar o rascunho local. |
 
 <p align="center">
   <img
@@ -329,16 +331,17 @@ Leia também:
 
 Ainda não fazem parte do vertical slice:
 
-- persistência do editor, autosave e edição de entidades/conteúdo;
+- persistência do editor e autosave;
 - combate automatizado e fichas completas;
 - multiplayer pela internet;
 - line-of-sight dinâmico;
 - marketplace, macros, VR ou primeira pessoa;
 - instalador Windows.
 
-O editor atual é um rascunho reversível: descarte as alterações antes de abrir
-uma mesa. A persistência chegará na BATCH-007. Acompanhe o
-[roadmap](docs/ROADMAP.md).
+O editor atual é um rascunho reversível. Ele permite ajustar o grid, a narrativa
+em ambos os idiomas e as entidades do andar ativo, mas ainda não grava essas
+alterações no SQLite. Descarte as alterações antes de abrir uma mesa. A
+persistência chegará na BATCH-007. Acompanhe o [roadmap](docs/ROADMAP.md).
 
 ## Privacidade, IA e segurança
 

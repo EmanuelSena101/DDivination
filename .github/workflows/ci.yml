@@ -35,6 +35,7 @@ jobs:
       - run: npm run lint:web
       - run: npm run test:web
       - run: npm run build:web
+      - run: npm run check:bundle
 
   go:
     strategy:

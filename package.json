@@ -11,6 +11,7 @@
     "test:all": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1",
     "dev:web": "npm --workspace apps/web run dev",
     "build:web": "npm --workspace apps/web run build",
+    "check:bundle": "npm --workspace apps/web run check:bundle",
     "api:generate": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/generate-contract.ps1",
     "api:check": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-contract.ps1",
     "test:web": "npm --workspace apps/web run test",

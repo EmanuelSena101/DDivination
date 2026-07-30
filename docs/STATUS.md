@@ -51,6 +51,11 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-003-vtt-instrumentation.md](batches/BATCH-003-vtt-instrumentation.md).
 
-## Próxima batch planejada
+## Batch em andamento
 
 `BATCH-004 — Spike e otimização 3D`
+
+O trabalho atual transforma a instrumentação da BATCH-003 em otimizações
+mensuráveis de instancing, carregamento e qualidade adaptada à carga da cena.
+Consulte
+[BATCH-004-3d-optimization.md](batches/BATCH-004-3d-optimization.md).

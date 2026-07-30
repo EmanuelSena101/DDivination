@@ -4,7 +4,7 @@ Estado: `VALIDATING`
 
 Issue: [#22](https://github.com/EmanuelSena101/DDivination/issues/22)
 
-Pull Request: a criar
+Pull Request: [#23](https://github.com/EmanuelSena101/DDivination/pull/23)
 
 ## Contexto
 
@@ -108,6 +108,7 @@ ativo, mantendo o documento semântico como fonte da cena 3D.
   VTT, 819,1 KiB da física dos dados e 1164,7 KiB total.
 - A inspeção nos modos História e Entidades confirmou o layout rolável, a
   atualização da cena e nenhum erro no console.
+- Pull Request #23 aberta para validação contínua e revisão.
 
 ## Resultado
 

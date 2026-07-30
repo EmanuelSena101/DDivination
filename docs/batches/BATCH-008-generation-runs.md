@@ -4,7 +4,7 @@ Estado: `VALIDATING`
 
 Issue: [#29](https://github.com/EmanuelSena101/DDivination/issues/29)
 
-Pull Request: a criar
+Pull Request: [#30](https://github.com/EmanuelSena101/DDivination/pull/30)
 
 ## Contexto
 
@@ -128,6 +128,12 @@ cancelável, mantendo o servidor local como autoridade.
   reload, editores, benchmark 64×64 e mesa GM/jogador.
 - QA visual confirmou painel de execução, histórico recente, transição para a
   VTT e ausência de erros no console.
+
+### 2026-07-30 — publicação
+
+- Implementação publicada no PR #30.
+- A issue #29 será encerrada automaticamente após a aprovação dos checks e o
+  merge do PR.
 
 ## Resultado
 

@@ -6,6 +6,8 @@ Issue: [#10](https://github.com/EmanuelSena101/DDivination/issues/10)
 
 Pull Request: [#11](https://github.com/EmanuelSena101/DDivination/pull/11)
 
+Finalização documental: [#12](https://github.com/EmanuelSena101/DDivination/pull/12)
+
 ## Contexto
 
 O VTT já renderiza a cena 3D e sincroniza uma mesa pela LAN, mas ainda não

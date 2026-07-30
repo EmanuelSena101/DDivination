@@ -4,7 +4,7 @@ Estado: `VALIDATING`
 
 Issue: [#10](https://github.com/EmanuelSena101/DDivination/issues/10)
 
-Pull Request: a criar
+Pull Request: [#11](https://github.com/EmanuelSena101/DDivination/pull/11)
 
 ## Contexto
 
@@ -125,6 +125,7 @@ BATCH-004 identificar gargalos e comprovar os efeitos das otimizações.
 - Suite completa `scripts/test.ps1 -SkipInstall` aprovada.
 - Playwright confirmou painel, relatório, download, sincronização GM/jogador e
   rolagem autoritativa.
+- Pull Request #11 aberta como draft para validação do CI.
 
 ## Resultado
 

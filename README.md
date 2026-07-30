@@ -92,7 +92,8 @@ Na raiz do repositório:
 ```
 
 Na primeira execução, o script instala as dependências, compila o servidor e
-inicia backend e frontend. Ao terminar, ele mostra:
+compila um snapshot do frontend para os jogadores LAN e inicia backend e Vite.
+Ao terminar, ele mostra:
 
 ```text
 Frontend: http://127.0.0.1:5173
@@ -100,6 +101,9 @@ Backend:  http://127.0.0.1:8080
 ```
 
 Abra [http://127.0.0.1:5173](http://127.0.0.1:5173) no navegador.
+
+O endereço `:5173` é a interface do mestre com hot reload. Os links de jogador
+usam `:8080` e recebem automaticamente o snapshot compilado pelo script.
 
 ### 4. Encerre corretamente
 

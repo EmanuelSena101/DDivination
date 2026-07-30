@@ -14,10 +14,12 @@ $backendErrorLog = Join-Path $runtimeDir "backend.error.log"
 $webLog = Join-Path $runtimeDir "web.log"
 $webErrorLog = Join-Path $runtimeDir "web.error.log"
 $backendBinary = Join-Path $runtimeDir "ddivination-dev.exe"
+$webDist = Join-Path $repoRoot "apps\web\dist"
 $backendProcess = $null
 $webProcess = $null
 $runtimeFileCreated = $false
 $previousDataDir = [Environment]::GetEnvironmentVariable("DDIVINATION_DATA_DIR", "Process")
+$previousWebDir = [Environment]::GetEnvironmentVariable("DDIVINATION_WEB_DIR", "Process")
 
 Push-Location $repoRoot
 try {
@@ -51,6 +53,12 @@ try {
     }
     New-Item -ItemType Directory -Path $resolvedDataDir -Force | Out-Null
 
+    Write-Host "Compilando frontend para o acesso LAN..."
+    & $nodeTools.Npm run build:web
+    if ($LASTEXITCODE -ne 0) {
+        throw "Build do frontend falhou com codigo $LASTEXITCODE."
+    }
+
     Write-Host "Compilando servidor Go..."
     & $goExe -C (Join-Path $repoRoot "apps\server") build -o $backendBinary ./cmd/ddivination
     if ($LASTEXITCODE -ne 0) {
@@ -58,6 +66,7 @@ try {
     }
 
     $env:DDIVINATION_DATA_DIR = $resolvedDataDir
+    $env:DDIVINATION_WEB_DIR = $webDist
     $backendProcess = Start-Process `
         -FilePath $backendBinary `
         -WorkingDirectory $repoRoot `
@@ -94,6 +103,7 @@ try {
     $runtimeFileCreated = $true
 
     Wait-DDivinationEndpoint -Uri "http://127.0.0.1:8080/api/v1/health"
+    Wait-DDivinationEndpoint -Uri "http://127.0.0.1:8080"
     Wait-DDivinationEndpoint -Uri "http://127.0.0.1:5173"
 
     Write-Host ""
@@ -120,6 +130,11 @@ try {
         Remove-Item Env:DDIVINATION_DATA_DIR -ErrorAction SilentlyContinue
     } else {
         $env:DDIVINATION_DATA_DIR = $previousDataDir
+    }
+    if ($null -eq $previousWebDir) {
+        Remove-Item Env:DDIVINATION_WEB_DIR -ErrorAction SilentlyContinue
+    } else {
+        $env:DDIVINATION_WEB_DIR = $previousWebDir
     }
     Pop-Location
 }

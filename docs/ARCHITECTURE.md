@@ -23,7 +23,14 @@ entram pela rede local somente depois que o mestre abre uma sessão.
 - O frontend deriva meshes a partir do documento semântico.
 - O editor altera uma cópia imutável local do documento semântico. Grid,
   conteúdo bilíngue e entidades compartilham o mesmo histórico limitado de
-  undo/redo; persistência editorial ainda não faz parte dessa fronteira.
+  undo/redo.
+- O frontend serializa autosaves após 1,5 segundo de inatividade. O backend
+  valida o documento, confere `If-Match`, incrementa a versão e persiste
+  documento e snapshot na mesma transação.
+- Respostas atrasadas são reconciliadas com o rascunho atual. Edições mais
+  recentes preservam o conteúdo local e são rebaseadas sobre a versão salva.
+- Conflitos pausam o autosave e exigem uma escolha explícita; não existe merge
+  silencioso campo a campo.
 - A cena instancia geometrias repetidas e escolhe um perfil de qualidade pela
   carga semântica do andar.
 - O pack procedural agrupa props por família, limita luzes locais e mantém
@@ -46,6 +53,8 @@ cena, [GRID_EDITOR.md](GRID_EDITOR.md) para as proteções editoriais e
 O documento armazena tiles, paredes, portais, salas, entidades e referências de
 assets. Geometrias derivadas, buffers WebGL e meshes não são persistidos.
 
+Cada edição persistida gera uma versão monotônica e um snapshot imutável.
+Checkpoints manuais não alteram a versão; restaurações criam uma versão nova.
 Sessões usam revisões monotônicas, eventos persistidos e snapshots. Assets são
 endereçados por SHA-256.
 

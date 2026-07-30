@@ -162,6 +162,25 @@ type AdventureDocument struct {
 	UpdatedAt        time.Time          `json:"updatedAt"`
 }
 
+type AdventureSnapshot struct {
+	ID          string            `json:"id"`
+	AdventureID string            `json:"adventureId"`
+	Version     int64             `json:"version"`
+	Reason      string            `json:"reason"`
+	Name        LocalizedText     `json:"name"`
+	CreatedAt   time.Time         `json:"createdAt"`
+	Document    AdventureDocument `json:"document"`
+}
+
+type AdventureSnapshotSummary struct {
+	ID          string        `json:"id"`
+	AdventureID string        `json:"adventureId"`
+	Version     int64         `json:"version"`
+	Reason      string        `json:"reason"`
+	Name        LocalizedText `json:"name"`
+	CreatedAt   time.Time     `json:"createdAt"`
+}
+
 type Attribution struct {
 	Title   string `json:"title"`
 	Creator string `json:"creator"`

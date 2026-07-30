@@ -67,6 +67,11 @@ O E2E exige a porta 8080 livre porque inicia um servidor isolado.
 Os arquivos são executados em série: abrir uma mesa altera intencionalmente a
 interface de rede do único servidor local do teste.
 
+Os cenários editoriais cobrem grid, conteúdo, autosave, reload, checkpoints e
+um conflito otimista provocado por um segundo cliente HTTP. A suíte usa um
+diretório SQLite isolado e mantém um único worker para preservar a ordem das
+operações autoritativas.
+
 Se o ambiente de desenvolvimento estiver aberto, encerre-o antes:
 
 ```powershell

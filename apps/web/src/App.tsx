@@ -1,9 +1,27 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { QRCodeSVG } from "qrcode.react";
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { closeSession, createSession, generateAdventure, joinSession, markdownURL, packageURL, printURL } from "./api";
+import {
+  APIError,
+  closeSession,
+  createAdventureCheckpoint,
+  createSession,
+  generateAdventure,
+  getAdventure,
+  joinSession,
+  listAdventureCheckpoints,
+  markdownURL,
+  packageURL,
+  printURL,
+  restoreAdventureCheckpoint,
+  updateAdventure,
+} from "./api";
 import { ContentEditorPanel } from "./components/ContentEditorPanel";
+import {
+  EditorPersistenceBar,
+  type EditorPersistenceStatus,
+} from "./components/EditorPersistenceBar";
 import { GridEditorPanel } from "./components/GridEditorPanel";
 import { VTTDiagnosticsPanel } from "./components/VTTDiagnosticsPanel";
 import type { GridEditorTool } from "./gridEditor";
@@ -65,7 +83,14 @@ function Builder() {
   const [spec, setSpec] = useState<AdventureSpec>(DEFAULT_SPEC);
   const mutation = useMutation({
     mutationFn: () => generateAdventure(spec),
-    onSuccess: (result) => setAdventure(result.adventure),
+    onSuccess: (result) => {
+      window.history.replaceState(
+        {},
+        "",
+        `/?adventure=${encodeURIComponent(result.adventure.id)}`,
+      );
+      setAdventure(result.adventure);
+    },
   });
   const set = <K extends keyof AdventureSpec>(key: K, value: AdventureSpec[K]) =>
     setSpec((current) => ({ ...current, [key]: value }));
@@ -283,6 +308,7 @@ function SessionShare({
 
 function VTT() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const language = useAppStore((state) => state.language);
   const adventure = useAppStore((state) => state.adventure)!;
   const floorId = useAppStore((state) => state.floorId);
@@ -310,6 +336,9 @@ function VTT() {
   const undoGridEdit = useAppStore((state) => state.undoGridEdit);
   const redoGridEdit = useAppStore((state) => state.redoGridEdit);
   const discardGridEdits = useAppStore((state) => state.discardGridEdits);
+  const acceptEditorSave = useAppStore((state) => state.acceptEditorSave);
+  const rebaseEditorAgainst = useAppStore((state) => state.rebaseEditorAgainst);
+  const setAdventure = useAppStore((state) => state.setAdventure);
   const editorPast = useAppStore((state) => state.editorPast);
   const editorFuture = useAppStore((state) => state.editorFuture);
   const editorDirty = useAppStore((state) => state.editorDirty);
@@ -326,6 +355,9 @@ function VTT() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<"grid" | "content">("grid");
   const [editorTool, setEditorTool] = useState<GridEditorTool>("tile-floor");
+  const [persistenceStatus, setPersistenceStatus] =
+    useState<EditorPersistenceStatus>("saved");
+  const saveInFlight = useRef(false);
   const [renderTelemetry, setRenderTelemetry] = useState<RenderTelemetry>(() => emptyRenderTelemetry());
 
   const floor = adventure.floors.find((candidate) => candidate.id === floorId) || adventure.floors[0];
@@ -376,6 +408,83 @@ function VTT() {
     mutationFn: () => closeSession(sessionId!, sessionToken!),
     onSuccess: disconnect,
   });
+  const checkpoints = useQuery({
+    queryKey: ["adventure-checkpoints", adventure.id],
+    queryFn: () => listAdventureCheckpoints(adventure.id),
+    enabled: role === "gm" && !session,
+  });
+
+  const saveDraft = useCallback(async () => {
+    if (saveInFlight.current) return;
+    const current = useAppStore.getState();
+    if (!current.adventure || !current.editorDirty || current.session) return;
+    saveInFlight.current = true;
+    setPersistenceStatus("saving");
+    try {
+      const saved = await updateAdventure(current.adventure);
+      acceptEditorSave(saved, current.adventure);
+      setPersistenceStatus(
+        useAppStore.getState().editorDirty ? "dirty" : "saved",
+      );
+      await queryClient.invalidateQueries({
+        queryKey: ["adventure-checkpoints", saved.id],
+      });
+    } catch (error) {
+      setPersistenceStatus(
+        error instanceof APIError && error.status === 409 ? "conflict" : "error",
+      );
+    } finally {
+      saveInFlight.current = false;
+    }
+  }, [acceptEditorSave, queryClient]);
+
+  useEffect(() => {
+    if (!editorDirty) {
+      if (persistenceStatus === "dirty") setPersistenceStatus("saved");
+      return;
+    }
+    if (
+      persistenceStatus === "conflict" ||
+      persistenceStatus === "error" ||
+      persistenceStatus === "saving"
+    ) {
+      return;
+    }
+    setPersistenceStatus("dirty");
+    const timer = window.setTimeout(() => void saveDraft(), 1500);
+    return () => window.clearTimeout(timer);
+  }, [adventure, editorDirty, persistenceStatus, saveDraft]);
+
+  const createCheckpoint = async () => {
+    await createAdventureCheckpoint(adventure.id);
+    await queryClient.invalidateQueries({
+      queryKey: ["adventure-checkpoints", adventure.id],
+    });
+  };
+  const restoreCheckpoint = async (checkpointId: string) => {
+    if (!window.confirm(t("persistenceRestoreConfirm"))) return;
+    const restored = await restoreAdventureCheckpoint(
+      adventure.id,
+      checkpointId,
+      adventure.version,
+    );
+    setAdventure(restored);
+    setPersistenceStatus("saved");
+    await queryClient.invalidateQueries({
+      queryKey: ["adventure-checkpoints", adventure.id],
+    });
+  };
+  const loadRemote = async () => {
+    if (!window.confirm(t("persistenceLoadRemoteConfirm"))) return;
+    setAdventure(await getAdventure(adventure.id));
+    setPersistenceStatus("saved");
+  };
+  const keepLocal = async () => {
+    if (!window.confirm(t("persistenceKeepLocalConfirm"))) return;
+    rebaseEditorAgainst(await getAdventure(adventure.id));
+    setPersistenceStatus("dirty");
+    await saveDraft();
+  };
 
   const localize = (value: { "pt-BR": string; "en-US": string }) => value[language];
   const roll = () => send("dice.roll", { expression: dice, visibility });
@@ -424,12 +533,16 @@ function VTT() {
     setMeasureEnd(null);
     setSelectedToken(null);
   };
+  const startNewAdventure = () => {
+    window.history.replaceState({}, "", "/");
+    clearAdventure();
+  };
 
   return (
     <main className="vtt-layout">
       <aside className="vtt-sidebar">
         <div className="vtt-title">
-          <button className="icon-button" title={t("newAdventure")} onClick={clearAdventure}>
+          <button className="icon-button" title={t("newAdventure")} onClick={startNewAdventure}>
             ←
           </button>
           <div>
@@ -703,6 +816,18 @@ function VTT() {
             onDiscard={discardGridEdits}
           />
         )}
+        {editorOpen && role === "gm" && !session && (
+          <EditorPersistenceBar
+            status={persistenceStatus}
+            checkpoints={checkpoints.data ?? []}
+            busy={saveInFlight.current}
+            onSave={() => void saveDraft()}
+            onCheckpoint={() => void createCheckpoint()}
+            onRestore={(checkpointId) => void restoreCheckpoint(checkpointId)}
+            onLoadRemote={() => void loadRemote()}
+            onKeepLocal={() => void keepLocal()}
+          />
+        )}
 
         {diagnosticsOpen && <VTTDiagnosticsPanel report={telemetryReport} />}
 
@@ -743,16 +868,40 @@ function VTT() {
 }
 
 export default function App() {
+  const { t } = useTranslation();
   const adventure = useAppStore((state) => state.adventure);
+  const setAdventure = useAppStore((state) => state.setAdventure);
   const error = useAppStore((state) => state.error);
   const clearError = useAppStore((state) => state.clearError);
   const params = useMemo(() => new URLSearchParams(window.location.search), []);
   const sessionId = params.get("session");
   const code = params.get("code");
+  const adventureId = params.get("adventure");
+  const [restoringAdventure, setRestoringAdventure] = useState(Boolean(adventureId));
 
   useEffect(() => {
     document.documentElement.lang = useAppStore.getState().language;
   }, []);
+  useEffect(() => {
+    if (!adventureId || sessionId || adventure) {
+      setRestoringAdventure(false);
+      return;
+    }
+    let active = true;
+    void getAdventure(adventureId)
+      .then((document) => {
+        if (active) setAdventure(document);
+      })
+      .catch(() => {
+        if (active) window.history.replaceState({}, "", "/");
+      })
+      .finally(() => {
+        if (active) setRestoringAdventure(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [adventure, adventureId, sessionId, setAdventure]);
 
   return (
     <div className="app-shell">
@@ -766,7 +915,15 @@ export default function App() {
           <button onClick={clearError}>×</button>
         </div>
       )}
-      {adventure ? <VTT /> : sessionId && code ? <JoinScreen sessionId={sessionId} code={code} /> : <Builder />}
+      {adventure ? (
+        <VTT />
+      ) : sessionId && code ? (
+        <JoinScreen sessionId={sessionId} code={code} />
+      ) : restoringAdventure ? (
+        <div className="scene-loading">{t("loading")}</div>
+      ) : (
+        <Builder />
+      )}
     </div>
   );
 }

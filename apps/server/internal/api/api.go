@@ -278,24 +278,81 @@ func (s *Server) updateAdventure(ctx context.Context, input *updateAdventureInpu
 		return nil, huma.NewError(http.StatusConflict, "adventure was changed by another editor")
 	} else if errors.Is(err, store.ErrNotFound) {
 		return nil, huma.NewError(http.StatusNotFound, "adventure not found")
+	} else if errors.Is(err, domain.ErrInvalidAdventure) {
+		return nil, huma.NewError(http.StatusUnprocessableEntity, err.Error())
 	} else if err != nil {
 		return nil, huma.NewError(http.StatusInternalServerError, "could not update adventure")
 	}
 	return &adventureOutput{ETag: fmt.Sprintf(`"%d"`, input.Body.Version), Body: input.Body}, nil
 }
 
-func (s *Server) checkpointAdventure(ctx context.Context, input *idInput) (*adventureOutput, error) {
-	doc, err := s.store.GetAdventure(ctx, input.ID)
+type listAdventureCheckpointsInput struct {
+	ID    string `path:"id"`
+	Limit int    `query:"limit" minimum:"1" maximum:"200" default:"50"`
+}
+
+type adventureCheckpointsOutput struct {
+	Body []domain.AdventureSnapshotSummary
+}
+
+func (s *Server) listAdventureCheckpoints(ctx context.Context, input *listAdventureCheckpointsInput) (*adventureCheckpointsOutput, error) {
+	snapshots, err := s.store.ListAdventureSnapshots(ctx, input.ID, input.Limit)
 	if errors.Is(err, store.ErrNotFound) {
 		return nil, huma.NewError(http.StatusNotFound, "adventure not found")
 	}
 	if err != nil {
-		return nil, huma.NewError(http.StatusInternalServerError, "could not load adventure")
+		return nil, huma.NewError(http.StatusInternalServerError, "could not list checkpoints")
 	}
-	if err := s.store.SaveAdventure(ctx, doc, &doc.Version, "manual-checkpoint"); err != nil {
+	return &adventureCheckpointsOutput{Body: snapshots}, nil
+}
+
+type adventureCheckpointOutput struct {
+	Body domain.AdventureSnapshotSummary
+}
+
+func (s *Server) checkpointAdventure(ctx context.Context, input *idInput) (*adventureCheckpointOutput, error) {
+	snapshot, err := s.store.CreateAdventureSnapshot(ctx, input.ID, "manual-checkpoint")
+	if errors.Is(err, store.ErrNotFound) {
+		return nil, huma.NewError(http.StatusNotFound, "adventure not found")
+	}
+	if err != nil {
 		return nil, huma.NewError(http.StatusInternalServerError, "could not create checkpoint")
 	}
-	return &adventureOutput{ETag: fmt.Sprintf(`"%d"`, doc.Version), Body: doc}, nil
+	return &adventureCheckpointOutput{Body: snapshot}, nil
+}
+
+type restoreAdventureCheckpointInput struct {
+	ID           string `path:"id"`
+	CheckpointID string `path:"checkpointId"`
+	IfMatch      string `header:"If-Match" required:"true"`
+}
+
+func (s *Server) restoreAdventureCheckpoint(ctx context.Context, input *restoreAdventureCheckpointInput) (*adventureOutput, error) {
+	expected, err := etagVersion(input.IfMatch)
+	if err != nil || expected == nil {
+		return nil, huma.NewError(http.StatusBadRequest, "invalid If-Match version")
+	}
+	snapshot, err := s.store.GetAdventureSnapshot(ctx, input.ID, input.CheckpointID)
+	if errors.Is(err, store.ErrNotFound) {
+		return nil, huma.NewError(http.StatusNotFound, "checkpoint not found")
+	}
+	if err != nil {
+		return nil, huma.NewError(http.StatusInternalServerError, "could not load checkpoint")
+	}
+	document := snapshot.Document
+	document.ID = input.ID
+	document.Version = *expected + 1
+	document.UpdatedAt = time.Now().UTC()
+	if err := s.store.SaveAdventure(ctx, document, expected, "checkpoint-restored"); errors.Is(err, store.ErrConflict) {
+		return nil, huma.NewError(http.StatusConflict, "adventure was changed by another editor")
+	} else if errors.Is(err, store.ErrNotFound) {
+		return nil, huma.NewError(http.StatusNotFound, "adventure not found")
+	} else if errors.Is(err, domain.ErrInvalidAdventure) {
+		return nil, huma.NewError(http.StatusUnprocessableEntity, err.Error())
+	} else if err != nil {
+		return nil, huma.NewError(http.StatusInternalServerError, "could not restore checkpoint")
+	}
+	return &adventureOutput{ETag: fmt.Sprintf(`"%d"`, document.Version), Body: document}, nil
 }
 
 type emptyOutput struct{}

@@ -10,6 +10,11 @@ import {
 } from "./contentEditor";
 import { applyGridEdit, type GridEdit } from "./gridEditor";
 import {
+  reconcileSavedAdventure,
+  sameAdventureContent,
+  withPersistenceMetadata,
+} from "./editorPersistence";
+import {
   createConnectionTelemetry,
   reduceConnectionTelemetry,
   type ConnectionTelemetry,
@@ -47,6 +52,7 @@ interface AppState {
   editorPast: AdventureDocument[];
   editorFuture: AdventureDocument[];
   editorDirty: boolean;
+  editorBaseline: AdventureDocument | null;
   connectionTelemetry: ConnectionTelemetry;
   error: string | null;
   socket: WebSocket | null;
@@ -63,6 +69,11 @@ interface AppState {
   undoGridEdit: () => void;
   redoGridEdit: () => void;
   discardGridEdits: () => void;
+  acceptEditorSave: (
+    saved: AdventureDocument,
+    submitted: AdventureDocument,
+  ) => void;
+  rebaseEditorAgainst: (remote: AdventureDocument) => void;
   connect: (args: {
     sessionId: string;
     participantId: string;
@@ -144,6 +155,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   editorPast: [],
   editorFuture: [],
   editorDirty: false,
+  editorBaseline: null,
   connectionTelemetry: createConnectionTelemetry(),
   error: null,
   socket: null,
@@ -164,6 +176,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       editorPast: [],
       editorFuture: [],
       editorDirty: false,
+      editorBaseline: adventure,
     }),
   clearAdventure: () => {
     get().socket?.close();
@@ -182,6 +195,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       editorPast: [],
       editorFuture: [],
       editorDirty: false,
+      editorBaseline: null,
       connectionTelemetry: createConnectionTelemetry(),
       socket: null,
     });
@@ -273,7 +287,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       adventure: previous,
       editorPast: current.editorPast.slice(0, -1),
       editorFuture: [current.adventure, ...current.editorFuture].slice(0, 40),
-      editorDirty: current.editorPast.length > 1,
+      editorDirty: !sameAdventureContent(previous, current.editorBaseline),
       error: null,
     });
   },
@@ -285,20 +299,58 @@ export const useAppStore = create<AppState>((set, get) => ({
       adventure: next,
       editorPast: [...current.editorPast, current.adventure].slice(-40),
       editorFuture: remaining,
-      editorDirty: true,
+      editorDirty: !sameAdventureContent(next, current.editorBaseline),
       error: null,
     });
   },
   discardGridEdits: () => {
     const current = get();
-    if (current.session || current.editorPast.length === 0) return;
+    if (current.session || !current.editorBaseline) return;
     set({
-      adventure: current.editorPast[0],
+      adventure: current.editorBaseline,
       editorPast: [],
       editorFuture: [],
       editorDirty: false,
       error: null,
       selectedTokenId: null,
+    });
+  },
+  acceptEditorSave: (saved, submitted) => {
+    const current = get();
+    if (!current.adventure || current.adventure.id !== saved.id) return;
+    const reconciled = reconcileSavedAdventure(current.adventure, {
+      ...submitted,
+      version: saved.version,
+      createdAt: saved.createdAt,
+      updatedAt: saved.updatedAt,
+    });
+    set({
+      adventure: reconciled.document,
+      editorBaseline: saved,
+      editorPast: current.editorPast.map((item) =>
+        withPersistenceMetadata(item, saved),
+      ),
+      editorFuture: current.editorFuture.map((item) =>
+        withPersistenceMetadata(item, saved),
+      ),
+      editorDirty: reconciled.dirty,
+      error: null,
+    });
+  },
+  rebaseEditorAgainst: (remote) => {
+    const current = get();
+    if (!current.adventure || current.adventure.id !== remote.id) return;
+    set({
+      adventure: withPersistenceMetadata(current.adventure, remote),
+      editorBaseline: remote,
+      editorPast: current.editorPast.map((item) =>
+        withPersistenceMetadata(item, remote),
+      ),
+      editorFuture: current.editorFuture.map((item) =>
+        withPersistenceMetadata(item, remote),
+      ),
+      editorDirty: !sameAdventureContent(current.adventure, remote),
+      error: null,
     });
   },
   connect: ({ sessionId, participantId, token, role, state, adventure, reconnecting = false }) => {
@@ -360,6 +412,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           editorPast: [],
           editorFuture: [],
           editorDirty: false,
+          editorBaseline: adventure,
           connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, {
             type: "snapshot",
             revision: data.state.revision,
@@ -433,6 +486,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       editorPast: [],
       editorFuture: [],
       editorDirty: false,
+      editorBaseline: null,
       connected: false,
       connectionTelemetry: initialConnectionTelemetry,
       error: null,
@@ -497,7 +551,7 @@ function editorChange(
     adventure,
     editorPast: [...current.editorPast, current.adventure!].slice(-40),
     editorFuture: [],
-    editorDirty: true,
+    editorDirty: !sameAdventureContent(adventure, current.editorBaseline),
     error: null,
     selectedTokenId: null,
   };

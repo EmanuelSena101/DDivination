@@ -56,10 +56,14 @@ suíte Go, contratos, budgets, QA visual e todos os sete jobs do CI.
 Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-006-content-entity-editor.md](batches/BATCH-006-content-entity-editor.md).
 
-## Próxima batch planejada
+## Batch em validação
 
 `BATCH-007 — Persistência editorial`
 
-O próximo passo é persistir o rascunho, implementar autosave, checkpoints e
-controle de concorrência. O pipeline completo de GLB permanece reservado à
-BATCH-014.
+A implementação conecta o editor ao `PUT` com optimistic locking e adiciona
+autosave, salvamento manual, checkpoints imutáveis, restauração e resolução
+explícita de conflitos. A validação local aprovou suíte Go, contratos,
+TypeScript strict, 26 testes Vitest, 6 cenários Playwright, budgets e QA visual
+sem erros no console. Falta o CI da PR para concluir a batch.
+
+O pipeline completo de GLB permanece reservado à BATCH-014.

@@ -967,6 +967,116 @@ button.secondary {
   width: min(390px, calc(100% - 24px));
 }
 
+.editor-persistence-bar {
+  width: min(390px, calc(100% - 24px));
+  padding: 10px 12px;
+  position: absolute;
+  top: 76px;
+  left: 414px;
+  z-index: 16;
+  color: #d7d2e2;
+  border: 1px solid rgba(91, 208, 140, 0.28);
+  border-radius: 7px;
+  background: rgba(8, 10, 15, 0.96);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.42);
+}
+
+@media (max-width: 840px) {
+  .editor-persistence-bar {
+    top: auto;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+  }
+
+  .grid-editor-panel {
+    max-height: calc(100% - 250px);
+  }
+}
+
+.persistence-summary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 2px 7px;
+}
+
+.persistence-summary small {
+  grid-column: 2;
+  color: #777381;
+  font-size: 8px;
+}
+
+.persistence-dot {
+  width: 8px;
+  height: 8px;
+  grid-row: 1 / 3;
+  border-radius: 50%;
+  background: #5bd08c;
+}
+
+.editor-persistence-bar.dirty .persistence-dot,
+.editor-persistence-bar.saving .persistence-dot {
+  background: #f3c969;
+}
+
+.editor-persistence-bar.conflict .persistence-dot,
+.editor-persistence-bar.error .persistence-dot {
+  background: #d85f68;
+}
+
+.persistence-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.persistence-actions button,
+.checkpoint-list button {
+  min-height: 30px;
+  color: #cfc9d6;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.persistence-actions button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.editor-persistence-bar details {
+  margin-top: 8px;
+  color: #9d97a5;
+  font-size: 9px;
+}
+
+.editor-persistence-bar summary {
+  cursor: pointer;
+}
+
+.checkpoint-list {
+  max-height: 170px;
+  margin-top: 7px;
+  display: grid;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.checkpoint-list button {
+  padding: 6px 7px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 7px;
+  text-align: left;
+}
+
+.checkpoint-list p {
+  margin: 4px 0;
+}
+
 .editor-mode-tabs,
 .content-section-tabs {
   display: grid;

@@ -8,6 +8,7 @@
 
 export * from './adventureDocument';
 export * from './adventureNarrative';
+export * from './adventureSnapshotSummary';
 export * from './adventureSpec';
 export * from './adventureSpecDifficulty';
 export * from './adventureSpecStructureStyle';
@@ -42,6 +43,7 @@ export * from './initiativeState';
 export * from './joined';
 export * from './joinRequest';
 export * from './joinRequestRole';
+export * from './listAdventureCheckpointsParams';
 export * from './listAdventuresParams';
 export * from './localizedText';
 export * from './participant';

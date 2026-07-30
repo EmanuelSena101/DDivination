@@ -7,6 +7,7 @@
  */
 import type {
   AdventureDocument,
+  AdventureSnapshotSummary,
   AdventureSummary,
   AiEnrichRequest,
   AssetRef,
@@ -21,6 +22,7 @@ import type {
   ImportAssetBody,
   JoinRequest,
   Joined,
+  ListAdventureCheckpointsParams,
   ListAdventuresParams,
   Result
 } from './models';
@@ -312,9 +314,78 @@ export const updateAdventure = async (id: string,
 
 
 
-export type checkpointAdventureResponse200 = {
-  data: AdventureDocument
+export type listAdventureCheckpointsResponse200 = {
+  data: AdventureSnapshotSummary[] | null
   status: 200
+}
+
+export type listAdventureCheckpointsResponse404 = {
+  data: ErrorModel
+  status: 404
+}
+
+export type listAdventureCheckpointsResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type listAdventureCheckpointsResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type listAdventureCheckpointsResponseSuccess = (listAdventureCheckpointsResponse200) & {
+  headers: Headers;
+};
+export type listAdventureCheckpointsResponseError = (listAdventureCheckpointsResponse404 | listAdventureCheckpointsResponse422 | listAdventureCheckpointsResponse500) & {
+  headers: Headers;
+};
+
+export type listAdventureCheckpointsResponse = (listAdventureCheckpointsResponseSuccess | listAdventureCheckpointsResponseError)
+
+export const getListAdventureCheckpointsUrl = (id: string,
+    params?: ListAdventureCheckpointsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/adventures/${id}/checkpoints?${stringifiedParams}` : `/api/v1/adventures/${id}/checkpoints`
+}
+
+/**
+ * @summary List immutable adventure checkpoints
+ */
+export const listAdventureCheckpoints = async (id: string,
+    params?: ListAdventureCheckpointsParams, options?: RequestInit): Promise<listAdventureCheckpointsResponse> => {
+
+  const res = await fetch(getListAdventureCheckpointsUrl(id,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdventureCheckpointsResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as listAdventureCheckpointsResponse
+}
+
+
+
+export type checkpointAdventureResponse201 = {
+  data: AdventureSnapshotSummary
+  status: 201
 }
 
 export type checkpointAdventureResponse404 = {
@@ -332,7 +403,7 @@ export type checkpointAdventureResponse500 = {
   status: 500
 }
 
-export type checkpointAdventureResponseSuccess = (checkpointAdventureResponse200) & {
+export type checkpointAdventureResponseSuccess = (checkpointAdventureResponse201) & {
   headers: Headers;
 };
 export type checkpointAdventureResponseError = (checkpointAdventureResponse404 | checkpointAdventureResponse422 | checkpointAdventureResponse500) & {
@@ -368,6 +439,78 @@ export const checkpointAdventure = async (id: string, options?: RequestInit): Pr
 
   const data: checkpointAdventureResponse['data'] = body ? JSON.parse(body) : {}
   return { data, status: res.status, headers: res.headers } as checkpointAdventureResponse
+}
+
+
+
+export type restoreAdventureCheckpointResponse200 = {
+  data: AdventureDocument
+  status: 200
+}
+
+export type restoreAdventureCheckpointResponse400 = {
+  data: ErrorModel
+  status: 400
+}
+
+export type restoreAdventureCheckpointResponse404 = {
+  data: ErrorModel
+  status: 404
+}
+
+export type restoreAdventureCheckpointResponse409 = {
+  data: ErrorModel
+  status: 409
+}
+
+export type restoreAdventureCheckpointResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type restoreAdventureCheckpointResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type restoreAdventureCheckpointResponseSuccess = (restoreAdventureCheckpointResponse200) & {
+  headers: Headers;
+};
+export type restoreAdventureCheckpointResponseError = (restoreAdventureCheckpointResponse400 | restoreAdventureCheckpointResponse404 | restoreAdventureCheckpointResponse409 | restoreAdventureCheckpointResponse422 | restoreAdventureCheckpointResponse500) & {
+  headers: Headers;
+};
+
+export type restoreAdventureCheckpointResponse = (restoreAdventureCheckpointResponseSuccess | restoreAdventureCheckpointResponseError)
+
+export const getRestoreAdventureCheckpointUrl = (id: string,
+    checkpointId: string,) => {
+
+
+
+
+  return `/api/v1/adventures/${id}/checkpoints/${checkpointId}/restore`
+}
+
+/**
+ * @summary Restore a checkpoint as a new adventure version
+ */
+export const restoreAdventureCheckpoint = async (id: string,
+    checkpointId: string, options?: RequestInit): Promise<restoreAdventureCheckpointResponse> => {
+
+  const res = await fetch(getRestoreAdventureCheckpointUrl(id,checkpointId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: restoreAdventureCheckpointResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as restoreAdventureCheckpointResponse
 }
 
 

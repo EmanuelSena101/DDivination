@@ -126,6 +126,15 @@ export interface AdventureDocument {
   updatedAt: string;
 }
 
+export interface AdventureSnapshotSummary {
+  id: string;
+  adventureId: string;
+  version: number;
+  reason: string;
+  name: LocalizedText;
+  createdAt: string;
+}
+
 export interface GenerationResult {
   run: {
     id: string;

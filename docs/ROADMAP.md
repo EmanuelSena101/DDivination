@@ -31,7 +31,7 @@ issue correspondente.
 | BATCH-004 | Spike e otimização 3D | DONE |
 | BATCH-005 | Editor de grid e revisão visual do pack base | DONE |
 | BATCH-006 | Editor de entidades e conteúdo | DONE |
-| BATCH-007 | Persistência editorial | VALIDATING |
+| BATCH-007 | Persistência editorial | DONE |
 | BATCH-008 | Execuções de geração | PLANNED |
 | BATCH-009 | Gerador de progressão | PLANNED |
 | BATCH-010 | Catálogo e regras 5E | PLANNED |

@@ -12,6 +12,8 @@ entram pela rede local usando um código temporário.
 - geração procedural bilíngue reproduzível por `seed + generatorVersion`;
 - mapas com múltiplos andares, salas, corredores, paredes e portais;
 - VTT 3D com câmera orbital, instancing, fog manual e tokens no grid;
+- diagnóstico local de frames, renderer, cena e sincronização, com relatório
+  JSON sanitizado;
 - sessão LAN com papéis `gm`, `player` e `display`;
 - validação autoritativa de movimento e filtragem de conteúdo secreto;
 - dados `d4`, `d6`, `d8`, `d10`, `d12`, `d20` e `d100`, com resultado do
@@ -101,6 +103,8 @@ portais, persistência SQLite, optimistic locking, permissões, dados, filtragem
 de segredos e segurança de pacotes.
 
 Consulte [docs/TESTING.md](docs/TESTING.md) para detalhes e diagnóstico.
+Para medir o VTT, consulte
+[docs/VTT_DIAGNOSTICS.md](docs/VTT_DIAGNOSTICS.md).
 
 ## OpenAPI e cliente TypeScript
 

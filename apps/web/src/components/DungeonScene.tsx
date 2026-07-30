@@ -3,6 +3,11 @@ import { Canvas, type ThreeEvent, useFrame } from "@react-three/fiber";
 import { Physics, RigidBody, type RapierRigidBody } from "@react-three/rapier";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Color, Matrix4, Object3D, type InstancedMesh, type Mesh, type MeshBasicMaterial } from "three";
+import {
+  FrameSampler,
+  rendererTelemetry,
+  type RenderTelemetry,
+} from "../telemetry";
 import type {
   AdventureDocument,
   DiceRoll,
@@ -53,11 +58,43 @@ interface Props {
   measureMode: boolean;
   measureStart: GridPosition | null;
   measureEnd: GridPosition | null;
+  telemetryEnabled: boolean;
+  onTelemetry: (telemetry: RenderTelemetry) => void;
   onSelectToken: (tokenId: string | null) => void;
   onMoveToken: (tokenId: string, floorId: string, position: GridPosition) => void;
   onFog: (floorId: string, position: GridPosition, revealed: boolean) => void;
   onPing: (floorId: string, position: GridPosition) => void;
   onMeasure: (position: GridPosition) => void;
+}
+
+function TelemetryProbe({
+  enabled,
+  onTelemetry,
+}: {
+  enabled: boolean;
+  onTelemetry: (telemetry: RenderTelemetry) => void;
+}) {
+  const sampler = useRef(new FrameSampler());
+  const lastPublishedAt = useRef(0);
+
+  useEffect(() => {
+    sampler.current.clear();
+    lastPublishedAt.current = 0;
+  }, [enabled]);
+
+  useFrame(({ gl }, delta) => {
+    if (!enabled) return;
+    sampler.current.record(delta * 1000);
+    const now = performance.now();
+    if (now - lastPublishedAt.current < 500) return;
+    lastPublishedAt.current = now;
+    onTelemetry({
+      frames: sampler.current.snapshot(),
+      renderer: rendererTelemetry(gl.info),
+    });
+  });
+
+  return null;
 }
 
 function worldPosition(floor: FloorMap, position: GridPosition): [number, number, number] {
@@ -545,6 +582,7 @@ export function DungeonScene(props: Props) {
         onPointerMissed={() => props.onSelectToken(null)}
       >
         <BattleScene {...props} />
+        <TelemetryProbe enabled={props.telemetryEnabled} onTelemetry={props.onTelemetry} />
       </Canvas>
     </div>
   );

@@ -22,6 +22,8 @@ entram pela rede local somente depois que o mestre abre uma sessão.
 - O servidor é autoritativo para permissões, movimento, fog e dados.
 - O frontend deriva meshes a partir do documento semântico.
 - Conteúdo secreto é removido no servidor antes de chegar ao cliente.
+- A instrumentação do VTT é opt-in, permanece no navegador e exporta somente
+  um relatório sanitizado construído por allowlist.
 
 A superfície administrativa REST existe somente em loopback. A interface LAN
 usa uma allowlist independente com health, entrada e WebSocket de sessão.

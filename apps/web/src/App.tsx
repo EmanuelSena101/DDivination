@@ -1,10 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
 import { QRCodeSVG } from "qrcode.react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { closeSession, createSession, generateAdventure, joinSession, markdownURL, packageURL, printURL } from "./api";
 import { DungeonScene } from "./components/DungeonScene";
+import { VTTDiagnosticsPanel } from "./components/VTTDiagnosticsPanel";
 import { useAppStore } from "./store";
+import {
+  createTelemetryReport,
+  emptyRenderTelemetry,
+  sceneTelemetry,
+  type RenderTelemetry,
+} from "./telemetry";
 import { DEFAULT_SPEC, type AdventureSpec, type Language } from "./types";
 
 function Brand() {
@@ -279,6 +286,7 @@ function VTT() {
   const sessionToken = useAppStore((state) => state.token);
   const disconnect = useAppStore((state) => state.disconnect);
   const connected = useAppStore((state) => state.connected);
+  const connectionTelemetry = useAppStore((state) => state.connectionTelemetry);
   const selectedTokenId = useAppStore((state) => state.selectedTokenId);
   const setSelectedToken = useAppStore((state) => state.setSelectedToken);
   const latestRoll = useAppStore((state) => state.latestRoll);
@@ -295,8 +303,38 @@ function VTT() {
   const [visibility, setVisibility] = useState<"public" | "gm">("public");
   const [share, setShare] = useState<{ code: string; url: string } | null>(null);
   const [initiativeScores, setInitiativeScores] = useState<Record<string, number>>({});
+  const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
+  const [renderTelemetry, setRenderTelemetry] = useState<RenderTelemetry>(() => emptyRenderTelemetry());
 
   const floor = adventure.floors.find((candidate) => candidate.id === floorId) || adventure.floors[0];
+  const activeSceneTelemetry = useMemo(
+    () => sceneTelemetry(floor, session, role),
+    [floor, session, role],
+  );
+  const telemetryReport = useMemo(
+    () =>
+      createTelemetryReport({
+        render: renderTelemetry,
+        scene: activeSceneTelemetry,
+        connection: connectionTelemetry,
+      }),
+    [activeSceneTelemetry, connectionTelemetry, renderTelemetry],
+  );
+  const updateRenderTelemetry = useCallback((next: RenderTelemetry) => {
+    setRenderTelemetry(next);
+  }, []);
+
+  useEffect(() => {
+    if (!diagnosticsOpen) {
+      delete window.__DDIVINATION_TELEMETRY__;
+      return;
+    }
+    window.__DDIVINATION_TELEMETRY__ = telemetryReport;
+    return () => {
+      delete window.__DDIVINATION_TELEMETRY__;
+    };
+  }, [diagnosticsOpen, telemetryReport]);
+
   const initiativeTokens = floor.entities.filter((entity) => entity.kind === "token" || entity.kind === "boss");
   const openMutation = useMutation({
     mutationFn: () => createSession(adventure.id, "Game Master"),
@@ -492,6 +530,14 @@ function VTT() {
             >
               ↔ <span>{t("measure")}</span>
             </button>
+            <button
+              data-testid="toggle-vtt-diagnostics"
+              aria-pressed={diagnosticsOpen}
+              className={diagnosticsOpen ? "active" : ""}
+              onClick={() => setDiagnosticsOpen((current) => !current)}
+            >
+              ◫ <span>{t("diagnostics")}</span>
+            </button>
           </div>
           <div className="connection-pill">
             <i className={connected ? "online" : ""} />
@@ -542,6 +588,8 @@ function VTT() {
           measureMode={measureMode}
           measureStart={measureStart}
           measureEnd={measureEnd}
+          telemetryEnabled={diagnosticsOpen}
+          onTelemetry={updateRenderTelemetry}
           onSelectToken={setSelectedToken}
           onMoveToken={(tokenId, nextFloorId, position) =>
             send("token.move", { tokenId, floorId: nextFloorId, x: position.x, z: position.z })
@@ -566,6 +614,8 @@ function VTT() {
             }
           }}
         />
+
+        {diagnosticsOpen && <VTTDiagnosticsPanel report={telemetryReport} />}
 
         <div className="floor-caption">
           <span>{String(floor.index + 1).padStart(2, "0")}</span>

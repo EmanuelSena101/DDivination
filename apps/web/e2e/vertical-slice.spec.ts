@@ -6,6 +6,19 @@ test("GM and player share an authoritative 3D dice roll", async ({ browser, page
   await page.getByRole("button", { name: "✦ Divinar dungeon" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Serpent Cult");
 
+  await page.getByTestId("toggle-vtt-diagnostics").click();
+  await expect(page.getByTestId("vtt-diagnostics-panel")).toBeVisible();
+  await expect
+    .poll(async () => Number(await page.getByTestId("telemetry-samples").innerText()))
+    .toBeGreaterThan(0);
+  const baseline = await page.evaluate(() => window.__DDIVINATION_TELEMETRY__);
+  expect(baseline?.schemaVersion).toBe("vtt-telemetry/v1");
+  expect(baseline?.scene.tiles).toBeGreaterThan(0);
+  expect(JSON.stringify(baseline).toLowerCase()).not.toContain("serpent cult");
+  const reportDownload = page.waitForEvent("download");
+  await page.getByRole("button", { name: "JSON↓ Baixar relatório" }).click();
+  expect((await reportDownload).suggestedFilename()).toMatch(/^ddivination-vtt-telemetry-.+\.json$/);
+
   await page.getByRole("button", { name: "◉ Abrir mesa" }).click();
   const code = await page.locator(".session-code strong").innerText();
   const displayedURL = await page.locator(".join-url").innerText();
@@ -24,4 +37,9 @@ test("GM and player share an authoritative 3D dice roll", async ({ browser, page
   await expect(player.locator(".last-roll")).toBeVisible();
   await expect(page.locator(".last-roll")).toBeVisible();
   expect(await player.locator(".last-roll").innerText()).toBe(await page.locator(".last-roll").innerText());
+  await expect
+    .poll(async () =>
+      page.evaluate(() => window.__DDIVINATION_TELEMETRY__?.connection.eventsReceived ?? 0),
+    )
+    .toBeGreaterThan(0);
 });

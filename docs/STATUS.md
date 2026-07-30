@@ -12,6 +12,7 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 - servidor Go 1.26 com API Huma/OpenAPI;
 - persistência SQLite em WAL e migrations incorporadas;
 - geração procedural determinística e bilíngue;
+- execuções de geração assíncronas, observáveis e canceláveis;
 - mapas semânticos com múltiplos andares;
 - visualizador/VTT 3D em React Three Fiber e Rapier;
 - sessões LAN com papéis `gm`, `player` e `display`;
@@ -37,7 +38,7 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 - edição completa de salas, encontros, tesouros e análise ainda não foi
   implementada;
-- geração parcial e jobs assíncronos ainda incompletos;
+- regeneração parcial de estágios ainda não foi implementada;
 - catálogo SRD inicial é limitado;
 - pacote ainda não incorpora toda a biblioteca binária de assets;
 - configuração visual e keychain do adapter de IA pendentes;
@@ -58,13 +59,14 @@ QA visual e todos os sete jobs do CI.
 Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-007-editorial-persistence.md](batches/BATCH-007-editorial-persistence.md).
 
-## Próxima batch
+## Batch em validação
 
 `BATCH-008 — Execuções de geração`
 
-O próximo passo é transformar a geração em uma execução observável e
-cancelável, com progresso por estágios, persistência dos diagnósticos e
-atualização em tempo real. O escopo detalhado será fechado antes da
-implementação.
+A geração agora é assíncrona, observável e cancelável, com estágios persistidos,
+WebSocket local, fallback por polling, recuperação explícita após reinício e
+retomada do acompanhamento por URL. A validação local aprovou Go, vet, build,
+contratos, TypeScript strict, 29 testes Vitest, 7 cenários Playwright, budgets
+e QA visual sem erros no console. Falta o CI da PR para concluir a batch.
 
 O pipeline completo de GLB permanece reservado à BATCH-014.

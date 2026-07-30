@@ -430,6 +430,143 @@ button.secondary {
   font-size: 12px;
 }
 
+.generation-progress {
+  margin-top: 8px;
+  padding: 16px;
+  border: 1px solid rgba(118, 87, 247, 0.32);
+  border-radius: 6px;
+  background:
+    linear-gradient(135deg, rgba(118, 87, 247, 0.12), transparent 54%),
+    rgba(8, 9, 15, 0.76);
+}
+
+.generation-progress.terminal-error {
+  border-color: rgba(228, 97, 117, 0.35);
+}
+
+.generation-progress > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.generation-progress header div {
+  display: grid;
+  gap: 4px;
+}
+
+.generation-progress header small {
+  color: var(--gold);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.generation-progress header strong {
+  color: #eeeaf5;
+  font: 600 13px "Cinzel", serif;
+}
+
+.generation-progress header > span {
+  color: var(--purple-soft);
+  font: 600 19px "Cinzel", serif;
+}
+
+.generation-progress-track {
+  height: 6px;
+  margin: 14px 0 11px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.generation-progress-track i {
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--purple), var(--gold));
+  box-shadow: 0 0 18px rgba(118, 87, 247, 0.55);
+  transition: width 300ms ease;
+}
+
+.generation-meta {
+  display: flex;
+  gap: 18px;
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.generation-meta strong {
+  margin-left: 3px;
+  color: #d9d4e5;
+}
+
+.generation-progress details,
+.generation-history {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.generation-progress summary,
+.generation-history summary {
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.generation-progress ul,
+.generation-history ul {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.generation-progress li {
+  padding: 3px 0;
+  overflow-wrap: anywhere;
+}
+
+.generation-cancel {
+  width: 100%;
+  margin-top: 14px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.generation-history {
+  padding-top: 4px;
+}
+
+.generation-history li + li {
+  border-top: 1px solid var(--line);
+}
+
+.generation-history button {
+  width: 100%;
+  padding: 8px 2px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  color: var(--muted);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.generation-history button:hover {
+  color: white;
+}
+
+.generation-history strong {
+  color: #d9d4e5;
+}
+
 .global-error {
   min-height: 38px;
   padding: 8px 24px;

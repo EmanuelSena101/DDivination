@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sort"
@@ -21,8 +22,23 @@ func (r rect) center() domain.GridPosition {
 }
 
 func Generate(spec domain.AdventureSpec, seed uint64, now time.Time) (domain.AdventureDocument, error) {
+	return GenerateContext(context.Background(), spec, seed, now, nil)
+}
+
+type FloorProgress func(completed, total int)
+
+func GenerateContext(
+	ctx context.Context,
+	spec domain.AdventureSpec,
+	seed uint64,
+	now time.Time,
+	onFloor FloorProgress,
+) (domain.AdventureDocument, error) {
 	spec = normalize(spec)
 	if err := validate(spec); err != nil {
+		return domain.AdventureDocument{}, err
+	}
+	if err := ctx.Err(); err != nil {
 		return domain.AdventureDocument{}, err
 	}
 
@@ -35,6 +51,9 @@ func Generate(spec domain.AdventureSpec, seed uint64, now time.Time) (domain.Adv
 
 	var previousPortal *domain.Portal
 	for floorIndex := 0; floorIndex < spec.FloorCount; floorIndex++ {
+		if err := ctx.Err(); err != nil {
+			return domain.AdventureDocument{}, err
+		}
 		floor, path, secretID, encounter := generateFloor(spec, rng, adventureID, floorIndex)
 		criticalPath = append(criticalPath, path...)
 		if secretID != "" {
@@ -84,8 +103,14 @@ func Generate(spec domain.AdventureSpec, seed uint64, now time.Time) (domain.Adv
 				}
 			}
 		}
+		if onFloor != nil {
+			onFloor(floorIndex+1, spec.FloorCount)
+		}
 	}
 
+	if err := ctx.Err(); err != nil {
+		return domain.AdventureDocument{}, err
+	}
 	name := generatedName(spec, rng)
 	doc := domain.AdventureDocument{
 		ID:               adventureID,

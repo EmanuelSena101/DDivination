@@ -135,15 +135,26 @@ export interface AdventureSnapshotSummary {
   createdAt: string;
 }
 
-export interface GenerationResult {
-  run: {
-    id: string;
-    status: string;
-    progress: number;
-    seed: number;
-    adventureId: string;
-  };
-  adventure: AdventureDocument;
+export interface GenerationStage {
+  name: string;
+  progress: number;
+  occurredAt: string;
+}
+
+export interface GenerationRun {
+  id: string;
+  status: "queued" | "running" | "completed" | "failed" | "cancelled";
+  stage: string;
+  progress: number;
+  seed: number;
+  generatorVersion: string;
+  spec: AdventureSpec;
+  adventureId?: string;
+  diagnostics: string[];
+  stages: GenerationStage[];
+  createdAt: string;
+  updatedAt: string;
+  completedAt?: string;
 }
 
 export interface Participant {

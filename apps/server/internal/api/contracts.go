@@ -31,7 +31,10 @@ var endpointContracts = []endpointContract{
 	{http.MethodGet, "/api/v1/health", "getHealth", exposureLAN, "rest"},
 	{http.MethodGet, "/api/v1/catalog", "getCatalog", exposureLocal, "rest"},
 	{http.MethodPost, "/api/v1/generation-runs", "createGenerationRun", exposureLocal, "rest"},
+	{http.MethodGet, "/api/v1/generation-runs", "listGenerationRuns", exposureLocal, "rest"},
 	{http.MethodGet, "/api/v1/generation-runs/{id}", "getGenerationRun", exposureLocal, "rest"},
+	{http.MethodDelete, "/api/v1/generation-runs/{id}", "cancelGenerationRun", exposureLocal, "rest"},
+	{http.MethodGet, "/api/v1/generation-runs/{id}/stream", "streamGenerationRun", exposureLocal, "websocket"},
 	{http.MethodGet, "/api/v1/adventures", "listAdventures", exposureLocal, "rest"},
 	{http.MethodGet, "/api/v1/adventures/{id}", "getAdventure", exposureLocal, "rest"},
 	{http.MethodPut, "/api/v1/adventures/{id}", "updateAdventure", exposureLocal, "rest"},
@@ -74,15 +77,25 @@ func (s *Server) registerREST(api huma.API) {
 		[]string{"Catalog"}, http.StatusOK,
 	), s.getCatalog)
 	huma.Register(api, apiOperation(
-		http.MethodPost, "/api/v1/generation-runs", "createGenerationRun", "Generate and persist an adventure",
+		http.MethodPost, "/api/v1/generation-runs", "createGenerationRun", "Queue an adventure generation run",
 		[]string{"Generation"}, http.StatusAccepted,
 		http.StatusBadRequest, http.StatusUnprocessableEntity, http.StatusInternalServerError,
 	), s.createGeneration)
+	huma.Register(api, apiOperation(
+		http.MethodGet, "/api/v1/generation-runs", "listGenerationRuns", "List generation runs",
+		[]string{"Generation"}, http.StatusOK,
+		http.StatusInternalServerError,
+	), s.listGenerationRuns)
 	huma.Register(api, apiOperation(
 		http.MethodGet, "/api/v1/generation-runs/{id}", "getGenerationRun", "Get a generation run",
 		[]string{"Generation"}, http.StatusOK,
 		http.StatusNotFound, http.StatusInternalServerError,
 	), s.getGeneration)
+	huma.Register(api, apiOperation(
+		http.MethodDelete, "/api/v1/generation-runs/{id}", "cancelGenerationRun", "Cancel an active generation run",
+		[]string{"Generation"}, http.StatusOK,
+		http.StatusNotFound, http.StatusInternalServerError,
+	), s.cancelGeneration)
 	huma.Register(api, apiOperation(
 		http.MethodGet, "/api/v1/adventures", "listAdventures", "List adventures",
 		[]string{"Adventures"}, http.StatusOK,

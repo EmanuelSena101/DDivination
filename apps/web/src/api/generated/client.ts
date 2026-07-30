@@ -16,7 +16,6 @@ import type {
   CreateSessionResponse,
   ErrorModel,
   GenerationInputBody,
-  GenerationResult,
   GenerationRun,
   HealthBody,
   ImportAssetBody,
@@ -24,6 +23,7 @@ import type {
   Joined,
   ListAdventureCheckpointsParams,
   ListAdventuresParams,
+  ListGenerationRunsParams,
   Result
 } from './models';
 
@@ -868,8 +868,70 @@ export const getCatalog = async ( options?: RequestInit): Promise<getCatalogResp
 
 
 
+export type listGenerationRunsResponse200 = {
+  data: GenerationRun[] | null
+  status: 200
+}
+
+export type listGenerationRunsResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type listGenerationRunsResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type listGenerationRunsResponseSuccess = (listGenerationRunsResponse200) & {
+  headers: Headers;
+};
+export type listGenerationRunsResponseError = (listGenerationRunsResponse422 | listGenerationRunsResponse500) & {
+  headers: Headers;
+};
+
+export type listGenerationRunsResponse = (listGenerationRunsResponseSuccess | listGenerationRunsResponseError)
+
+export const getListGenerationRunsUrl = (params?: ListGenerationRunsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/generation-runs?${stringifiedParams}` : `/api/v1/generation-runs`
+}
+
+/**
+ * @summary List generation runs
+ */
+export const listGenerationRuns = async (params?: ListGenerationRunsParams, options?: RequestInit): Promise<listGenerationRunsResponse> => {
+
+  const res = await fetch(getListGenerationRunsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listGenerationRunsResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as listGenerationRunsResponse
+}
+
+
+
 export type createGenerationRunResponse202 = {
-  data: GenerationResult
+  data: GenerationRun
   status: 202
 }
 
@@ -906,7 +968,7 @@ export const getCreateGenerationRunUrl = () => {
 }
 
 /**
- * @summary Generate and persist an adventure
+ * @summary Queue an adventure generation run
  */
 export const createGenerationRun = async (generationInputBody: NonReadonly<GenerationInputBody>, options?: RequestInit): Promise<createGenerationRunResponse> => {
 
@@ -924,6 +986,66 @@ export const createGenerationRun = async (generationInputBody: NonReadonly<Gener
 
   const data: createGenerationRunResponse['data'] = body ? JSON.parse(body) : {}
   return { data, status: res.status, headers: res.headers } as createGenerationRunResponse
+}
+
+
+
+export type cancelGenerationRunResponse200 = {
+  data: GenerationRun
+  status: 200
+}
+
+export type cancelGenerationRunResponse404 = {
+  data: ErrorModel
+  status: 404
+}
+
+export type cancelGenerationRunResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type cancelGenerationRunResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type cancelGenerationRunResponseSuccess = (cancelGenerationRunResponse200) & {
+  headers: Headers;
+};
+export type cancelGenerationRunResponseError = (cancelGenerationRunResponse404 | cancelGenerationRunResponse422 | cancelGenerationRunResponse500) & {
+  headers: Headers;
+};
+
+export type cancelGenerationRunResponse = (cancelGenerationRunResponseSuccess | cancelGenerationRunResponseError)
+
+export const getCancelGenerationRunUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/generation-runs/${id}`
+}
+
+/**
+ * @summary Cancel an active generation run
+ */
+export const cancelGenerationRun = async (id: string, options?: RequestInit): Promise<cancelGenerationRunResponse> => {
+
+  const res = await fetch(getCancelGenerationRunUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: cancelGenerationRunResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as cancelGenerationRunResponse
 }
 
 

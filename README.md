@@ -43,6 +43,8 @@
 ## O que já funciona
 
 - geração procedural bilíngue e reproduzível por `seed + generatorVersion`;
+- execuções assíncronas com progresso, histórico, cancelamento e retomada após
+  recarregar a página;
 - dungeons com vários andares, salas, corredores, paredes e portais;
 - visualizador 3D com câmera orbital, grid, fog manual e tokens;
 - pack visual procedural com pisos, portas, props, luzes e tokens distinguíveis;

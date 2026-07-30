@@ -189,18 +189,26 @@ type Attribution struct {
 	Notice  string `json:"notice"`
 }
 
+type GenerationStage struct {
+	Name       string    `json:"name"`
+	Progress   int       `json:"progress" minimum:"0" maximum:"100"`
+	OccurredAt time.Time `json:"occurredAt"`
+}
+
 type GenerationRun struct {
-	ID               string        `json:"id"`
-	Status           string        `json:"status" enum:"queued,running,completed,failed,cancelled"`
-	Stage            string        `json:"stage"`
-	Progress         int           `json:"progress" minimum:"0" maximum:"100"`
-	Seed             uint64        `json:"seed"`
-	GeneratorVersion string        `json:"generatorVersion"`
-	Spec             AdventureSpec `json:"spec"`
-	AdventureID      string        `json:"adventureId,omitempty"`
-	Diagnostics      []string      `json:"diagnostics"`
-	CreatedAt        time.Time     `json:"createdAt"`
-	CompletedAt      *time.Time    `json:"completedAt,omitempty"`
+	ID               string            `json:"id"`
+	Status           string            `json:"status" enum:"queued,running,completed,failed,cancelled"`
+	Stage            string            `json:"stage"`
+	Progress         int               `json:"progress" minimum:"0" maximum:"100"`
+	Seed             uint64            `json:"seed"`
+	GeneratorVersion string            `json:"generatorVersion"`
+	Spec             AdventureSpec     `json:"spec"`
+	AdventureID      string            `json:"adventureId,omitempty"`
+	Diagnostics      []string          `json:"diagnostics"`
+	Stages           []GenerationStage `json:"stages"`
+	CreatedAt        time.Time         `json:"createdAt"`
+	UpdatedAt        time.Time         `json:"updatedAt"`
+	CompletedAt      *time.Time        `json:"completedAt,omitempty"`
 }
 
 type AssetRef struct {

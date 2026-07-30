@@ -40,22 +40,20 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 - catálogo SRD inicial é limitado;
 - pacote ainda não incorpora toda a biblioteca binária de assets;
 - configuração visual e keychain do adapter de IA pendentes;
-- budgets de performance ainda não foram formalmente medidos;
-- bundle inicial da VTT precisa de code splitting;
+- FPS no hardware-alvo ainda precisa de validação formal;
+- runtime de física dos dados permanece grande, embora carregado sob demanda;
 - instalador Windows ainda não existe.
 
 ## Última batch concluída
 
-`BATCH-003 — Instrumentação do VTT`
-
-Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-003-vtt-instrumentation.md](batches/BATCH-003-vtt-instrumentation.md).
-
-## Batch em andamento
-
 `BATCH-004 — Spike e otimização 3D`
 
-O trabalho atual transforma a instrumentação da BATCH-003 em otimizações
-mensuráveis de instancing, carregamento e qualidade adaptada à carga da cena.
-Consulte
+Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-004-3d-optimization.md](batches/BATCH-004-3d-optimization.md).
+
+## Próxima batch planejada
+
+`BATCH-005 — Editor de grid`
+
+O próximo passo é permitir alterações manuais de tiles, paredes e portas sem
+misturar ainda a edição de entidades e conteúdo, reservada à BATCH-006.

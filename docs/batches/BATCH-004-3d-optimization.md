@@ -1,10 +1,12 @@
 # BATCH-004 — Spike e otimização 3D
 
-Estado: `VALIDATING`
+Estado: `DONE`
 
 Issue: [#14](https://github.com/EmanuelSena101/DDivination/issues/14)
 
 Pull Request: [#15](https://github.com/EmanuelSena101/DDivination/pull/15)
+
+Finalização documental: [#16](https://github.com/EmanuelSena101/DDivination/pull/16)
 
 ## Contexto
 
@@ -68,7 +70,7 @@ fixtures determinísticas e budgets automáticos que impeçam regressões.
 - [x] o build falha quando os budgets de bundle forem excedidos;
 - [x] fixtures de benchmark são determinísticas e cobertas por testes;
 - [x] comportamento de seleção, movimento, fog e dados continua aprovado;
-- [ ] documentação, suite completa e CI são aprovados.
+- [x] documentação, suite completa e CI são aprovados.
 
 ## Testes obrigatórios
 
@@ -116,6 +118,13 @@ fixtures determinísticas e budgets automáticos que impeçam regressões.
   às miniaturas para manter legibilidade à distância. Nenhum erro de console.
 - `scripts/test.ps1 -SkipInstall` aprovado, incluindo 11 testes frontend e
   dois cenários Playwright executados em série.
+
+### 2026-07-30 — conclusão
+
+- GitHub Actions aprovou contratos, web, E2E, workflow de desenvolvimento e Go
+  em Windows, Linux e macOS.
+- PR #15 promovida e integrada à `main`.
+- Issue #14 encerrada automaticamente pela integração.
 
 ## Resultado
 

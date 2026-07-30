@@ -46,19 +46,19 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 ## Última batch concluída
 
-`BATCH-004 — Spike e otimização 3D`
-
-Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-004-3d-optimization.md](batches/BATCH-004-3d-optimization.md).
-
-## Batch em andamento
-
 `BATCH-005 — Editor de grid e revisão visual do pack base`
 
-O trabalho atual adiciona edição local de tiles, paredes e portas e melhora os
-modelos procedurais nativos. Persistência editorial, edição de conteúdo e
-pipeline completo de GLB continuam nas Batches 7, 6 e 14, respectivamente.
+O mestre agora pode editar tiles, paredes e portas em um rascunho local com
+undo/redo. O pack procedural 0.2.0 apresenta arquitetura, superfícies, props,
+luzes e tokens mais legíveis. A validação incluiu 17 testes Vitest, 3 cenários
+Playwright, suíte Go, contratos, budgets, QA visual e todos os sete jobs do CI.
 
-Implementação e validação local foram concluídas: 17 testes Vitest, 3 cenários
-Playwright, suíte Go, contratos, build e budgets estão aprovados. A batch aguarda
-validação do CI e merge no GitHub.
+Consulte [ROADMAP.md](ROADMAP.md) e
+[BATCH-005-grid-editor-visual-pack.md](batches/BATCH-005-grid-editor-visual-pack.md).
+
+## Próxima batch planejada
+
+`BATCH-006 — Editor de entidades e conteúdo`
+
+Persistência editorial continua reservada à BATCH-007 e o pipeline completo de
+GLB à BATCH-014.

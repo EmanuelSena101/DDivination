@@ -48,25 +48,23 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 ## Última batch concluída
 
-`BATCH-007 — Persistência editorial`
-
-O editor agora persiste alterações no SQLite com autosave, controle otimista de
-versão, checkpoints imutáveis, restauração e resolução explícita de conflitos.
-A aventura é restaurada pela URL após recarregar a aplicação. A validação
-incluiu suíte Go, contratos, 26 testes Vitest, 6 cenários Playwright, budgets,
-QA visual e todos os sete jobs do CI.
-
-Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-007-editorial-persistence.md](batches/BATCH-007-editorial-persistence.md).
-
-## Batch em validação
-
 `BATCH-008 — Execuções de geração`
 
 A geração agora é assíncrona, observável e cancelável, com estágios persistidos,
 WebSocket local, fallback por polling, recuperação explícita após reinício e
-retomada do acompanhamento por URL. A validação local aprovou Go, vet, build,
-contratos, TypeScript strict, 29 testes Vitest, 7 cenários Playwright, budgets
-e QA visual sem erros no console. Falta o CI da PR para concluir a batch.
+retomada do acompanhamento por URL. A validação incluiu suíte Go, contratos, 29
+testes Vitest, 7 cenários Playwright, budgets, QA visual e todos os sete jobs do
+CI.
+
+Consulte [ROADMAP.md](ROADMAP.md) e
+[BATCH-008-generation-runs.md](batches/BATCH-008-generation-runs.md).
+
+## Próxima batch
+
+`BATCH-009 — Gerador de progressão`
+
+O próximo passo é aprofundar o gerador semântico com progressão entre salas e
+andares, locks, chaves, segredos, clímax e invariantes de solubilidade. O escopo
+detalhado será fechado antes da implementação.
 
 O pipeline completo de GLB permanece reservado à BATCH-014.

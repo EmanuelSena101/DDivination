@@ -32,7 +32,7 @@ issue correspondente.
 | BATCH-005 | Editor de grid e revisão visual do pack base | DONE |
 | BATCH-006 | Editor de entidades e conteúdo | DONE |
 | BATCH-007 | Persistência editorial | DONE |
-| BATCH-008 | Execuções de geração | VALIDATING |
+| BATCH-008 | Execuções de geração | DONE |
 | BATCH-009 | Gerador de progressão | PLANNED |
 | BATCH-010 | Catálogo e regras 5E | PLANNED |
 | BATCH-011 | Administração da mesa | PLANNED |

@@ -35,7 +35,8 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 ## Limitações conhecidas
 
-- editor completo ainda não implementado;
+- edição completa de salas, encontros, tesouros e análise ainda não foi
+  implementada;
 - geração parcial e jobs assíncronos ainda incompletos;
 - catálogo SRD inicial é limitado;
 - pacote ainda não incorpora toda a biblioteca binária de assets;
@@ -46,24 +47,24 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 ## Última batch concluída
 
-`BATCH-006 — Editor de entidades e conteúdo`
-
-O mestre agora pode editar narrativa bilíngue, nome do andar e entidades no
-mesmo rascunho local do grid, com undo/redo compartilhado e atualização
-imediata da cena. A validação incluiu 22 testes Vitest, 4 cenários Playwright,
-suíte Go, contratos, budgets, QA visual e todos os sete jobs do CI.
-
-Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-006-content-entity-editor.md](batches/BATCH-006-content-entity-editor.md).
-
-## Batch em validação
-
 `BATCH-007 — Persistência editorial`
 
-A implementação conecta o editor ao `PUT` com optimistic locking e adiciona
-autosave, salvamento manual, checkpoints imutáveis, restauração e resolução
-explícita de conflitos. A validação local aprovou suíte Go, contratos,
-TypeScript strict, 26 testes Vitest, 6 cenários Playwright, budgets e QA visual
-sem erros no console. Falta o CI da PR para concluir a batch.
+O editor agora persiste alterações no SQLite com autosave, controle otimista de
+versão, checkpoints imutáveis, restauração e resolução explícita de conflitos.
+A aventura é restaurada pela URL após recarregar a aplicação. A validação
+incluiu suíte Go, contratos, 26 testes Vitest, 6 cenários Playwright, budgets,
+QA visual e todos os sete jobs do CI.
+
+Consulte [ROADMAP.md](ROADMAP.md) e
+[BATCH-007-editorial-persistence.md](batches/BATCH-007-editorial-persistence.md).
+
+## Próxima batch
+
+`BATCH-008 — Execuções de geração`
+
+O próximo passo é transformar a geração em uma execução observável e
+cancelável, com progresso por estágios, persistência dos diagnósticos e
+atualização em tempo real. O escopo detalhado será fechado antes da
+implementação.
 
 O pipeline completo de GLB permanece reservado à BATCH-014.

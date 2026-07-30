@@ -1,10 +1,12 @@
 # BATCH-007 — Persistência editorial
 
-Estado: `VALIDATING`
+Estado: `DONE`
 
 Issue: [#26](https://github.com/EmanuelSena101/DDivination/issues/26)
 
-Pull Request: [#27](https://github.com/EmanuelSena101/DDivination/pull/27)
+Pull Requests:
+[implementação #27](https://github.com/EmanuelSena101/DDivination/pull/27) e
+[encerramento #28](https://github.com/EmanuelSena101/DDivination/pull/28)
 
 ## Contexto
 
@@ -62,7 +64,7 @@ e resolução explícita de conflitos, sem permitir sobrescrita silenciosa.
 - [x] cada persistência incrementa a versão monotonicamente;
 - [x] documentos semanticamente inválidos são rejeitados;
 - [x] mesa LAN só abre com estado persistido e estável;
-- [ ] testes, documentação, QA visual e CI são aprovados.
+- [x] testes, documentação, QA visual e CI são aprovados.
 
 ## Testes obrigatórios
 
@@ -133,8 +135,17 @@ e resolução explícita de conflitos, sem permitir sobrescrita silenciosa.
 ### 2026-07-30 — publicação
 
 - Implementação publicada no PR #27.
-- A issue #26 será encerrada automaticamente após a aprovação dos checks e o
-  merge do PR.
+- A issue #26 foi encerrada automaticamente pelo merge do PR.
+
+### 2026-07-30 — conclusão
+
+- Os sete jobs do projeto no GitHub Actions foram aprovados: contrato,
+  developer workflow, E2E, web e Go em Windows, Linux e macOS.
+- A falha externa da Vercel não é gate do projeto: o DDivination é uma
+  aplicação local-first distribuída com servidor Go.
+- Pull Request #27 integrada à `main`.
+- Pull Request #28 registra o encerramento definitivo da batch.
+- Issue #26 encerrada pela integração.
 
 ## Resultado
 

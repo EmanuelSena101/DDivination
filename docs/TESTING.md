@@ -19,10 +19,16 @@ O script:
 
 - valida Node, npm, Go e as portas 8080/5173;
 - instala dependências quando `node_modules` não existe;
+- compila um snapshot do frontend para os clientes LAN;
 - compila o backend;
 - inicia backend e Vite em processos ocultos;
 - aguarda os dois serviços;
 - registra PIDs e logs em `.tmp/dev-runtime`.
+
+O mestre usa `http://127.0.0.1:5173`, com hot reload. Quando uma mesa é aberta,
+os jogadores recebem uma URL LAN em `:8080`, servida pelo snapshot compilado no
+início da execução. Reinicie `dev.ps1` para refletir alterações recentes do
+frontend nesse snapshot LAN.
 
 Use outro diretório de dados quando necessário:
 

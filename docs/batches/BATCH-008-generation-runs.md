@@ -1,10 +1,12 @@
 # BATCH-008 — Execuções de geração
 
-Estado: `VALIDATING`
+Estado: `DONE`
 
 Issue: [#29](https://github.com/EmanuelSena101/DDivination/issues/29)
 
-Pull Request: [#30](https://github.com/EmanuelSena101/DDivination/pull/30)
+Pull Requests:
+[implementação #30](https://github.com/EmanuelSena101/DDivination/pull/30) e
+[encerramento #31](https://github.com/EmanuelSena101/DDivination/pull/31)
 
 ## Contexto
 
@@ -64,7 +66,7 @@ cancelável, mantendo o servidor local como autoridade.
 - [x] reload restaura o acompanhamento da execução;
 - [x] reinício não deixa execuções eternamente pendentes;
 - [x] falha ou ausência de IA mantém o fallback procedural;
-- [ ] testes, documentação, QA visual e CI são aprovados.
+- [x] testes, documentação, QA visual e CI são aprovados.
 
 ## Testes obrigatórios
 
@@ -132,8 +134,16 @@ cancelável, mantendo o servidor local como autoridade.
 ### 2026-07-30 — publicação
 
 - Implementação publicada no PR #30.
-- A issue #29 será encerrada automaticamente após a aprovação dos checks e o
-  merge do PR.
+- A issue #29 foi encerrada automaticamente pelo merge do PR.
+
+### 2026-07-30 — conclusão
+
+- Os sete jobs do projeto no GitHub Actions foram aprovados: contrato,
+  developer workflow, E2E, web e Go em Windows, Linux e macOS.
+- A falha externa da Vercel não é gate do projeto local-first.
+- Pull Request #30 integrada à `main`.
+- Pull Request #31 registra o encerramento definitivo da batch.
+- Issue #29 encerrada pela integração.
 
 ## Resultado
 

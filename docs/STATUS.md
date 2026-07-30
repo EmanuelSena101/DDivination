@@ -46,17 +46,11 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 ## Última batch concluída
 
-`BATCH-002 — Contratos e fronteiras da API`
-
-Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-002-api-contracts.md](batches/BATCH-002-api-contracts.md).
-
-## Batch em validação
-
 `BATCH-003 — Instrumentação do VTT`
 
-Esta batch mede frames, renderer, carga semântica da cena e saúde da conexão
-WebSocket antes das otimizações planejadas para a BATCH-004. A implementação e
-a suíte local estão aprovadas; falta a validação do CI e a integração da PR.
-Consulte
+Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-003-vtt-instrumentation.md](batches/BATCH-003-vtt-instrumentation.md).
+
+## Próxima batch planejada
+
+`BATCH-004 — Spike e otimização 3D`

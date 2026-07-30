@@ -1,10 +1,12 @@
 # BATCH-003 — Instrumentação do VTT
 
-Estado: `VALIDATING`
+Estado: `DONE`
 
 Issue: [#10](https://github.com/EmanuelSena101/DDivination/issues/10)
 
 Pull Request: [#11](https://github.com/EmanuelSena101/DDivination/pull/11)
+
+Finalização documental: [#12](https://github.com/EmanuelSena101/DDivination/pull/12)
 
 ## Contexto
 
@@ -82,7 +84,7 @@ BATCH-004 identificar gargalos e comprovar os efeitos das otimizações.
 - [x] a coleta é inteiramente local e usa memória limitada;
 - [x] testes unitários, TypeScript, build e E2E são aprovados;
 - [x] documentação e status são atualizados;
-- [ ] CI é aprovado e a PR é mesclada.
+- [x] CI é aprovado e a PR é mesclada.
 
 ## Testes obrigatórios
 
@@ -127,6 +129,13 @@ BATCH-004 identificar gargalos e comprovar os efeitos das otimizações.
   rolagem autoritativa.
 - Pull Request #11 aberta como draft para validação do CI.
 
+### 2026-07-30 — conclusão
+
+- GitHub Actions aprovou contratos, web, E2E, workflow de desenvolvimento e Go
+  em Windows, Linux e macOS.
+- PR #11 promovida e integrada à `main`.
+- Issue #10 encerrada pela integração.
+
 ## Resultado
 
 - Instrumentação opt-in com janela circular de 240 frames.
@@ -136,6 +145,7 @@ BATCH-004 identificar gargalos e comprovar os efeitos das otimizações.
 - Uma amostra manual, não normativa, da cena gerada 64×64 registrou cerca de
   60 FPS, P95 de 18 ms, 8 draw calls e 17 mil triângulos.
 - Sete testes frontend aprovados, além da suíte Go, contrato, build e E2E.
+- Todos os jobs oficiais do CI aprovados.
 
 ## Pendências encontradas
 

@@ -1,6 +1,6 @@
 # BATCH-006 — Editor de entidades e conteúdo
 
-Estado: `VALIDATING`
+Estado: `DONE`
 
 Issue: [#22](https://github.com/EmanuelSena101/DDivination/issues/22)
 
@@ -63,7 +63,7 @@ ativo, mantendo o documento semântico como fonte da cena 3D.
 - [x] coordenadas inválidas ou sem tile são rejeitadas;
 - [x] undo, redo e descarte abrangem grid e conteúdo;
 - [x] o editor permanece bloqueado durante sessão LAN;
-- [ ] testes, documentação, QA visual e CI são aprovados.
+- [x] testes, documentação, QA visual e CI são aprovados.
 
 ## Testes obrigatórios
 
@@ -109,6 +109,15 @@ ativo, mantendo o documento semântico como fonte da cena 3D.
 - A inspeção nos modos História e Entidades confirmou o layout rolável, a
   atualização da cena e nenhum erro no console.
 - Pull Request #23 aberta para validação contínua e revisão.
+
+### 2026-07-30 — conclusão
+
+- Os sete jobs do projeto no GitHub Actions foram aprovados: contrato,
+  developer workflow, E2E, web e Go em Windows, Linux e macOS.
+- A falha externa da Vercel não é gate do projeto: o DDivination é uma
+  aplicação local-first distribuída com servidor Go.
+- Pull Request #23 integrada à `main`.
+- Issue #22 encerrada pela integração.
 
 ## Resultado
 

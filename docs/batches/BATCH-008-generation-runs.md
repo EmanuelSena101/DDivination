@@ -6,7 +6,7 @@ Issue: [#29](https://github.com/EmanuelSena101/DDivination/issues/29)
 
 Pull Requests:
 [implementação #30](https://github.com/EmanuelSena101/DDivination/pull/30) e
-encerramento a criar
+[encerramento #31](https://github.com/EmanuelSena101/DDivination/pull/31)
 
 ## Contexto
 
@@ -142,6 +142,7 @@ cancelável, mantendo o servidor local como autoridade.
   developer workflow, E2E, web e Go em Windows, Linux e macOS.
 - A falha externa da Vercel não é gate do projeto local-first.
 - Pull Request #30 integrada à `main`.
+- Pull Request #31 registra o encerramento definitivo da batch.
 - Issue #29 encerrada pela integração.
 
 ## Resultado

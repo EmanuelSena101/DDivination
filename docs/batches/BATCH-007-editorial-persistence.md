@@ -6,7 +6,7 @@ Issue: [#26](https://github.com/EmanuelSena101/DDivination/issues/26)
 
 Pull Requests:
 [implementação #27](https://github.com/EmanuelSena101/DDivination/pull/27) e
-encerramento a criar
+[encerramento #28](https://github.com/EmanuelSena101/DDivination/pull/28)
 
 ## Contexto
 
@@ -144,6 +144,7 @@ e resolução explícita de conflitos, sem permitir sobrescrita silenciosa.
 - A falha externa da Vercel não é gate do projeto: o DDivination é uma
   aplicação local-first distribuída com servidor Go.
 - Pull Request #27 integrada à `main`.
+- Pull Request #28 registra o encerramento definitivo da batch.
 - Issue #26 encerrada pela integração.
 
 ## Resultado

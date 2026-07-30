@@ -1,55 +1,85 @@
-# DDivination
+<p align="center">
+  <img
+    src="docs/images/readme-hero.png"
+    alt="Dungeon isométrica iluminada por um dado de vinte lados violeta"
+    width="100%"
+  />
+</p>
 
-DDivination é um gerador determinístico de aventuras compatíveis com 5E 2024 e
-uma VTT 3D local-first. Um único binário Go hospeda a visão do mestre; jogadores
-entram pela rede local usando um código temporário.
+<h1 align="center">DDivination</h1>
 
-> O rewrite está em desenvolvimento no branch `rewrite/go-v1`. O MVP anterior
-> permanece disponível na tag `legacy-python-mvp`.
+<p align="center">
+  <strong>Crie a aventura. Abra a mesa. Explore em 3D.</strong>
+</p>
 
-## Vertical slice disponível
+<p align="center">
+  Gerador determinístico de aventuras compatíveis com 5E 2024 e VTT 3D
+  local-first para mestres e jogadores na mesma rede.
+</p>
 
-- geração procedural bilíngue reproduzível por `seed + generatorVersion`;
-- mapas com múltiplos andares, salas, corredores, paredes e portais;
-- VTT 3D com câmera orbital, instancing, fog manual e tokens no grid;
-- diagnóstico local de frames, renderer, cena e sincronização, com relatório
-  JSON sanitizado;
-- sessão LAN com papéis `gm`, `player` e `display`;
-- validação autoritativa de movimento e filtragem de conteúdo secreto;
-- dados `d4`, `d6`, `d8`, `d10`, `d12`, `d20` e `d100`, com resultado do
-  servidor e animação física Rapier;
-- iniciativa simples, ping e diário das últimas 100 rolagens no protocolo;
-- SQLite em WAL, snapshots, optimistic locking e pacotes `.ddivination`;
-- upload validado de PNG, WebP e GLB autocontido;
-- enriquecimento narrativo opcional via Responses API, com Structured Outputs,
-  chave somente em memória e fallback procedural;
-- API OpenAPI 3.1 via Huma e configuração Orval;
-- interface em `pt-BR` e `en-US`, sem dependências de rede em runtime.
+<p align="center">
+  <a href="https://github.com/EmanuelSena101/DDivination/actions/workflows/ci.yml">
+    <img src="https://github.com/EmanuelSena101/DDivination/actions/workflows/ci.yml/badge.svg" alt="CI" />
+  </a>
+  <img src="https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white" alt="Go 1.26" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=101820" alt="React 19" />
+  <img src="https://img.shields.io/badge/funciona-offline-6f52ff" alt="Funciona offline" />
+</p>
 
-## Arquitetura
+<p align="center">
+  <a href="#início-rápido">Início rápido</a> ·
+  <a href="#sua-primeira-aventura">Primeira aventura</a> ·
+  <a href="#abrindo-uma-mesa-na-rede-local">Mesa LAN</a> ·
+  <a href="#testes">Testes</a> ·
+  <a href="#problemas-comuns">Problemas comuns</a>
+</p>
 
-```mermaid
-flowchart LR
-  GM["Navegador do mestre"] -->|REST + WebSocket| Go["Servidor Go / Huma"]
-  P["Jogadores na LAN"] -->|WebSocket filtrado| Go
-  Go --> SQLite["SQLite WAL"]
-  Go --> Gen["Gerador determinístico"]
-  Go --> Pack["Pacotes e assets"]
-  GM --> Scene["React Three Fiber + Rapier"]
-  P --> Scene
+> [!IMPORTANT]
+> O DDivination ainda está em desenvolvimento. O vertical slice é funcional,
+> mas não existe instalador oficial e o editor completo ainda não está pronto.
+> O fluxo recomendado neste momento é Windows + PowerShell.
+
+## O que já funciona
+
+- geração procedural bilíngue e reproduzível por `seed + generatorVersion`;
+- dungeons com vários andares, salas, corredores, paredes e portais;
+- visualizador 3D com câmera orbital, grid, fog manual e tokens;
+- mesa pela rede local com papéis de mestre, jogador e display;
+- movimento autoritativo, ping, medição e iniciativa simples;
+- dados 3D `d4`, `d6`, `d8`, `d10`, `d12`, `d20` e `d100`;
+- histórico das últimas 100 rolagens;
+- diagnóstico local de FPS, renderer, cena e WebSocket;
+- SQLite, checkpoints, exportações e pacotes `.ddivination`;
+- interface em `pt-BR` e `en-US`;
+- uso offline sem conta ou serviço externo.
+
+## Início rápido
+
+### 1. Pré-requisitos
+
+Instale:
+
+- [Git](https://git-scm.com/downloads);
+- [Go 1.26 ou mais recente](https://go.dev/dl/);
+- [Node.js 24 ou mais recente](https://nodejs.org/), com npm 11+;
+- Windows PowerShell 5.1 ou PowerShell 7.
+
+Confirme as versões:
+
+```powershell
+go version
+node --version
+npm --version
 ```
 
-O documento persistido é semântico: tiles, paredes, entidades, salas e
-referências de assets. As meshes são derivadas no frontend e nunca entram no
-banco.
+### 2. Baixe o projeto
 
-## Requisitos para desenvolvimento
+```powershell
+git clone https://github.com/EmanuelSena101/DDivination.git
+cd DDivination
+```
 
-- Go 1.26;
-- Node.js 24;
-- npm 11 ou mais recente.
-
-## Executar
+### 3. Inicie tudo
 
 Na raiz do repositório:
 
@@ -57,104 +87,261 @@ Na raiz do repositório:
 .\scripts\dev.ps1
 ```
 
-Abra `http://127.0.0.1:5173`. Logs e registros dos processos ficam em
-`.tmp/dev-runtime`.
+Na primeira execução, o script instala as dependências, compila o servidor e
+inicia backend e frontend. Ao terminar, ele mostra:
 
-Para encerrar backend e frontend:
+```text
+Frontend: http://127.0.0.1:5173
+Backend:  http://127.0.0.1:8080
+```
+
+Abra [http://127.0.0.1:5173](http://127.0.0.1:5173) no navegador.
+
+### 4. Encerre corretamente
+
+Quando terminar:
 
 ```powershell
 .\scripts\stop.ps1
 ```
 
-O servidor permanece restrito ao loopback até o mestre abrir uma sessão; nesse
-momento, somente a interface de jogador é exposta nos endereços IPv4 privados.
+Esse comando encerra somente os processos registrados pelo DDivination e
+preserva os logs para diagnóstico.
 
-O `go.work` também permite executar somente o backend a partir da raiz:
+## Sua primeira aventura
+
+<p align="center">
+  <img
+    src="docs/images/readme-builder.png"
+    alt="Tela de criação de uma nova aventura no DDivination"
+    width="100%"
+  />
+</p>
+
+1. Escolha tamanho e nível do grupo.
+2. Defina duração, quantidade de andares e dificuldade.
+3. Descreva tema, bioma, antagonista e objetivo.
+4. Escolha uma estrutura linear, ramificada ou labiríntica.
+5. Clique em **Divinar dungeon**.
+
+O servidor cria e salva um documento semântico. A cena 3D é derivada de tiles,
+paredes, entidades e portais; meshes e buffers gráficos não entram no banco.
+
+### Controles principais da VTT
+
+| Controle | O que faz |
+| --- | --- |
+| **Andares** | Alterna entre os mapas conectados da aventura. |
+| **Medir** | Mede distâncias no grid; cada célula representa 5 pés. |
+| **Diagnóstico** | Mostra FPS, P95, draw calls, triângulos e sincronização. |
+| **Abrir mesa** | Inicia uma sessão para jogadores na rede local. |
+| **Fog** | Revela ou oculta células manualmente; disponível ao mestre. |
+| **Ping** | Marca uma posição para os participantes conectados. |
+| **Dados** | Rola uma expressão como `1d20`, com resultado do servidor. |
+| **Exportar** | Gera pacote, Markdown, página imprimível ou screenshot. |
+
+<p align="center">
+  <img
+    src="docs/images/readme-vtt-diagnostics.png"
+    alt="VTT 3D do DDivination com painel local de diagnóstico aberto"
+    width="100%"
+  />
+</p>
+
+## Abrindo uma mesa na rede local
+
+1. Gere uma aventura e clique em **Abrir mesa**.
+2. O DDivination mostra um QR code, um código temporário e um endereço LAN.
+3. Compartilhe o QR code ou endereço com quem estiver na mesma rede.
+4. O jogador informa um nome e entra como **player** ou **display**.
+5. O mestre pode movimentar qualquer token. O primeiro jogador recebe o token
+   do grupo automaticamente; jogadores controlam somente tokens atribuídos.
+
+O backend continua autoritativo para movimento, fog e dados. Conteúdo secreto é
+filtrado no servidor antes de ser enviado ao cliente.
+
+> [!NOTE]
+> O servidor começa restrito a `127.0.0.1`. A interface LAN só é ativada quando
+> o mestre abre uma mesa e expõe apenas health, entrada e WebSocket da sessão.
+
+## Onde ficam dados e logs
+
+No modo de desenvolvimento:
+
+| Conteúdo | Local padrão |
+| --- | --- |
+| Banco e assets locais | `.tmp/dev-data` |
+| Logs e registro de processos | `.tmp/dev-runtime` |
+| Build web | `apps/web/dist` |
+| Binários portáteis | `release` |
+
+Para iniciar com outro diretório de dados:
 
 ```powershell
-go run ./apps/server/cmd/ddivination
+.\scripts\dev.ps1 -DataDir ".tmp\campanha-teste"
 ```
 
-Para servir o build web sem Vite:
+Isso é útil para testar uma campanha nova sem misturar o banco anterior.
+
+## Testes
+
+Encerre o ambiente de desenvolvimento antes do E2E:
 
 ```powershell
-npm run build:web
-$env:DDIVINATION_WEB_DIR = (Resolve-Path "apps/web/dist")
-cd apps/server
-go run ./cmd/ddivination
+.\scripts\stop.ps1
 ```
 
-## Verificação
-
-Suite completa:
+Execute a suíte completa:
 
 ```powershell
 .\scripts\test.ps1
 ```
 
-Para omitir apenas o E2E:
+Atalhos úteis:
 
 ```powershell
+# Ignora somente o Playwright
 .\scripts\test.ps1 -SkipE2E
-```
 
-Os testes Go verificam determinismo, conectividade de centenas de seeds,
-portais, persistência SQLite, optimistic locking, permissões, dados, filtragem
-de segredos e segurança de pacotes.
+# Reutiliza node_modules já instalado
+.\scripts\test.ps1 -SkipInstall
 
-Consulte [docs/TESTING.md](docs/TESTING.md) para detalhes e diagnóstico.
-Para medir o VTT, consulte
-[docs/VTT_DIAGNOSTICS.md](docs/VTT_DIAGNOSTICS.md).
-
-## OpenAPI e cliente TypeScript
-
-Gere o contrato OpenAPI 3.1 e o cliente Orval a partir da fonte Go:
-
-```powershell
-.\scripts\generate-contract.ps1
-```
-
-Verifique se os artefatos estão sincronizados:
-
-```powershell
+# Verifica OpenAPI e cliente TypeScript
 .\scripts\check-contract.ps1
 ```
 
-As operações administrativas existem somente em loopback. A interface LAN
-expõe apenas health, entrada e WebSocket de sessão. Consulte
-[docs/API.md](docs/API.md) para a matriz completa.
+A suíte inclui testes Go, `go vet`, build do servidor, contratos OpenAPI,
+TypeScript strict, Vitest, build Vite e Playwright com mestre e jogador.
+
+Consulte [docs/TESTING.md](docs/TESTING.md) para detalhes.
 
 ## Build portátil
 
+Para criar o executável Windows x64:
+
 ```powershell
-./scripts/build.ps1 -TargetOS windows -TargetArch amd64
+.\scripts\build.ps1 -TargetOS windows -TargetArch amd64
 ```
 
-O script compila o frontend, o incorpora no binário Go e copia
-`assets/base-pack` ao lado do executável em `release/`.
+O resultado fica em:
 
-## Dados e segurança
+```text
+release/
+├── ddivination-windows-amd64.exe
+└── assets/
+    └── base-pack/
+```
 
-- O banco fica no diretório de configuração do usuário, em `DDivination/`.
-- `DDIVINATION_DATA_DIR` escolhe um diretório alternativo.
-- Códigos de entrada expiram em 15 minutos e tokens de sessão são efêmeros.
-- A interface LAN não expõe criação, catálogo, importação ou administração.
-- Chaves de IA ainda não são persistidas nem solicitadas pelo vertical slice.
-- Imports rejeitam path traversal, entradas excessivas, hashes divergentes,
-  formatos não permitidos e GLBs com recursos externos.
+O frontend é incorporado ao executável. O pack visual fica ao lado dele para
+permitir atualizações independentes.
 
-## Licenciamento e SRD
+## Problemas comuns
 
-O catálogo inicial e as aventuras incluem atribuição ao **System Reference
-Document 5.2.1**, de Wizards of the Coast LLC, licenciado sob CC-BY-4.0.
-DDivination não é um produto oficial de D&D.
+### “Já existe uma execução registrada”
 
-O pack visual inicial contém somente primitivas procedurais originais sob
-CC0-1.0. Consulte `assets/base-pack/manifest.json` e `LICENSE.md`.
+```powershell
+.\scripts\stop.ps1
+.\scripts\dev.ps1
+```
 
-## Próximos marcos
+### Porta 8080 ou 5173 em uso
 
-O vertical slice é funcional, mas o release v1 ainda precisa do editor completo,
-regeneração parcial, catálogo SRD ampliado, configuração visual/keychain do
-adapter de IA, regressão visual automatizada, validação formal dos budgets de
-performance e empacotamento do instalador Windows.
+Primeiro tente `.\scripts\stop.ps1`. Se o processo não foi iniciado pelo
+DDivination, o erro informa o nome e o PID do responsável pela porta.
+
+### `go: cannot find main module`
+
+Use o comando a partir da raiz atual do projeto:
+
+```powershell
+go run ./apps/server/cmd/ddivination
+```
+
+O `go.work` da raiz referencia o módulo em `apps/server`.
+
+### Vite mostra `ECONNREFUSED 127.0.0.1:8080`
+
+O frontend está aberto, mas o backend não iniciou. Encerre a execução parcial e
+use o fluxo unificado:
+
+```powershell
+.\scripts\stop.ps1
+.\scripts\dev.ps1
+```
+
+Depois consulte:
+
+```text
+.tmp/dev-runtime/backend.error.log
+.tmp/dev-runtime/web.error.log
+```
+
+### Playwright reclama que a porta 8080 está ocupada
+
+O E2E inicia um backend isolado. Execute `.\scripts\stop.ps1` antes dos testes.
+
+## Arquitetura em uma imagem
+
+```mermaid
+flowchart LR
+  GM["Mestre<br/>localhost"] -->|REST + WebSocket| Go["Servidor Go<br/>Huma"]
+  Player["Jogadores<br/>rede local"] -->|Join + WebSocket| Go
+  Display["Display<br/>rede local"] -->|Join + WebSocket| Go
+  Go --> DB[("SQLite WAL")]
+  Go --> Generator["Gerador<br/>determinístico"]
+  Go --> Packages["Pacotes e assets"]
+  GM --> Scene["React Three Fiber<br/>+ Rapier"]
+  Player --> Scene
+  Display --> Scene
+```
+
+Estrutura principal:
+
+```text
+apps/server        API, persistência, geração e sessões
+apps/web           React, interface e cena 3D
+assets/base-pack   pack visual e atribuições
+docs               arquitetura, API, testes e batches
+scripts            iniciar, encerrar, testar e construir
+```
+
+Leia também:
+
+- [estado atual](docs/STATUS.md);
+- [roadmap por batches](docs/ROADMAP.md);
+- [arquitetura](docs/ARCHITECTURE.md);
+- [contratos da API](docs/API.md);
+- [diagnóstico da VTT](docs/VTT_DIAGNOSTICS.md).
+
+## Limites atuais
+
+Ainda não fazem parte do vertical slice:
+
+- editor completo de mapa e conteúdo;
+- combate automatizado e fichas completas;
+- multiplayer pela internet;
+- line-of-sight dinâmico;
+- marketplace, macros, VR ou primeira pessoa;
+- instalador Windows.
+
+As otimizações formais do cenário 3D são o próximo marco. Acompanhe o
+[roadmap](docs/ROADMAP.md).
+
+## Privacidade, IA e segurança
+
+- A aplicação funciona offline e não exige conta.
+- Códigos de entrada expiram e tokens de sessão são efêmeros.
+- Chaves de IA não entram no SQLite, logs ou pacotes.
+- A IA é opcional; falhas nunca bloqueiam a geração procedural.
+- Imports validam tamanho, formato, hashes e caminhos.
+- O relatório de diagnóstico é local e não contém narrativa ou credenciais.
+
+## SRD e atribuição
+
+O catálogo inicial e as aventuras incluem material do
+[System Reference Document 5.2.1](https://www.dndbeyond.com/srd), de Wizards of
+the Coast LLC, licenciado sob CC-BY-4.0.
+
+DDivination não é um produto oficial de D&D. O pack visual inicial contém
+primitivas procedurais originais; consulte
+[assets/base-pack/LICENSE.md](assets/base-pack/LICENSE.md).

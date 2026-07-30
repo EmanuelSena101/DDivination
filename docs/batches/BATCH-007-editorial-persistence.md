@@ -4,7 +4,7 @@ Estado: `VALIDATING`
 
 Issue: [#26](https://github.com/EmanuelSena101/DDivination/issues/26)
 
-Pull Request: a criar
+Pull Request: [#27](https://github.com/EmanuelSena101/DDivination/pull/27)
 
 ## Contexto
 
@@ -129,6 +129,12 @@ e resolução explícita de conflitos, sem permitir sobrescrita silenciosa.
 - Estados Salvo, ações manuais, motivos, versões e horários dos checkpoints
   foram inspecionados no navegador.
 - Nenhum erro foi registrado no console.
+
+### 2026-07-30 — publicação
+
+- Implementação publicada no PR #27.
+- A issue #26 será encerrada automaticamente após a aprovação dos checks e o
+  merge do PR.
 
 ## Resultado
 

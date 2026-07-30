@@ -4,7 +4,7 @@ Estado: `VALIDATING`
 
 Issue: [#14](https://github.com/EmanuelSena101/DDivination/issues/14)
 
-Pull Request: a criar
+Pull Request: [#15](https://github.com/EmanuelSena101/DDivination/pull/15)
 
 ## Contexto
 

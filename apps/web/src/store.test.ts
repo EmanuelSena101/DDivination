@@ -121,6 +121,45 @@ describe("local editor history", () => {
     expect(useAppStore.getState().adventure).toEqual(before);
     expect(useAppStore.getState().editorDirty).toBe(false);
   });
+
+  it("reconciles an autosave without losing a newer local edit", () => {
+    const before = adventure();
+    useAppStore.getState().setAdventure(before);
+    useAppStore.getState().editContent({
+      floorId: "benchmark-64",
+      name: { "pt-BR": "Enviado", "en-US": "Submitted" },
+      summary: before.summary,
+      hook: before.narrative.hook,
+      objective: before.narrative.objective,
+      antagonist: before.narrative.antagonist,
+      atmosphere: before.narrative.atmosphere,
+      floorName: before.floors[0].name,
+    });
+    const submitted = useAppStore.getState().adventure!;
+    useAppStore.getState().editContent({
+      floorId: "benchmark-64",
+      name: { "pt-BR": "Mais novo", "en-US": "Newer" },
+      summary: before.summary,
+      hook: before.narrative.hook,
+      objective: before.narrative.objective,
+      antagonist: before.narrative.antagonist,
+      atmosphere: before.narrative.atmosphere,
+      floorName: before.floors[0].name,
+    });
+
+    useAppStore.getState().acceptEditorSave(
+      {
+        ...submitted,
+        version: 2,
+        updatedAt: "2026-07-30T15:00:00Z",
+      },
+      submitted,
+    );
+
+    expect(useAppStore.getState().adventure?.name["pt-BR"]).toBe("Mais novo");
+    expect(useAppStore.getState().adventure?.version).toBe(2);
+    expect(useAppStore.getState().editorDirty).toBe(true);
+  });
 });
 
 function tileKind(document: AdventureDocument, x: number, z: number) {

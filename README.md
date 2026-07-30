@@ -37,8 +37,7 @@
 > [!IMPORTANT]
 > O DDivination ainda está em desenvolvimento. O vertical slice é funcional,
 > mas não existe instalador oficial. O editor de mapa, conteúdo bilíngue e
-> entidades já funciona como rascunho local; o salvamento editorial ainda não
-> está pronto.
+> entidades já possui autosave versionado, checkpoints e resolução de conflitos.
 > O fluxo recomendado neste momento é Windows + PowerShell.
 
 ## O que já funciona
@@ -49,6 +48,7 @@
 - pack visual procedural com pisos, portas, props, luzes e tokens distinguíveis;
 - editor local de tiles, paredes, portas, narrativa bilíngue e entidades com
   desfazer/refazer compartilhado;
+- autosave no SQLite, checkpoints imutáveis e recuperação após recarregar;
 - mesa pela rede local com papéis de mestre, jogador e display;
 - movimento autoritativo, ping, medição e iniciativa simples;
 - dados 3D `d4`, `d6`, `d8`, `d10`, `d12`, `d20` e `d100`;
@@ -332,17 +332,15 @@ Leia também:
 
 Ainda não fazem parte do vertical slice:
 
-- persistência do editor e autosave;
 - combate automatizado e fichas completas;
 - multiplayer pela internet;
 - line-of-sight dinâmico;
 - marketplace, macros, VR ou primeira pessoa;
 - instalador Windows.
 
-O editor atual é um rascunho reversível. Ele permite ajustar o grid, a narrativa
-em ambos os idiomas e as entidades do andar ativo, mas ainda não grava essas
-alterações no SQLite. Descarte as alterações antes de abrir uma mesa. A
-persistência chegará na BATCH-007. Acompanhe o [roadmap](docs/ROADMAP.md).
+O editor mantém um rascunho reversível e o salva automaticamente no SQLite.
+Checkpoints marcam versões importantes; conflitos nunca sobrescrevem dados
+remotos sem confirmação. Acompanhe o [roadmap](docs/ROADMAP.md).
 
 ## Privacidade, IA e segurança
 

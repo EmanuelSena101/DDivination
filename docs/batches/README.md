@@ -28,6 +28,7 @@ release v1.
 | [BATCH-004](BATCH-004-3d-optimization.md) | Spike e otimização 3D | DONE |
 | [BATCH-005](BATCH-005-grid-editor-visual-pack.md) | Editor de grid e pack visual | DONE |
 | [BATCH-006](BATCH-006-content-entity-editor.md) | Editor de conteúdo e entidades | DONE |
+| [BATCH-007](BATCH-007-editorial-persistence.md) | Persistência editorial | VALIDATING |
 
 O estado das próximas batches permanece centralizado no
 [roadmap](../ROADMAP.md).

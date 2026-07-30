@@ -36,7 +36,9 @@ var endpointContracts = []endpointContract{
 	{http.MethodGet, "/api/v1/adventures/{id}", "getAdventure", exposureLocal, "rest"},
 	{http.MethodPut, "/api/v1/adventures/{id}", "updateAdventure", exposureLocal, "rest"},
 	{http.MethodDelete, "/api/v1/adventures/{id}", "deleteAdventure", exposureLocal, "rest"},
+	{http.MethodGet, "/api/v1/adventures/{id}/checkpoints", "listAdventureCheckpoints", exposureLocal, "rest"},
 	{http.MethodPost, "/api/v1/adventures/{id}/checkpoints", "checkpointAdventure", exposureLocal, "rest"},
+	{http.MethodPost, "/api/v1/adventures/{id}/checkpoints/{checkpointId}/restore", "restoreAdventureCheckpoint", exposureLocal, "rest"},
 	{http.MethodGet, "/api/v1/adventures/{id}/export.md", "exportAdventureMarkdown", exposureLocal, "rest"},
 	{http.MethodGet, "/api/v1/adventures/{id}/print", "printAdventure", exposureLocal, "rest"},
 	{http.MethodPost, "/api/v1/sessions", "createSession", exposureLocal, "rest"},
@@ -102,10 +104,20 @@ func (s *Server) registerREST(api huma.API) {
 		http.StatusNotFound, http.StatusInternalServerError,
 	), s.deleteAdventure)
 	huma.Register(api, apiOperation(
-		http.MethodPost, "/api/v1/adventures/{id}/checkpoints", "checkpointAdventure", "Create an immutable adventure checkpoint",
+		http.MethodGet, "/api/v1/adventures/{id}/checkpoints", "listAdventureCheckpoints", "List immutable adventure checkpoints",
 		[]string{"Adventures"}, http.StatusOK,
 		http.StatusNotFound, http.StatusInternalServerError,
+	), s.listAdventureCheckpoints)
+	huma.Register(api, apiOperation(
+		http.MethodPost, "/api/v1/adventures/{id}/checkpoints", "checkpointAdventure", "Create an immutable adventure checkpoint",
+		[]string{"Adventures"}, http.StatusCreated,
+		http.StatusNotFound, http.StatusInternalServerError,
 	), s.checkpointAdventure)
+	huma.Register(api, apiOperation(
+		http.MethodPost, "/api/v1/adventures/{id}/checkpoints/{checkpointId}/restore", "restoreAdventureCheckpoint", "Restore a checkpoint as a new adventure version",
+		[]string{"Adventures"}, http.StatusOK,
+		http.StatusBadRequest, http.StatusNotFound, http.StatusConflict, http.StatusUnprocessableEntity, http.StatusInternalServerError,
+	), s.restoreAdventureCheckpoint)
 	huma.Register(api, apiOperation(
 		http.MethodGet, "/api/v1/adventures/{id}/export.md", "exportAdventureMarkdown", "Export an adventure as Markdown",
 		[]string{"Portability"}, http.StatusOK,

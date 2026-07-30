@@ -1,10 +1,21 @@
 import type {
   AdventureDocument,
+  AdventureSnapshotSummary,
   AdventureSpec,
   CreatedSession,
   GenerationResult,
   JoinedSession,
 } from "./types";
+
+export class APIError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = "APIError";
+  }
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
@@ -16,7 +27,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
   if (!response.ok) {
     const problem = await response.json().catch(() => null);
-    throw new Error(problem?.detail || problem?.title || `HTTP ${response.status}`);
+    throw new APIError(
+      response.status,
+      problem?.detail || problem?.title || `HTTP ${response.status}`,
+    );
   }
   return response.json() as Promise<T>;
 }
@@ -30,6 +44,42 @@ export function generateAdventure(spec: AdventureSpec, seed?: number): Promise<G
 
 export function getAdventure(id: string): Promise<AdventureDocument> {
   return request(`/api/v1/adventures/${encodeURIComponent(id)}`);
+}
+
+export function updateAdventure(document: AdventureDocument): Promise<AdventureDocument> {
+  return request(`/api/v1/adventures/${encodeURIComponent(document.id)}`, {
+    method: "PUT",
+    headers: { "If-Match": `"${document.version}"` },
+    body: JSON.stringify(document),
+  });
+}
+
+export function listAdventureCheckpoints(
+  adventureId: string,
+): Promise<AdventureSnapshotSummary[]> {
+  return request(`/api/v1/adventures/${encodeURIComponent(adventureId)}/checkpoints`);
+}
+
+export function createAdventureCheckpoint(
+  adventureId: string,
+): Promise<AdventureSnapshotSummary> {
+  return request(`/api/v1/adventures/${encodeURIComponent(adventureId)}/checkpoints`, {
+    method: "POST",
+  });
+}
+
+export function restoreAdventureCheckpoint(
+  adventureId: string,
+  checkpointId: string,
+  expectedVersion: number,
+): Promise<AdventureDocument> {
+  return request(
+    `/api/v1/adventures/${encodeURIComponent(adventureId)}/checkpoints/${encodeURIComponent(checkpointId)}/restore`,
+    {
+      method: "POST",
+      headers: { "If-Match": `"${expectedVersion}"` },
+    },
+  );
 }
 
 export function createSession(adventureId: string, gmName: string): Promise<CreatedSession> {

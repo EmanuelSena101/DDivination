@@ -13,8 +13,10 @@ resultado diretamente na cena 3D.
 5. em **Grid**, escolha uma ferramenta e clique em uma célula ou aresta;
 6. em **Conteúdo**, edite a história ou escolha **Entidades**;
 7. aplique explicitamente a seção ou entidade alterada;
-8. use **Desfazer**, **Refazer** ou **Descartar** no painel lateral;
-9. saia do editor quando terminar.
+8. acompanhe o estado **Não salvo**, **Salvando** ou **Salvo**;
+9. use **Desfazer**, **Refazer**, **Descartar** ou **Salvar agora**;
+10. crie um checkpoint quando quiser marcar uma versão importante;
+11. saia do editor quando terminar.
 
 O destaque translúcido mostra a célula ou aresta que receberá a operação.
 Água e lava são criadas como células não caminháveis. A remoção de um tile
@@ -53,14 +55,31 @@ cena 3D. A remoção exige confirmação.
 - o histórico local compartilhado entre grid, conteúdo e entidades mantém até
   40 estados.
 
-## Limite desta versão
+## Salvamento e checkpoints
 
-As alterações são um rascunho local e não são salvas no SQLite. Persistência,
-autosave, checkpoints, validação semântica do documento completo e resolução de
-conflitos pertencem à BATCH-007.
+Depois de 1,5 segundo sem novas alterações, o frontend salva automaticamente no
+SQLite. **Salvar agora** ignora a espera. Se uma alteração surgir enquanto a
+requisição está em andamento, ela permanece no rascunho e dispara outro
+autosave; a resposta antiga nunca apaga trabalho novo.
 
-Até a BATCH-007 ser concluída, use **Descartar** para retornar ao documento
-carregado antes de abrir uma mesa.
+**Criar checkpoint** registra o estado salvo atual sem incrementar a versão.
+Abra **Histórico** para restaurar qualquer marco como uma nova versão. Recarregar
+a URL `?adventure=...` restaura a última versão persistida.
+
+## Conflitos e validação
+
+Se outro editor alterar a mesma aventura, o autosave pausa com **Conflito de
+versão**. O mestre escolhe:
+
+- **Carregar remoto**: descarta o rascunho e carrega a versão do servidor;
+- **Manter local**: após confirmação, rebasa e persiste explicitamente o
+  rascunho sobre a versão remota.
+
+O servidor rejeita documentos semanticamente inválidos. Nesse caso, o painel
+mostra **Falha ao salvar** e permite desfazer, descartar ou corrigir antes de
+tentar novamente. A mesa LAN só abre quando o estado está salvo e estável.
 
 As decisões, arquivos modificados, critérios e evidências da edição de conteúdo
 estão no [diário da BATCH-006](batches/BATCH-006-content-entity-editor.md).
+Persistência, concorrência e checkpoints estão documentados no
+[diário da BATCH-007](batches/BATCH-007-editorial-persistence.md).

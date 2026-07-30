@@ -106,6 +106,9 @@ func (s *Store) migrate(ctx context.Context) error {
 }
 
 func (s *Store) SaveAdventure(ctx context.Context, doc domain.AdventureDocument, expectedVersion *int64, reason string) error {
+	if err := domain.ValidateAdventure(doc); err != nil {
+		return err
+	}
 	payload, err := json.Marshal(doc)
 	if err != nil {
 		return fmt.Errorf("encode adventure: %w", err)
@@ -145,12 +148,7 @@ func (s *Store) SaveAdventure(ctx context.Context, doc domain.AdventureDocument,
 		return fmt.Errorf("save adventure: %w", err)
 	}
 	if reason != "" {
-		snapshotID := fmt.Sprintf("%s-v%d-%d", doc.ID, doc.Version, time.Now().UTC().UnixNano())
-		_, err = tx.ExecContext(ctx, `
-			INSERT INTO adventure_snapshots(id, adventure_id, version, reason, document_json, created_at)
-			VALUES(?, ?, ?, ?, ?, ?)
-		`, snapshotID, doc.ID, doc.Version, reason, payload, time.Now().UTC().Format(time.RFC3339Nano))
-		if err != nil {
+		if _, err = insertAdventureSnapshot(ctx, tx, doc, payload, reason); err != nil {
 			return fmt.Errorf("save snapshot: %w", err)
 		}
 	}
@@ -198,6 +196,104 @@ func (s *Store) ListAdventures(ctx context.Context, limit int) ([]AdventureSumma
 	return result, rows.Err()
 }
 
+func (s *Store) CreateAdventureSnapshot(ctx context.Context, adventureID, reason string) (domain.AdventureSnapshotSummary, error) {
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return domain.AdventureSnapshotSummary{}, err
+	}
+	defer tx.Rollback()
+	var payload []byte
+	if err := tx.QueryRowContext(ctx, `SELECT document_json FROM adventures WHERE id = ?`, adventureID).Scan(&payload); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.AdventureSnapshotSummary{}, ErrNotFound
+		}
+		return domain.AdventureSnapshotSummary{}, err
+	}
+	var document domain.AdventureDocument
+	if err := json.Unmarshal(payload, &document); err != nil {
+		return domain.AdventureSnapshotSummary{}, fmt.Errorf("decode adventure snapshot: %w", err)
+	}
+	snapshot, err := insertAdventureSnapshot(ctx, tx, document, payload, reason)
+	if err != nil {
+		return domain.AdventureSnapshotSummary{}, err
+	}
+	if err := tx.Commit(); err != nil {
+		return domain.AdventureSnapshotSummary{}, err
+	}
+	return snapshot, nil
+}
+
+func (s *Store) ListAdventureSnapshots(ctx context.Context, adventureID string, limit int) ([]domain.AdventureSnapshotSummary, error) {
+	if limit < 1 || limit > 200 {
+		limit = 50
+	}
+	var exists int
+	if err := s.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM adventures WHERE id = ?`, adventureID).Scan(&exists); err != nil {
+		return nil, err
+	}
+	if exists == 0 {
+		return nil, ErrNotFound
+	}
+	rows, err := s.db.QueryContext(ctx, `
+		SELECT id, version, reason, document_json, created_at
+		FROM adventure_snapshots
+		WHERE adventure_id = ?
+		ORDER BY created_at DESC
+		LIMIT ?
+	`, adventureID, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := make([]domain.AdventureSnapshotSummary, 0)
+	for rows.Next() {
+		var summary domain.AdventureSnapshotSummary
+		var payload []byte
+		var created string
+		if err := rows.Scan(&summary.ID, &summary.Version, &summary.Reason, &payload, &created); err != nil {
+			return nil, err
+		}
+		var document domain.AdventureDocument
+		if err := json.Unmarshal(payload, &document); err != nil {
+			return nil, fmt.Errorf("decode adventure snapshot: %w", err)
+		}
+		summary.AdventureID = adventureID
+		summary.Name = document.Name
+		summary.CreatedAt, _ = time.Parse(time.RFC3339Nano, created)
+		result = append(result, summary)
+	}
+	return result, rows.Err()
+}
+
+func (s *Store) GetAdventureSnapshot(ctx context.Context, adventureID, snapshotID string) (domain.AdventureSnapshot, error) {
+	var snapshot domain.AdventureSnapshot
+	var payload []byte
+	var created string
+	if err := s.db.QueryRowContext(ctx, `
+		SELECT id, version, reason, document_json, created_at
+		FROM adventure_snapshots
+		WHERE adventure_id = ? AND id = ?
+	`, adventureID, snapshotID).Scan(
+		&snapshot.ID,
+		&snapshot.Version,
+		&snapshot.Reason,
+		&payload,
+		&created,
+	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.AdventureSnapshot{}, ErrNotFound
+		}
+		return domain.AdventureSnapshot{}, err
+	}
+	if err := json.Unmarshal(payload, &snapshot.Document); err != nil {
+		return domain.AdventureSnapshot{}, fmt.Errorf("decode adventure snapshot: %w", err)
+	}
+	snapshot.AdventureID = adventureID
+	snapshot.Name = snapshot.Document.Name
+	snapshot.CreatedAt, _ = time.Parse(time.RFC3339Nano, created)
+	return snapshot, nil
+}
+
 func (s *Store) DeleteAdventure(ctx context.Context, id string) error {
 	result, err := s.db.ExecContext(ctx, `DELETE FROM adventures WHERE id = ?`, id)
 	if err != nil {
@@ -211,6 +307,29 @@ func (s *Store) DeleteAdventure(ctx context.Context, id string) error {
 		return ErrNotFound
 	}
 	return nil
+}
+
+func insertAdventureSnapshot(
+	ctx context.Context,
+	tx *sql.Tx,
+	document domain.AdventureDocument,
+	payload []byte,
+	reason string,
+) (domain.AdventureSnapshotSummary, error) {
+	createdAt := time.Now().UTC()
+	snapshot := domain.AdventureSnapshotSummary{
+		ID:          fmt.Sprintf("%s-v%d-%d", document.ID, document.Version, createdAt.UnixNano()),
+		AdventureID: document.ID,
+		Version:     document.Version,
+		Reason:      reason,
+		Name:        document.Name,
+		CreatedAt:   createdAt,
+	}
+	_, err := tx.ExecContext(ctx, `
+		INSERT INTO adventure_snapshots(id, adventure_id, version, reason, document_json, created_at)
+		VALUES(?, ?, ?, ?, ?, ?)
+	`, snapshot.ID, document.ID, document.Version, reason, payload, createdAt.Format(time.RFC3339Nano))
+	return snapshot, err
 }
 
 func (s *Store) SaveGenerationRun(ctx context.Context, run domain.GenerationRun) error {

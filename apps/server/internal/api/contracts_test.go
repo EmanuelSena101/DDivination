@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"log/slog"
@@ -200,6 +201,131 @@ func TestPortableExportsPreserveTheirMediaTypes(t *testing.T) {
 			t.Errorf("%s returned an empty body", testCase.path)
 		}
 	}
+}
+
+func TestAdventureEditingCheckpointsAndRestore(t *testing.T) {
+	server, handlers := newContractTestServer(t)
+	document, err := generator.Generate(
+		domain.DefaultAdventureSpec(),
+		91,
+		time.Date(2026, time.July, 30, 12, 0, 0, 0, time.UTC),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := server.store.SaveAdventure(t.Context(), document, nil, "generated"); err != nil {
+		t.Fatal(err)
+	}
+
+	document.Name.PTBR = "Edição persistida"
+	response := serveJSON(t, handlers.Local, http.MethodPut, "/api/v1/adventures/"+document.ID, document, map[string]string{
+		"If-Match": `"1"`,
+	})
+	if response.Code != http.StatusOK {
+		t.Fatalf("update: expected 200, got %d: %s", response.Code, response.Body.String())
+	}
+	var saved domain.AdventureDocument
+	if err := json.Unmarshal(response.Body.Bytes(), &saved); err != nil {
+		t.Fatal(err)
+	}
+	if saved.Version != 2 || response.Header().Get("ETag") != `"2"` {
+		t.Fatalf("expected version 2 and ETag, got version=%d etag=%q", saved.Version, response.Header().Get("ETag"))
+	}
+
+	conflict := serveJSON(t, handlers.Local, http.MethodPut, "/api/v1/adventures/"+document.ID, document, map[string]string{
+		"If-Match": `"1"`,
+	})
+	if conflict.Code != http.StatusConflict {
+		t.Fatalf("stale update: expected 409, got %d: %s", conflict.Code, conflict.Body.String())
+	}
+
+	checkpointResponse := serveJSON(t, handlers.Local, http.MethodPost, "/api/v1/adventures/"+document.ID+"/checkpoints", nil, nil)
+	if checkpointResponse.Code != http.StatusCreated {
+		t.Fatalf("checkpoint: expected 201, got %d: %s", checkpointResponse.Code, checkpointResponse.Body.String())
+	}
+	var checkpoint domain.AdventureSnapshotSummary
+	if err := json.Unmarshal(checkpointResponse.Body.Bytes(), &checkpoint); err != nil {
+		t.Fatal(err)
+	}
+	if checkpoint.Version != 2 || checkpoint.Reason != "manual-checkpoint" {
+		t.Fatalf("unexpected checkpoint: %#v", checkpoint)
+	}
+
+	saved.Name.PTBR = "Nova edição"
+	response = serveJSON(t, handlers.Local, http.MethodPut, "/api/v1/adventures/"+document.ID, saved, map[string]string{
+		"If-Match": `"2"`,
+	})
+	if response.Code != http.StatusOK {
+		t.Fatalf("second update: expected 200, got %d: %s", response.Code, response.Body.String())
+	}
+	if err := json.Unmarshal(response.Body.Bytes(), &saved); err != nil {
+		t.Fatal(err)
+	}
+
+	restorePath := "/api/v1/adventures/" + document.ID + "/checkpoints/" + checkpoint.ID + "/restore"
+	response = serveJSON(t, handlers.Local, http.MethodPost, restorePath, nil, map[string]string{
+		"If-Match": `"3"`,
+	})
+	if response.Code != http.StatusOK {
+		t.Fatalf("restore: expected 200, got %d: %s", response.Code, response.Body.String())
+	}
+	var restored domain.AdventureDocument
+	if err := json.Unmarshal(response.Body.Bytes(), &restored); err != nil {
+		t.Fatal(err)
+	}
+	if restored.Version != 4 || restored.Name.PTBR != "Edição persistida" {
+		t.Fatalf("checkpoint was not restored as version 4: %#v", restored)
+	}
+
+	list := httptest.NewRecorder()
+	handlers.Local.ServeHTTP(list, httptest.NewRequest(http.MethodGet, "/api/v1/adventures/"+document.ID+"/checkpoints", nil))
+	if list.Code != http.StatusOK {
+		t.Fatalf("list checkpoints: expected 200, got %d: %s", list.Code, list.Body.String())
+	}
+	var snapshots []domain.AdventureSnapshotSummary
+	if err := json.Unmarshal(list.Body.Bytes(), &snapshots); err != nil {
+		t.Fatal(err)
+	}
+	if len(snapshots) != 5 {
+		t.Fatalf("expected five immutable snapshots, got %d", len(snapshots))
+	}
+
+	restored.Floors[0].Entities[0].Position = domain.GridPosition{X: -1, Z: -1}
+	invalid := serveJSON(t, handlers.Local, http.MethodPut, "/api/v1/adventures/"+document.ID, restored, map[string]string{
+		"If-Match": `"4"`,
+	})
+	if invalid.Code != http.StatusUnprocessableEntity {
+		t.Fatalf("invalid update: expected 422, got %d: %s", invalid.Code, invalid.Body.String())
+	}
+}
+
+func serveJSON(
+	t *testing.T,
+	handler http.Handler,
+	method string,
+	path string,
+	body any,
+	headers map[string]string,
+) *httptest.ResponseRecorder {
+	t.Helper()
+	var payload io.Reader
+	if body != nil {
+		encoded, err := json.Marshal(body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		payload = bytes.NewReader(encoded)
+	}
+	request := httptest.NewRequest(method, path, payload)
+	if body != nil {
+		request.Header.Set("Content-Type", "application/json")
+	}
+	for name, value := range headers {
+		request.Header.Set(name, value)
+	}
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, request)
+	return response
 }
 
 func assertProblemContentType(t *testing.T, response *httptest.ResponseRecorder) {

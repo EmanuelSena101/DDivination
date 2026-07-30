@@ -37,6 +37,24 @@ func TestAdventurePersistenceAndOptimisticLock(t *testing.T) {
 	if err := database.SaveAdventure(ctx, doc, &wrongVersion, "manual"); !errors.Is(err, ErrConflict) {
 		t.Fatalf("expected optimistic lock conflict, got %v", err)
 	}
+	checkpoint, err := database.CreateAdventureSnapshot(ctx, doc.ID, "manual-checkpoint")
+	if err != nil {
+		t.Fatal(err)
+	}
+	snapshots, err := database.ListAdventureSnapshots(ctx, doc.ID, 50)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(snapshots) != 2 || snapshots[0].ID != checkpoint.ID {
+		t.Fatalf("expected manual and generated snapshots, got %#v", snapshots)
+	}
+	loadedSnapshot, err := database.GetAdventureSnapshot(ctx, doc.ID, checkpoint.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if loadedSnapshot.Document.ID != doc.ID || loadedSnapshot.Version != doc.Version {
+		t.Fatalf("snapshot did not round-trip: %#v", loadedSnapshot)
+	}
 	if err := database.DeleteAdventure(ctx, doc.ID); err != nil {
 		t.Fatal(err)
 	}

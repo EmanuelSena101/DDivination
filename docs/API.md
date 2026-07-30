@@ -24,7 +24,9 @@ interface é aberta na LAN com uma allowlist mínima.
 | GET | `/api/v1/adventures/{id}` | `getAdventure` | sim | não |
 | PUT | `/api/v1/adventures/{id}` | `updateAdventure` | sim | não |
 | DELETE | `/api/v1/adventures/{id}` | `deleteAdventure` | sim | não |
+| GET | `/api/v1/adventures/{id}/checkpoints` | `listAdventureCheckpoints` | sim | não |
 | POST | `/api/v1/adventures/{id}/checkpoints` | `checkpointAdventure` | sim | não |
+| POST | `/api/v1/adventures/{id}/checkpoints/{checkpointId}/restore` | `restoreAdventureCheckpoint` | sim | não |
 | GET | `/api/v1/adventures/{id}/export.md` | `exportAdventureMarkdown` | sim | não |
 | GET | `/api/v1/adventures/{id}/print` | `printAdventure` | sim | não |
 | POST | `/api/v1/sessions` | `createSession` | sim | não |
@@ -58,6 +60,15 @@ Erros de validação podem incluir a coleção adicional `errors`.
 
 `GET /api/v1/adventures/{id}` retorna `ETag`. Uma substituição usa o mesmo valor
 no header `If-Match`. Uma versão desatualizada recebe `409 Conflict`.
+
+O servidor valida o documento semântico antes de persistir. IDs duplicados,
+referências inválidas, posições sem tile, andares desconectados e salas
+obrigatórias inalcançáveis recebem `422 Unprocessable Entity`.
+
+Cada `PUT` aprovado incrementa a versão e cria um snapshot imutável. O endpoint
+de checkpoints também permite criar um marco manual sem alterar a versão.
+Restaurar um checkpoint exige `If-Match` e grava seu conteúdo como uma nova
+versão, preservando todo o histórico anterior.
 
 ## WebSocket
 

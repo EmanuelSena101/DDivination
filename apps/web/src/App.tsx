@@ -4,12 +4,16 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useTranslation } from "react-i18next";
 import {
   APIError,
+  cancelGenerationRun,
   closeSession,
   createAdventureCheckpoint,
+  createGenerationRun,
   createSession,
-  generateAdventure,
   getAdventure,
+  getGenerationRun,
+  generationRunStreamURL,
   joinSession,
+  listGenerationRuns,
   listAdventureCheckpoints,
   markdownURL,
   packageURL,
@@ -18,6 +22,7 @@ import {
   updateAdventure,
 } from "./api";
 import { ContentEditorPanel } from "./components/ContentEditorPanel";
+import { GenerationProgress } from "./components/GenerationProgress";
 import {
   EditorPersistenceBar,
   type EditorPersistenceStatus,
@@ -25,6 +30,7 @@ import {
 import { GridEditorPanel } from "./components/GridEditorPanel";
 import { VTTDiagnosticsPanel } from "./components/VTTDiagnosticsPanel";
 import type { GridEditorTool } from "./gridEditor";
+import { isGenerationTerminal, reconcileGenerationRun } from "./generationRun";
 import { useAppStore } from "./store";
 import {
   createTelemetryReport,
@@ -32,7 +38,12 @@ import {
   sceneTelemetry,
   type RenderTelemetry,
 } from "./telemetry";
-import { DEFAULT_SPEC, type AdventureSpec, type Language } from "./types";
+import {
+  DEFAULT_SPEC,
+  type AdventureSpec,
+  type GenerationRun,
+  type Language,
+} from "./types";
 
 const DungeonScene = lazy(() =>
   import("./components/DungeonScene").then(({ DungeonScene: Scene }) => ({
@@ -79,19 +90,151 @@ function LanguageSwitch() {
 
 function Builder() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const setAdventure = useAppStore((state) => state.setAdventure);
   const [spec, setSpec] = useState<AdventureSpec>(DEFAULT_SPEC);
+  const [runId, setRunId] = useState(
+    () => new URLSearchParams(window.location.search).get("generation"),
+  );
+  const [run, setRun] = useState<GenerationRun | null>(null);
+  const [trackingError, setTrackingError] = useState<string | null>(null);
+  const openingAdventure = useRef<string | null>(null);
+  const runVisibleAt = useRef(Date.now());
+  const acceptRun = useCallback((incoming: GenerationRun) => {
+    setRun((current) => reconcileGenerationRun(current, incoming));
+    setTrackingError(null);
+  }, []);
   const mutation = useMutation({
-    mutationFn: () => generateAdventure(spec),
-    onSuccess: (result) => {
+    mutationFn: () => createGenerationRun(spec),
+    onSuccess: (created) => {
       window.history.replaceState(
         {},
         "",
-        `/?adventure=${encodeURIComponent(result.adventure.id)}`,
+        `/?generation=${encodeURIComponent(created.id)}`,
       );
-      setAdventure(result.adventure);
+      setRunId(created.id);
+      runVisibleAt.current = Date.now();
+      acceptRun(created);
+      void queryClient.invalidateQueries({ queryKey: ["generation-runs"] });
     },
   });
+  const cancelMutation = useMutation({
+    mutationFn: (id: string) => cancelGenerationRun(id),
+    onSuccess: acceptRun,
+  });
+  const recentRuns = useQuery({
+    queryKey: ["generation-runs"],
+    queryFn: () => listGenerationRuns(5),
+  });
+
+  useEffect(() => {
+    if (!runId) return;
+    let disposed = false;
+    let pollTimer: number | undefined;
+    let socket: WebSocket | null = null;
+    const stopTransports = () => {
+      if (pollTimer !== undefined) window.clearInterval(pollTimer);
+      pollTimer = undefined;
+      socket?.close();
+      socket = null;
+    };
+    const receive = (incoming: GenerationRun) => {
+      if (disposed) return;
+      acceptRun(incoming);
+      if (isGenerationTerminal(incoming.status)) {
+        stopTransports();
+        void queryClient.invalidateQueries({ queryKey: ["generation-runs"] });
+      }
+    };
+    const poll = async () => {
+      try {
+        receive(await getGenerationRun(runId));
+      } catch (error) {
+        if (!disposed) {
+          setTrackingError(error instanceof Error ? error.message : t("error"));
+        }
+      }
+    };
+
+    void poll();
+    pollTimer = window.setInterval(() => void poll(), 750);
+    try {
+      socket = new WebSocket(generationRunStreamURL(runId));
+      socket.onmessage = (event) => {
+        try {
+          receive(JSON.parse(event.data) as GenerationRun);
+        } catch {
+          setTrackingError(t("generationInvalidUpdate"));
+        }
+      };
+      socket.onerror = () => {
+        // Polling remains active as the recovery path.
+      };
+    } catch {
+      // Polling remains active when WebSocket is unavailable.
+    }
+    return () => {
+      disposed = true;
+      stopTransports();
+    };
+  }, [acceptRun, queryClient, runId, t]);
+
+  useEffect(() => {
+    if (
+      run?.status !== "completed" ||
+      !run.adventureId ||
+      openingAdventure.current === run.id
+    ) {
+      return;
+    }
+    openingAdventure.current = run.id;
+    let active = true;
+    const remainingVisibleTime = Math.max(
+      0,
+      600 - (Date.now() - runVisibleAt.current),
+    );
+    const timer = window.setTimeout(() => {
+      void getAdventure(run.adventureId!)
+        .then((adventure) => {
+          if (!active) return;
+          window.history.replaceState(
+            {},
+            "",
+            `/?adventure=${encodeURIComponent(adventure.id)}`,
+          );
+          setAdventure(adventure);
+        })
+        .catch((error) => {
+          if (active) {
+            openingAdventure.current = null;
+            setTrackingError(error instanceof Error ? error.message : t("error"));
+          }
+        });
+    }, remainingVisibleTime);
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [run, setAdventure, t]);
+
+  const dismissRun = () => {
+    window.history.replaceState({}, "", "/");
+    openingAdventure.current = null;
+    setRunId(null);
+    setRun(null);
+    setTrackingError(null);
+  };
+  const resumeRun = (selected: GenerationRun) => {
+    window.history.replaceState(
+      {},
+      "",
+      `/?generation=${encodeURIComponent(selected.id)}`,
+    );
+    openingAdventure.current = null;
+    runVisibleAt.current = Date.now();
+    setRun(selected);
+    setRunId(selected.id);
+  };
   const set = <K extends keyof AdventureSpec>(key: K, value: AdventureSpec[K]) =>
     setSpec((current) => ({ ...current, [key]: value }));
 
@@ -214,11 +357,42 @@ function Builder() {
           </label>
         </div>
 
-        {mutation.error && <div className="inline-error">{mutation.error.message}</div>}
-        <button className="primary action" disabled={mutation.isPending} onClick={() => mutation.mutate()}>
-          <span>{mutation.isPending ? "◌" : "✦"}</span>
-          {mutation.isPending ? t("generating") : t("generate")}
-        </button>
+        {(mutation.error || trackingError) && (
+          <div className="inline-error">
+            {mutation.error?.message || trackingError}
+          </div>
+        )}
+        {run ? (
+          <GenerationProgress
+            run={run}
+            cancelling={cancelMutation.isPending}
+            onCancel={() => cancelMutation.mutate(run.id)}
+            onDismiss={dismissRun}
+          />
+        ) : (
+          <>
+            <button className="primary action" disabled={mutation.isPending} onClick={() => mutation.mutate()}>
+              <span>{mutation.isPending ? "◌" : "✦"}</span>
+              {mutation.isPending ? t("generating") : t("generate")}
+            </button>
+            {(recentRuns.data?.length || 0) > 0 && (
+              <details className="generation-history">
+                <summary>{t("generationRecent")}</summary>
+                <ul>
+                  {recentRuns.data?.map((recent) => (
+                    <li key={recent.id}>
+                      <button onClick={() => resumeRun(recent)}>
+                        <span>{t(`generationStatus_${recent.status}`)}</span>
+                        <strong>{recent.seed}</strong>
+                        <small>{recent.progress}%</small>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </>
+        )}
       </section>
     </main>
   );

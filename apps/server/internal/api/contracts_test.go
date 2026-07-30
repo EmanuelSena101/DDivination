@@ -203,6 +203,72 @@ func TestPortableExportsPreserveTheirMediaTypes(t *testing.T) {
 	}
 }
 
+func TestGenerationRunIsAsynchronousObservableAndPersisted(t *testing.T) {
+	_, handlers := newContractTestServer(t)
+	response := serveJSON(
+		t,
+		handlers.Local,
+		http.MethodPost,
+		"/api/v1/generation-runs",
+		map[string]any{
+			"spec": domain.DefaultAdventureSpec(),
+			"seed": 808,
+		},
+		nil,
+	)
+	if response.Code != http.StatusAccepted {
+		t.Fatalf("create run: expected 202, got %d: %s", response.Code, response.Body.String())
+	}
+	var queued domain.GenerationRun
+	if err := json.Unmarshal(response.Body.Bytes(), &queued); err != nil {
+		t.Fatal(err)
+	}
+	if queued.Status != "queued" || queued.Progress != 0 || len(queued.Stages) != 1 {
+		t.Fatalf("expected queued run, got %#v", queued)
+	}
+
+	var completed domain.GenerationRun
+	deadline := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadline) {
+		get := httptest.NewRecorder()
+		handlers.Local.ServeHTTP(
+			get,
+			httptest.NewRequest(http.MethodGet, "/api/v1/generation-runs/"+queued.ID, nil),
+		)
+		if get.Code != http.StatusOK {
+			t.Fatalf("get run: expected 200, got %d: %s", get.Code, get.Body.String())
+		}
+		if err := json.Unmarshal(get.Body.Bytes(), &completed); err != nil {
+			t.Fatal(err)
+		}
+		if completed.Status == "completed" {
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	if completed.Status != "completed" || completed.AdventureID == "" {
+		t.Fatalf("run did not complete: %#v", completed)
+	}
+
+	adventure := httptest.NewRecorder()
+	handlers.Local.ServeHTTP(
+		adventure,
+		httptest.NewRequest(http.MethodGet, "/api/v1/adventures/"+completed.AdventureID, nil),
+	)
+	if adventure.Code != http.StatusOK {
+		t.Fatalf("persisted adventure: expected 200, got %d: %s", adventure.Code, adventure.Body.String())
+	}
+
+	list := httptest.NewRecorder()
+	handlers.Local.ServeHTTP(
+		list,
+		httptest.NewRequest(http.MethodGet, "/api/v1/generation-runs?limit=10", nil),
+	)
+	if list.Code != http.StatusOK || !strings.Contains(list.Body.String(), queued.ID) {
+		t.Fatalf("list runs: expected run %s, got %d: %s", queued.ID, list.Code, list.Body.String())
+	}
+}
+
 func TestAdventureEditingCheckpointsAndRestore(t *testing.T) {
 	server, handlers := newContractTestServer(t)
 	document, err := generator.Generate(

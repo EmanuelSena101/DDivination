@@ -17,7 +17,8 @@ entram pela rede local somente depois que o mestre abre uma sessão.
 ## Fronteiras
 
 - REST gerencia recursos persistentes e é integralmente contratado com Huma.
-- WebSocket transporta comandos e eventos de sessão.
+- WebSocket transporta comandos/eventos de sessão e snapshots de progresso da
+  geração.
 - SQLite é a fonte local de persistência.
 - O servidor é autoritativo para permissões, movimento, fog e dados.
 - O frontend deriva meshes a partir do documento semântico.
@@ -31,6 +32,15 @@ entram pela rede local somente depois que o mestre abre uma sessão.
   recentes preservam o conteúdo local e são rebaseadas sobre a versão salva.
 - Conflitos pausam o autosave e exigem uma escolha explícita; não existe merge
   silencioso campo a campo.
+- Gerações são enfileiradas por um coordenador local. O SQLite guarda o estado
+  durável; memória guarda somente funções de cancelamento e assinantes ativos.
+- O pipeline publica estágios monotônicos entre validação, construção dos
+  andares, enriquecimento opcional, validação semântica e persistência.
+- Cancelamento usa `context.Context` e é verificado entre andares e antes da
+  gravação. Após reinício, jobs incompletos são diagnosticados como
+  interrompidos em vez de permanecerem ativos indefinidamente.
+- O frontend combina WebSocket com polling. Mensagens atrasadas não podem
+  reduzir o progresso nem reabrir um estado terminal.
 - A cena instancia geometrias repetidas e escolhe um perfil de qualidade pela
   carga semântica do andar.
 - O pack procedural agrupa props por família, limita luzes locais e mantém
@@ -56,7 +66,8 @@ assets. Geometrias derivadas, buffers WebGL e meshes não são persistidos.
 Cada edição persistida gera uma versão monotônica e um snapshot imutável.
 Checkpoints manuais não alteram a versão; restaurações criam uma versão nova.
 Sessões usam revisões monotônicas, eventos persistidos e snapshots. Assets são
-endereçados por SHA-256.
+endereçados por SHA-256. Execuções de geração persistem o snapshot completo de
+seu estado e histórico a cada transição relevante.
 
 ## Segurança local
 

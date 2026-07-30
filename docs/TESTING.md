@@ -72,6 +72,12 @@ um conflito otimista provocado por um segundo cliente HTTP. A suíte usa um
 diretório SQLite isolado e mantém um único worker para preservar a ordem das
 operações autoritativas.
 
+O fluxo de geração cobre a resposta assíncrona, progresso monotônico,
+persistência final, cancelamento idempotente, recuperação após reinício e
+cancelamento cooperativo do gerador. No navegador, o E2E combina uma aventura
+realmente persistida com um stream controlado para verificar progresso,
+WebSocket, polling, reload e abertura final da VTT sem flakiness temporal.
+
 Se o ambiente de desenvolvimento estiver aberto, encerre-o antes:
 
 ```powershell

@@ -1,12 +1,28 @@
 package generator
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/EmanuelSena101/DDivination/apps/server/internal/domain"
 )
+
+func TestGenerateContextHonorsCancellation(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, err := GenerateContext(
+		ctx,
+		domain.DefaultAdventureSpec(),
+		1,
+		time.Now(),
+		nil,
+	); !errors.Is(err, context.Canceled) {
+		t.Fatalf("expected context cancellation, got %v", err)
+	}
+}
 
 func TestGenerateIsDeterministic(t *testing.T) {
 	now := time.Date(2026, 7, 28, 12, 0, 0, 0, time.UTC)

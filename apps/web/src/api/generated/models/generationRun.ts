@@ -7,6 +7,7 @@
  */
 import type { AdventureSpec } from './adventureSpec';
 import type { GenerationRunStatus } from './generationRunStatus';
+import type { GenerationStage } from './generationStage';
 
 export interface GenerationRun {
   /** A URL to the JSON Schema for this object. */
@@ -27,5 +28,8 @@ export interface GenerationRun {
   seed: number;
   spec: AdventureSpec;
   stage: string;
+  /** @nullable */
+  stages: GenerationStage[] | null;
   status: GenerationRunStatus;
+  updatedAt: string;
 }

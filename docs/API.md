@@ -5,7 +5,8 @@
 - Os tipos e registros Huma em `apps/server/internal/api` definem a API REST.
 - `apps/web/openapi.json` é o contrato OpenAPI 3.1 gerado.
 - `apps/web/src/api/generated` é o cliente TypeScript gerado pelo Orval.
-- O WebSocket de sessão é um protocolo separado e não faz parte do OpenAPI.
+- Os WebSockets de sessão e geração são protocolos separados e não fazem parte
+  do OpenAPI.
 
 Não edite os artefatos gerados manualmente.
 
@@ -19,7 +20,9 @@ interface é aberta na LAN com uma allowlist mínima.
 | GET | `/api/v1/health` | `getHealth` | sim | sim |
 | GET | `/api/v1/catalog` | `getCatalog` | sim | não |
 | POST | `/api/v1/generation-runs` | `createGenerationRun` | sim | não |
+| GET | `/api/v1/generation-runs` | `listGenerationRuns` | sim | não |
 | GET | `/api/v1/generation-runs/{id}` | `getGenerationRun` | sim | não |
+| DELETE | `/api/v1/generation-runs/{id}` | `cancelGenerationRun` | sim | não |
 | GET | `/api/v1/adventures` | `listAdventures` | sim | não |
 | GET | `/api/v1/adventures/{id}` | `getAdventure` | sim | não |
 | PUT | `/api/v1/adventures/{id}` | `updateAdventure` | sim | não |
@@ -37,6 +40,7 @@ interface é aberta na LAN com uma allowlist mínima.
 | GET | `/api/v1/assets` | `listAssets` | sim | não |
 | POST | `/api/v1/assets` | `importAsset` | sim | não |
 | POST | `/api/v1/ai/enrich` | `enrichAdventure` | sim | não |
+| GET | `/api/v1/generation-runs/{id}/stream` | WebSocket | sim | não |
 | GET | `/api/v1/sessions/{id}/stream` | WebSocket | sim | sim |
 
 Na LAN, qualquer rota fora de health, join e stream retorna `404`.
@@ -70,7 +74,30 @@ de checkpoints também permite criar um marco manual sem alterar a versão.
 Restaurar um checkpoint exige `If-Match` e grava seu conteúdo como uma nova
 versão, preservando todo o histórico anterior.
 
-## WebSocket
+## Execuções de geração
+
+`POST /api/v1/generation-runs` persiste uma execução com estado `queued` e
+retorna `202 Accepted` sem aguardar a aventura. O cliente consulta o recurso
+até alcançar `completed`, `failed` ou `cancelled`. Quando concluída,
+`adventureId` identifica o documento persistido.
+
+Cada execução guarda seed, versão do gerador, estágio atual, progresso
+monotônico, diagnósticos e histórico de estágios. `DELETE` é idempotente:
+execuções terminais são devolvidas sem reabertura; jobs ativos recebem
+cancelamento cooperativo.
+
+Atualizações de baixa latência ficam disponíveis apenas em loopback:
+
+```text
+GET /api/v1/generation-runs/{id}/stream
+```
+
+O stream envia snapshots completos de `GenerationRun`. Se a conexão não estiver
+disponível, a mesma execução continua consultável por REST. Jobs `queued` ou
+`running` encontrados após reinício são finalizados como `failed` com
+diagnóstico de interrupção.
+
+## WebSocket de sessão
 
 Conexão:
 

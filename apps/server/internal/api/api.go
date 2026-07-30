@@ -23,6 +23,7 @@ import (
 	"github.com/EmanuelSena101/DDivination/apps/server/internal/asset"
 	"github.com/EmanuelSena101/DDivination/apps/server/internal/domain"
 	"github.com/EmanuelSena101/DDivination/apps/server/internal/exporter"
+	generationjobs "github.com/EmanuelSena101/DDivination/apps/server/internal/generation"
 	"github.com/EmanuelSena101/DDivination/apps/server/internal/generator"
 	"github.com/EmanuelSena101/DDivination/apps/server/internal/packageio"
 	"github.com/EmanuelSena101/DDivination/apps/server/internal/session"
@@ -38,13 +39,14 @@ type LANEnabler interface {
 }
 
 type Server struct {
-	store  *store.Store
-	hub    *session.Hub
-	lan    LANEnabler
-	logger *slog.Logger
-	webDir string
-	webFS  fs.FS
-	assets *asset.Manager
+	store      *store.Store
+	hub        *session.Hub
+	lan        LANEnabler
+	logger     *slog.Logger
+	webDir     string
+	webFS      fs.FS
+	assets     *asset.Manager
+	generation *generationjobs.Manager
 }
 
 type Handlers struct {
@@ -53,10 +55,15 @@ type Handlers struct {
 }
 
 func New(s *store.Store, hub *session.Hub, lan LANEnabler, logger *slog.Logger, webDir string, webFS fs.FS, assetsDir string) *Server {
-	return &Server{
+	server := &Server{
 		store: s, hub: hub, lan: lan, logger: logger, webDir: webDir, webFS: webFS,
-		assets: asset.NewManager(assetsDir, s),
+		assets:     asset.NewManager(assetsDir, s),
+		generation: generationjobs.NewManager(s, logger),
 	}
+	if err := server.generation.Recover(context.Background()); err != nil {
+		logger.Error("could not recover interrupted generation runs", "error", err)
+	}
+	return server
 }
 
 func (s *Server) Handlers() Handlers {
@@ -65,6 +72,7 @@ func (s *Server) Handlers() Handlers {
 	config.Info.Description = "Local-first 3D VTT and deterministic 5E-compatible adventure generator."
 	localAPI := humago.New(localMux, config)
 	s.registerREST(localAPI)
+	localMux.HandleFunc("GET /api/v1/generation-runs/{id}/stream", s.streamGeneration)
 	localMux.HandleFunc("GET /api/v1/sessions/{id}/stream", s.streamSession)
 	localMux.Handle("/", s.staticHandler())
 
@@ -128,13 +136,8 @@ type generationInput struct {
 	}
 }
 
-type generationResult struct {
-	Run       domain.GenerationRun     `json:"run"`
-	Adventure domain.AdventureDocument `json:"adventure"`
-}
-
 type generationOutput struct {
-	Body generationResult
+	Body domain.GenerationRun
 }
 
 func (s *Server) createGeneration(ctx context.Context, input *generationInput) (*generationOutput, error) {
@@ -149,61 +152,117 @@ func (s *Server) createGeneration(ctx context.Context, input *generationInput) (
 	now := time.Now().UTC()
 	run := domain.GenerationRun{
 		ID:               runID,
-		Status:           "running",
-		Stage:            "building-topology",
-		Progress:         20,
 		Seed:             seed,
 		GeneratorVersion: domain.GeneratorVersion,
 		Spec:             input.Body.Spec,
 		Diagnostics:      []string{"procedural-mode", "offline-ready"},
-		CreatedAt:        now,
 	}
-	if err := s.store.SaveGenerationRun(ctx, run); err != nil {
+	queued, err := s.generation.Enqueue(
+		ctx,
+		run,
+		s.generationExecutor(run, input.OpenAIKey, now),
+	)
+	if err != nil {
 		return nil, huma.NewError(http.StatusInternalServerError, "could not persist generation run")
 	}
-	doc, err := generator.Generate(input.Body.Spec, seed, now)
-	if err != nil {
-		run.Status = "failed"
-		run.Stage = "validation-failed"
-		run.Diagnostics = append(run.Diagnostics, err.Error())
-		completed := time.Now().UTC()
-		run.CompletedAt = &completed
-		_ = s.store.SaveGenerationRun(ctx, run)
-		return nil, huma.NewError(http.StatusUnprocessableEntity, err.Error())
-	}
-	if input.Body.Spec.UseAI {
-		if strings.TrimSpace(input.OpenAIKey) == "" {
-			run.Diagnostics = append(run.Diagnostics, "ai-skipped:key-missing", "procedural-fallback-used")
-		} else {
-			result, enrichErr := ai.NewOpenAI(input.OpenAIKey, "").Enrich(ctx, input.Body.Spec)
-			if enrichErr != nil {
-				run.Diagnostics = append(run.Diagnostics, "ai-failed:"+enrichErr.Error(), "procedural-fallback-used")
-			} else {
-				doc.Narrative = result.Enrichment
-				run.Diagnostics = append(
-					run.Diagnostics,
-					fmt.Sprintf("ai-provider:%s", result.Diagnostics.Provider),
-					fmt.Sprintf("ai-model:%s", result.Diagnostics.Model),
-					fmt.Sprintf("ai-input-tokens:%d", result.Diagnostics.InputTokens),
-					fmt.Sprintf("ai-output-tokens:%d", result.Diagnostics.OutputTokens),
-					fmt.Sprintf("ai-latency-ms:%d", result.Diagnostics.Latency.Milliseconds()),
+	return &generationOutput{Body: queued}, nil
+}
+
+func (s *Server) generationExecutor(
+	run domain.GenerationRun,
+	openAIKey string,
+	startedAt time.Time,
+) generationjobs.Executor {
+	return func(ctx context.Context, report generationjobs.Reporter) (string, error) {
+		if err := report("validating-spec", 5); err != nil {
+			return "", err
+		}
+		var reportErr error
+		doc, err := generator.GenerateContext(
+			ctx,
+			run.Spec,
+			run.Seed,
+			startedAt,
+			func(completed, total int) {
+				if reportErr != nil {
+					return
+				}
+				progress := 10 + completed*55/total
+				reportErr = report(
+					fmt.Sprintf("building-floor-%d-of-%d", completed, total),
+					progress,
 				)
+			},
+		)
+		if err != nil {
+			return "", err
+		}
+		if reportErr != nil {
+			return "", reportErr
+		}
+		if err := report("procedural-complete", 72); err != nil {
+			return "", err
+		}
+		if run.Spec.UseAI {
+			if err := report("enriching-narrative", 78); err != nil {
+				return "", err
+			}
+			if strings.TrimSpace(openAIKey) == "" {
+				if err := report(
+					"procedural-fallback",
+					84,
+					"ai-skipped:key-missing",
+					"procedural-fallback-used",
+				); err != nil {
+					return "", err
+				}
+			} else {
+				result, enrichErr := ai.NewOpenAI(openAIKey, "").Enrich(ctx, run.Spec)
+				if enrichErr != nil {
+					if err := report(
+						"procedural-fallback",
+						84,
+						"ai-failed:"+enrichErr.Error(),
+						"procedural-fallback-used",
+					); err != nil {
+						return "", err
+					}
+				} else {
+					doc.Narrative = result.Enrichment
+					if err := report(
+						"ai-complete",
+						84,
+						fmt.Sprintf("ai-provider:%s", result.Diagnostics.Provider),
+						fmt.Sprintf("ai-model:%s", result.Diagnostics.Model),
+						fmt.Sprintf("ai-input-tokens:%d", result.Diagnostics.InputTokens),
+						fmt.Sprintf("ai-output-tokens:%d", result.Diagnostics.OutputTokens),
+						fmt.Sprintf("ai-latency-ms:%d", result.Diagnostics.Latency.Milliseconds()),
+					); err != nil {
+						return "", err
+					}
+				}
 			}
 		}
+		if err := report("validating-document", 90); err != nil {
+			return "", err
+		}
+		if err := domain.ValidateAdventure(doc); err != nil {
+			return "", err
+		}
+		if err := ctx.Err(); err != nil {
+			return "", err
+		}
+		if err := report("persisting-adventure", 96); err != nil {
+			return "", err
+		}
+		if err := ctx.Err(); err != nil {
+			return "", err
+		}
+		if err := s.store.SaveAdventure(ctx, doc, nil, "generated"); err != nil {
+			return "", err
+		}
+		return doc.ID, nil
 	}
-	if err := s.store.SaveAdventure(ctx, doc, nil, "generated"); err != nil {
-		return nil, huma.NewError(http.StatusInternalServerError, "could not persist generated adventure")
-	}
-	completed := time.Now().UTC()
-	run.Status = "completed"
-	run.Stage = "completed"
-	run.Progress = 100
-	run.AdventureID = doc.ID
-	run.CompletedAt = &completed
-	if err := s.store.SaveGenerationRun(ctx, run); err != nil {
-		return nil, huma.NewError(http.StatusInternalServerError, "could not finalize generation run")
-	}
-	return &generationOutput{Body: generationResult{Run: run, Adventure: doc}}, nil
 }
 
 type idInput struct {
@@ -223,6 +282,76 @@ func (s *Server) getGeneration(ctx context.Context, input *idInput) (*generation
 		return nil, huma.NewError(http.StatusInternalServerError, "could not load generation run")
 	}
 	return &generationRunOutput{Body: run}, nil
+}
+
+type listGenerationRunsInput struct {
+	Limit int `query:"limit" minimum:"1" maximum:"200" default:"50"`
+}
+
+type listGenerationRunsOutput struct {
+	Body []domain.GenerationRun
+}
+
+func (s *Server) listGenerationRuns(
+	ctx context.Context,
+	input *listGenerationRunsInput,
+) (*listGenerationRunsOutput, error) {
+	runs, err := s.store.ListGenerationRuns(ctx, input.Limit)
+	if err != nil {
+		return nil, huma.NewError(http.StatusInternalServerError, "could not list generation runs")
+	}
+	return &listGenerationRunsOutput{Body: runs}, nil
+}
+
+func (s *Server) cancelGeneration(
+	ctx context.Context,
+	input *idInput,
+) (*generationRunOutput, error) {
+	run, err := s.generation.Cancel(ctx, input.ID)
+	if errors.Is(err, store.ErrNotFound) {
+		return nil, huma.NewError(http.StatusNotFound, "generation run not found")
+	}
+	if err != nil {
+		return nil, huma.NewError(http.StatusInternalServerError, "could not cancel generation run")
+	}
+	return &generationRunOutput{Body: run}, nil
+}
+
+func (s *Server) streamGeneration(w http.ResponseWriter, r *http.Request) {
+	runID := r.PathValue("id")
+	updates, unsubscribe, err := s.generation.Subscribe(r.Context(), runID)
+	if errors.Is(err, store.ErrNotFound) {
+		writeProblem(w, http.StatusNotFound, "Generation run not found", "")
+		return
+	}
+	if err != nil {
+		writeProblem(w, http.StatusInternalServerError, "Could not subscribe to generation run", err.Error())
+		return
+	}
+	defer unsubscribe()
+
+	connection, err := websocket.Accept(
+		w,
+		r,
+		&websocket.AcceptOptions{OriginPatterns: allowedOrigins(r)},
+	)
+	if err != nil {
+		return
+	}
+	defer connection.Close(websocket.StatusNormalClosure, "generation run closed")
+	for {
+		select {
+		case <-r.Context().Done():
+			return
+		case run := <-updates:
+			if err := wsjson.Write(r.Context(), connection, run); err != nil {
+				return
+			}
+			if run.Status == "completed" || run.Status == "failed" || run.Status == "cancelled" {
+				return
+			}
+		}
+	}
 }
 
 type listAdventuresInput struct {

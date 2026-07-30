@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { createSceneBenchmarkFloor } from "../src/testFixtures/sceneBenchmark";
-import type { GenerationResult } from "../src/types";
+import type { AdventureDocument } from "../src/types";
 
 test("GM edits tiles and edges with reversible local history", async ({ page }) => {
   test.setTimeout(120_000);
@@ -10,11 +10,19 @@ test("GM edits tiles and edges with reversible local history", async ({ page }) 
     propCount: 0,
   });
 
-  await page.route("**/api/v1/generation-runs", async (route) => {
+  await page.route("**/api/v1/adventures/*", async (route) => {
+    const url = new URL(route.request().url());
+    if (
+      route.request().method() !== "GET" ||
+      !/^\/api\/v1\/adventures\/[^/]+$/.test(url.pathname)
+    ) {
+      await route.continue();
+      return;
+    }
     const response = await route.fetch();
-    const payload = (await response.json()) as GenerationResult;
-    payload.adventure.floors = [floor];
-    payload.adventure.analysis.totalFloors = 1;
+    const payload = (await response.json()) as AdventureDocument;
+    payload.floors = [floor];
+    payload.analysis.totalFloors = 1;
     await route.fulfill({ response, json: payload });
   });
 

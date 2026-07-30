@@ -1,16 +1,24 @@
 import { expect, test } from "@playwright/test";
 import { createSceneBenchmarkFloor } from "../src/testFixtures/sceneBenchmark";
-import type { GenerationResult } from "../src/types";
+import type { AdventureDocument } from "../src/types";
 
 test("dense 64×64 scene keeps a bounded render structure", async ({ page }) => {
   test.setTimeout(120_000);
   const benchmarkFloor = createSceneBenchmarkFloor({ size: 64 });
 
-  await page.route("**/api/v1/generation-runs", async (route) => {
+  await page.route("**/api/v1/adventures/*", async (route) => {
+    const url = new URL(route.request().url());
+    if (
+      route.request().method() !== "GET" ||
+      !/^\/api\/v1\/adventures\/[^/]+$/.test(url.pathname)
+    ) {
+      await route.continue();
+      return;
+    }
     const response = await route.fetch();
-    const payload = (await response.json()) as GenerationResult;
-    payload.adventure.floors = [benchmarkFloor];
-    payload.adventure.analysis.totalFloors = 1;
+    const payload = (await response.json()) as AdventureDocument;
+    payload.floors = [benchmarkFloor];
+    payload.analysis.totalFloors = 1;
     await route.fulfill({ response, json: payload });
   });
 

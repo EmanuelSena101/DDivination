@@ -364,6 +364,36 @@ func (s *Store) GetGenerationRun(ctx context.Context, id string) (domain.Generat
 	return run, nil
 }
 
+func (s *Store) ListGenerationRuns(ctx context.Context, limit int) ([]domain.GenerationRun, error) {
+	if limit < 1 {
+		limit = 50
+	}
+	rows, err := s.db.QueryContext(ctx, `
+		SELECT run_json
+		FROM generation_runs
+		ORDER BY created_at DESC
+		LIMIT ?
+	`, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	runs := make([]domain.GenerationRun, 0)
+	for rows.Next() {
+		var payload []byte
+		if err := rows.Scan(&payload); err != nil {
+			return nil, err
+		}
+		var run domain.GenerationRun
+		if err := json.Unmarshal(payload, &run); err != nil {
+			return nil, err
+		}
+		runs = append(runs, run)
+	}
+	return runs, rows.Err()
+}
+
 func (s *Store) SaveSessionEvent(ctx context.Context, sessionID string, event domain.SessionEvent) error {
 	payload, err := json.Marshal(event)
 	if err != nil {

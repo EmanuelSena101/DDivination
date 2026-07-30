@@ -3,7 +3,7 @@ import type {
   AdventureSnapshotSummary,
   AdventureSpec,
   CreatedSession,
-  GenerationResult,
+  GenerationRun,
   JoinedSession,
 } from "./types";
 
@@ -35,11 +35,30 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-export function generateAdventure(spec: AdventureSpec, seed?: number): Promise<GenerationResult> {
+export function createGenerationRun(spec: AdventureSpec, seed?: number): Promise<GenerationRun> {
   return request("/api/v1/generation-runs", {
     method: "POST",
     body: JSON.stringify({ spec, ...(seed == null ? {} : { seed }) }),
   });
+}
+
+export function getGenerationRun(id: string): Promise<GenerationRun> {
+  return request(`/api/v1/generation-runs/${encodeURIComponent(id)}`);
+}
+
+export function listGenerationRuns(limit = 10): Promise<GenerationRun[]> {
+  return request(`/api/v1/generation-runs?limit=${limit}`);
+}
+
+export function cancelGenerationRun(id: string): Promise<GenerationRun> {
+  return request(`/api/v1/generation-runs/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
+}
+
+export function generationRunStreamURL(id: string): string {
+  const scheme = window.location.protocol === "https:" ? "wss:" : "ws:";
+  return `${scheme}//${window.location.host}/api/v1/generation-runs/${encodeURIComponent(id)}/stream`;
 }
 
 export function getAdventure(id: string): Promise<AdventureDocument> {

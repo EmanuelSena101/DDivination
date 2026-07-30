@@ -1,8 +1,19 @@
 import { Html, Line, OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
 import { Canvas, type ThreeEvent, useFrame } from "@react-three/fiber";
-import { Physics, RigidBody, type RapierRigidBody } from "@react-three/rapier";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Color, Matrix4, Object3D, type InstancedMesh, type Mesh, type MeshBasicMaterial } from "three";
+import { lazy, Suspense, useEffect, useMemo, useRef } from "react";
+import {
+  Color,
+  DynamicDrawUsage,
+  Matrix4,
+  Object3D,
+  type InstancedMesh,
+  type Mesh,
+  type MeshBasicMaterial,
+} from "three";
+import {
+  selectSceneQualityProfile,
+  type SceneQualityProfile,
+} from "../scenePerformance";
 import {
   FrameSampler,
   rendererTelemetry,
@@ -21,28 +32,10 @@ import type {
 
 const TILE_SIZE = 1;
 const WALL_HEIGHT = 1.8;
-let diceAudioContext: AudioContext | null = null;
-let lastDiceCollision = 0;
 
-function playDiceCollision() {
-  const now = performance.now();
-  if (now - lastDiceCollision < 70) return;
-  lastDiceCollision = now;
-  diceAudioContext ??= new AudioContext();
-  if (diceAudioContext.state === "suspended") {
-    void diceAudioContext.resume();
-  }
-  const oscillator = diceAudioContext.createOscillator();
-  const gain = diceAudioContext.createGain();
-  oscillator.type = "triangle";
-  oscillator.frequency.setValueAtTime(145, diceAudioContext.currentTime);
-  oscillator.frequency.exponentialRampToValueAtTime(70, diceAudioContext.currentTime + 0.045);
-  gain.gain.setValueAtTime(0.035, diceAudioContext.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.0001, diceAudioContext.currentTime + 0.055);
-  oscillator.connect(gain).connect(diceAudioContext.destination);
-  oscillator.start();
-  oscillator.stop(diceAudioContext.currentTime + 0.06);
-}
+const DiceRoll3D = lazy(() =>
+  import("./DiceRoll3D").then(({ DiceRoll3D: Dice }) => ({ default: Dice })),
+);
 
 interface Props {
   adventure: AdventureDocument;
@@ -108,12 +101,15 @@ function worldPosition(floor: FloorMap, position: GridPosition): [number, number
 function TileInstances({
   floor,
   onTile,
+  shadows,
 }: {
   floor: FloorMap;
   onTile: (tile: Tile) => void;
+  shadows: boolean;
 }) {
   const mesh = useRef<InstancedMesh>(null);
   const helper = useMemo(() => new Object3D(), []);
+  const color = useMemo(() => new Color(), []);
   useEffect(() => {
     if (!mesh.current) return;
     floor.tiles.forEach((tile, index) => {
@@ -123,17 +119,18 @@ function TileInstances({
       helper.scale.set(0.96, tile.kind === "stairs" ? 0.18 : 0.12, 0.96);
       helper.updateMatrix();
       mesh.current?.setMatrixAt(index, helper.matrix);
-      const color =
+      const tileColor =
         tile.kind === "stairs"
-          ? new Color("#dfaa55")
+          ? "#dfaa55"
           : tile.kind === "corridor"
-            ? new Color("#696e80")
-            : new Color("#858a9f");
-      mesh.current?.setColorAt(index, color);
+            ? "#696e80"
+            : "#858a9f";
+      mesh.current?.setColorAt(index, color.set(tileColor));
     });
     mesh.current.instanceMatrix.needsUpdate = true;
     if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true;
-  }, [floor, helper]);
+    mesh.current.computeBoundingSphere();
+  }, [color, floor, helper]);
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
@@ -145,7 +142,7 @@ function TileInstances({
     <instancedMesh
       ref={mesh}
       args={[undefined, undefined, floor.tiles.length]}
-      receiveShadow
+      receiveShadow={shadows}
       onClick={handleClick}
     >
       <boxGeometry args={[TILE_SIZE, 1, TILE_SIZE]} />
@@ -160,7 +157,7 @@ function TileInstances({
   );
 }
 
-function WallInstances({ floor }: { floor: FloorMap }) {
+function WallInstances({ floor, shadows }: { floor: FloorMap; shadows: boolean }) {
   const mesh = useRef<InstancedMesh>(null);
   const helper = useMemo(() => new Object3D(), []);
   useEffect(() => {
@@ -175,10 +172,16 @@ function WallInstances({ floor }: { floor: FloorMap }) {
       mesh.current?.setMatrixAt(index, helper.matrix);
     });
     mesh.current.instanceMatrix.needsUpdate = true;
+    mesh.current.computeBoundingSphere();
   }, [floor, helper]);
 
   return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, floor.walls.length]} castShadow receiveShadow>
+    <instancedMesh
+      ref={mesh}
+      args={[undefined, undefined, floor.walls.length]}
+      castShadow={shadows}
+      receiveShadow={shadows}
+    >
       <boxGeometry args={[1.04, WALL_HEIGHT, 0.14]} />
       <meshStandardMaterial color="#515668" roughness={0.72} metalness={0.18} />
     </instancedMesh>
@@ -198,9 +201,18 @@ function wallTransform(x: number, z: number, wall: WallEdge) {
   }
 }
 
-function PropInstances({ floor, entities }: { floor: FloorMap; entities: SceneEntity[] }) {
+function PropInstances({
+  floor,
+  entities,
+  shadows,
+}: {
+  floor: FloorMap;
+  entities: SceneEntity[];
+  shadows: boolean;
+}) {
   const mesh = useRef<InstancedMesh>(null);
   const helper = useMemo(() => new Object3D(), []);
+  const color = useMemo(() => new Color(), []);
   useEffect(() => {
     if (!mesh.current) return;
     entities.forEach((entity, index) => {
@@ -211,99 +223,150 @@ function PropInstances({ floor, entities }: { floor: FloorMap; entities: SceneEn
       helper.scale.set(column ? 0.55 : 0.58, column ? 1.6 : 0.62, column ? 0.55 : 0.58);
       helper.updateMatrix();
       mesh.current?.setMatrixAt(index, helper.matrix);
-      const color =
+      const propColor =
         entity.kind === "key"
-          ? new Color("#dcae52")
+          ? "#dcae52"
           : entity.assetId?.includes("brazier")
-            ? new Color("#e66a3e")
+            ? "#e66a3e"
             : entity.assetId?.includes("column")
-              ? new Color("#707481")
-              : new Color("#8b684e");
-      mesh.current?.setColorAt(index, color);
+              ? "#707481"
+              : "#8b684e";
+      mesh.current?.setColorAt(index, color.set(propColor));
     });
     mesh.current.instanceMatrix.needsUpdate = true;
     if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true;
-  }, [entities, floor, helper]);
+    mesh.current.computeBoundingSphere();
+  }, [color, entities, floor, helper]);
   if (entities.length === 0) return null;
   return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, entities.length]} castShadow receiveShadow>
+    <instancedMesh
+      ref={mesh}
+      args={[undefined, undefined, entities.length]}
+      castShadow={shadows}
+      receiveShadow={shadows}
+    >
       <boxGeometry args={[1, 1, 1]} />
       <meshStandardMaterial roughness={0.68} metalness={0.12} vertexColors />
     </instancedMesh>
   );
 }
 
-function EntityMesh({
-  floor,
-  entity,
-  position,
-  selected,
-  canSelect,
-  onSelect,
-}: {
-  floor: FloorMap;
+interface TokenRenderItem {
   entity: SceneEntity;
   position: GridPosition;
   selected: boolean;
   canSelect: boolean;
-  onSelect: () => void;
-}) {
-  const [x, , z] = worldPosition(floor, position);
-  if (entity.kind === "token" || entity.kind === "boss") {
-    const boss = entity.kind === "boss";
-    return (
-      <group
-        position={[x, 0.28, z]}
-        onClick={(event) => {
-          event.stopPropagation();
-          if (canSelect) onSelect();
-        }}
-      >
-        <mesh castShadow>
-          <cylinderGeometry args={[boss ? 0.38 : 0.3, boss ? 0.46 : 0.36, boss ? 0.85 : 0.68, 16]} />
-          <meshStandardMaterial
-            color={boss ? "#b33b4a" : "#7a5cff"}
-            emissive={selected ? "#f3c969" : "#000000"}
-            emissiveIntensity={selected ? 0.85 : 0}
-            roughness={0.38}
-            metalness={0.35}
-          />
-        </mesh>
-        <mesh position={[0, boss ? 0.58 : 0.46, 0]} castShadow>
-          <sphereGeometry args={[boss ? 0.24 : 0.19, 16, 12]} />
-          <meshStandardMaterial color={boss ? "#db5967" : "#b6a7ff"} roughness={0.4} />
-        </mesh>
-        <mesh position={[0, -0.25, 0]} receiveShadow>
-          <cylinderGeometry args={[0.43, 0.43, 0.08, 24]} />
-          <meshStandardMaterial color={selected ? "#f3c969" : "#11131a"} metalness={0.6} />
-        </mesh>
-        {selected && (
-          <pointLight color="#f3c969" intensity={5} distance={3} position={[0, 1, 0]} />
-        )}
-      </group>
-    );
-  }
+}
 
-  const color =
-    entity.kind === "key"
-      ? "#dcae52"
-      : entity.assetId?.includes("brazier")
-        ? "#e66a3e"
-        : entity.assetId?.includes("column")
-          ? "#5b5e69"
-          : "#795b45";
+function TokenInstances({
+  floor,
+  tokens,
+  shadows,
+  onSelect,
+}: {
+  floor: FloorMap;
+  tokens: TokenRenderItem[];
+  shadows: boolean;
+  onSelect: (token: TokenRenderItem) => void;
+}) {
+  const bodies = useRef<InstancedMesh>(null);
+  const heads = useRef<InstancedMesh>(null);
+  const bases = useRef<InstancedMesh>(null);
+  const helper = useMemo(() => new Object3D(), []);
+  const color = useMemo(() => new Color(), []);
+
+  useEffect(() => {
+    const meshes = [bodies.current, heads.current, bases.current];
+    if (meshes.some((mesh) => !mesh)) return;
+
+    for (const mesh of meshes) {
+      mesh!.instanceMatrix.setUsage(DynamicDrawUsage);
+    }
+
+    tokens.forEach((token, index) => {
+      const [x, , z] = worldPosition(floor, token.position);
+      const boss = token.entity.kind === "boss";
+      const scale = boss ? 1.27 : 1;
+
+      helper.position.set(x, 0.28, z);
+      helper.rotation.set(0, 0, 0);
+      helper.scale.set(scale, boss ? 1.25 : 1, scale);
+      helper.updateMatrix();
+      bodies.current!.setMatrixAt(index, helper.matrix);
+      bodies.current!.setColorAt(
+        index,
+        color.set(token.selected ? "#f3c969" : boss ? "#b33b4a" : "#7a5cff"),
+      );
+
+      helper.position.set(x, boss ? 0.86 : 0.74, z);
+      helper.scale.setScalar(boss ? 1.26 : 1);
+      helper.updateMatrix();
+      heads.current!.setMatrixAt(index, helper.matrix);
+      heads.current!.setColorAt(index, color.set(boss ? "#db5967" : "#b6a7ff"));
+
+      helper.position.set(x, 0.03, z);
+      helper.scale.setScalar(boss ? 1.12 : 1);
+      helper.updateMatrix();
+      bases.current!.setMatrixAt(index, helper.matrix);
+      bases.current!.setColorAt(index, color.set(token.selected ? "#f3c969" : "#11131a"));
+    });
+
+    for (const mesh of meshes) {
+      mesh!.instanceMatrix.needsUpdate = true;
+      if (mesh!.instanceColor) mesh!.instanceColor.needsUpdate = true;
+      mesh!.computeBoundingSphere();
+    }
+  }, [color, floor, helper, tokens]);
+
+  const handleClick = (event: ThreeEvent<MouseEvent>) => {
+    event.stopPropagation();
+    if (event.instanceId == null) return;
+    const token = tokens[event.instanceId];
+    if (token?.canSelect) onSelect(token);
+  };
+
+  if (tokens.length === 0) return null;
   return (
-    <group position={[x, 0.32, z]}>
-      <mesh castShadow receiveShadow>
-        {entity.assetId?.includes("column") ? (
-          <cylinderGeometry args={[0.25, 0.3, 1.6, 10]} />
-        ) : (
-          <boxGeometry args={[0.58, 0.62, 0.58]} />
-        )}
-        <meshStandardMaterial color={color} roughness={0.7} metalness={entity.kind === "key" ? 0.5 : 0.08} />
-      </mesh>
-      {entity.assetId?.includes("brazier") && <pointLight color="#ff6b35" intensity={8} distance={5} position={[0, 0.8, 0]} />}
-    </group>
+    <>
+      <instancedMesh
+        ref={bodies}
+        args={[undefined, undefined, tokens.length]}
+        castShadow={shadows}
+        onClick={handleClick}
+      >
+        <cylinderGeometry args={[0.3, 0.36, 0.68, 16]} />
+        <meshStandardMaterial
+          vertexColors
+          emissive="#241860"
+          emissiveIntensity={0.42}
+          roughness={0.38}
+          metalness={0.35}
+        />
+      </instancedMesh>
+      <instancedMesh
+        ref={heads}
+        args={[undefined, undefined, tokens.length]}
+        castShadow={shadows}
+        onClick={handleClick}
+      >
+        <sphereGeometry args={[0.19, 16, 12]} />
+        <meshStandardMaterial
+          vertexColors
+          emissive="#211b42"
+          emissiveIntensity={0.32}
+          roughness={0.4}
+        />
+      </instancedMesh>
+      <instancedMesh
+        ref={bases}
+        args={[undefined, undefined, tokens.length]}
+        receiveShadow={shadows}
+        onClick={handleClick}
+      >
+        <cylinderGeometry args={[0.43, 0.43, 0.08, 24]} />
+        <meshStandardMaterial vertexColors metalness={0.6} />
+      </instancedMesh>
+    </>
   );
 }
 
@@ -338,75 +401,6 @@ function FogInstances({
       <boxGeometry args={[0.98, role === "gm" ? 0.06 : 1.45, 0.98]} />
       <meshBasicMaterial color="#05060a" transparent opacity={role === "gm" ? 0.22 : 0.97} depthWrite={role !== "gm"} />
     </instancedMesh>
-  );
-}
-
-function DiceGeometry({ sides }: { sides: number }) {
-  switch (sides) {
-    case 4:
-      return <tetrahedronGeometry args={[0.72]} />;
-    case 6:
-      return <boxGeometry args={[0.95, 0.95, 0.95]} />;
-    case 8:
-      return <octahedronGeometry args={[0.72]} />;
-    case 12:
-      return <dodecahedronGeometry args={[0.68]} />;
-    case 20:
-      return <icosahedronGeometry args={[0.72]} />;
-    default:
-      return <cylinderGeometry args={[0.62, 0.62, 0.8, 10]} />;
-  }
-}
-
-function DiceRoll3D({ roll }: { roll: DiceRoll }) {
-  const body = useRef<RapierRigidBody>(null);
-  const [settled, setSettled] = useState(false);
-  const sides = Number(roll.expression.match(/d(\d+)/i)?.[1] || 20);
-  useEffect(() => {
-    const start = window.setTimeout(() => {
-      body.current?.setLinvel({ x: 2.5, y: 4.5, z: -1.2 }, true);
-      body.current?.setAngvel({ x: 8, y: 12, z: 6 }, true);
-    }, 30);
-    const finish = window.setTimeout(() => setSettled(true), 1900);
-    return () => {
-      window.clearTimeout(start);
-      window.clearTimeout(finish);
-    };
-  }, [roll.id]);
-
-  const die = (
-    <mesh castShadow>
-      <DiceGeometry sides={sides} />
-      <meshStandardMaterial color="#7858ff" roughness={0.25} metalness={0.32} />
-    </mesh>
-  );
-
-  return (
-    <group position={[0, 0, 0]}>
-      {settled ? (
-        <group position={[0, 0.78, 0]} rotation={[roll.total * 0.17, roll.total * 0.31, 0.2]}>
-          {die}
-        </group>
-      ) : (
-        <RigidBody
-          ref={body}
-          position={[-2, 4.5, 1]}
-          colliders="hull"
-          restitution={0.62}
-          friction={0.68}
-          onCollisionEnter={playDiceCollision}
-        >
-          {die}
-        </RigidBody>
-      )}
-      <Html center position={[0, 2.3, 0]} zIndexRange={[50, 0]}>
-        <div className="dice-result" aria-live="polite">
-          <span>{roll.expression}</span>
-          <strong>{roll.total}</strong>
-          <small>{roll.values.join(" + ")}{roll.modifier ? ` ${roll.modifier > 0 ? "+" : ""}${roll.modifier}` : ""}</small>
-        </div>
-      </Html>
-    </group>
   );
 }
 
@@ -454,7 +448,7 @@ function Measurement({
   );
 }
 
-function BattleScene(props: Props) {
+function BattleScene(props: Props & { quality: SceneQualityProfile }) {
   const {
     adventure,
     floor,
@@ -469,6 +463,7 @@ function BattleScene(props: Props) {
     measureMode,
     measureStart,
     measureEnd,
+    quality,
     onSelectToken,
     onMoveToken,
     onFog,
@@ -476,9 +471,18 @@ function BattleScene(props: Props) {
     onMeasure,
   } = props;
   const revealed = session?.revealedCells[floor.id] || floor.tiles.map(({ x, z }) => ({ x, z }));
-  const entities = floor.entities.filter((entity) => !entity.hidden || role === "gm");
-  const tokens = entities.filter((entity) => entity.kind === "token" || entity.kind === "boss");
-  const sceneProps = entities.filter((entity) => entity.kind !== "token" && entity.kind !== "boss");
+  const entities = useMemo(
+    () => floor.entities.filter((entity) => !entity.hidden || role === "gm"),
+    [floor.entities, role],
+  );
+  const tokens = useMemo(
+    () => entities.filter((entity) => entity.kind === "token" || entity.kind === "boss"),
+    [entities],
+  );
+  const sceneProps = useMemo(
+    () => entities.filter((entity) => entity.kind !== "token" && entity.kind !== "boss"),
+    [entities],
+  );
 
   const handleTile = (tile: Tile) => {
     if (pingMode && session) {
@@ -500,10 +504,29 @@ function BattleScene(props: Props) {
     }
   };
 
-  const tokenPosition = (entity: SceneEntity) => session?.tokenPositions[entity.id] || entity.position;
-  const tokenFloor = (entity: SceneEntity) => session?.tokenFloors[entity.id] || floor.id;
-  const canSelect = (entity: SceneEntity) =>
-    role === "gm" || (role === "player" && session?.tokenOwners[entity.id] === participantId);
+  const renderTokens = useMemo(
+    () =>
+      tokens
+        .filter((entity) => (session?.tokenFloors[entity.id] || floor.id) === floor.id)
+        .map((entity) => ({
+          entity,
+          position: session?.tokenPositions[entity.id] || entity.position,
+          selected: selectedTokenId === entity.id,
+          canSelect:
+            role === "gm" ||
+            (role === "player" && session?.tokenOwners[entity.id] === participantId),
+        })),
+    [
+      floor.id,
+      participantId,
+      role,
+      selectedTokenId,
+      session?.tokenFloors,
+      session?.tokenOwners,
+      session?.tokenPositions,
+      tokens,
+    ],
+  );
   const sceneSize = Math.max(floor.width, floor.height);
 
   return (
@@ -526,45 +549,52 @@ function BattleScene(props: Props) {
       <ambientLight intensity={2.8} color="#d2d6ef" />
       <hemisphereLight color="#b8b4ff" groundColor="#34394c" intensity={1.6} />
       <directionalLight
-        castShadow
+        castShadow={quality.shadows}
         color="#d8d4ff"
         intensity={3.4}
         position={[12, 24, 8]}
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        shadow-mapSize-width={quality.shadowMapSize}
+        shadow-mapSize-height={quality.shadowMapSize}
       />
       <pointLight color="#765aff" intensity={24} distance={42} position={[-12, 8, -8]} />
-      <Stars radius={75} depth={28} count={700} factor={1.2} saturation={0.2} fade speed={0.15} />
-      <Physics gravity={[0, -18, 0]}>
-        <RigidBody type="fixed" colliders="cuboid">
-          <mesh position={[0, -0.2, 0]} receiveShadow>
-            <boxGeometry args={[floor.width + 8, 0.25, floor.height + 8]} />
-            <meshStandardMaterial color="#151822" roughness={1} />
-          </mesh>
-        </RigidBody>
-        <TileInstances floor={floor} onTile={handleTile} />
-        <WallInstances floor={floor} />
-        <PropInstances floor={floor} entities={sceneProps} />
-        {tokens.map((entity) =>
-          tokenFloor(entity) === floor.id ? (
-            <EntityMesh
-              key={entity.id}
-              floor={floor}
-              entity={entity}
-              position={tokenPosition(entity)}
-              selected={selectedTokenId === entity.id}
-              canSelect={canSelect(entity)}
-              onSelect={() => onSelectToken(selectedTokenId === entity.id ? null : entity.id)}
-            />
-          ) : null,
-        )}
+      {quality.starCount > 0 && (
+        <Stars
+          radius={75}
+          depth={28}
+          count={quality.starCount}
+          factor={1.2}
+          saturation={0.2}
+          fade
+          speed={0.15}
+        />
+      )}
+      <group>
+        <mesh position={[0, -0.2, 0]} receiveShadow={quality.shadows}>
+          <boxGeometry args={[floor.width + 8, 0.25, floor.height + 8]} />
+          <meshStandardMaterial color="#151822" roughness={1} />
+        </mesh>
+        <TileInstances floor={floor} onTile={handleTile} shadows={quality.shadows} />
+        <WallInstances floor={floor} shadows={quality.shadows} />
+        <PropInstances floor={floor} entities={sceneProps} shadows={quality.shadows} />
+        <TokenInstances
+          floor={floor}
+          tokens={renderTokens}
+          shadows={quality.shadows}
+          onSelect={({ entity }) =>
+            onSelectToken(selectedTokenId === entity.id ? null : entity.id)
+          }
+        />
         {session && <FogInstances floor={floor} revealed={revealed} role={role} />}
-        {latestRoll && <DiceRoll3D key={latestRoll.id} roll={latestRoll} />}
+        {latestRoll && (
+          <Suspense fallback={null}>
+            <DiceRoll3D key={latestRoll.id} roll={latestRoll} />
+          </Suspense>
+        )}
         {latestPing?.floorId === floor.id && (
           <PingMarker key={latestPing.revision} floor={floor} position={latestPing} />
         )}
         {measureStart && measureEnd && <Measurement floor={floor} start={measureStart} end={measureEnd} />}
-      </Physics>
+      </group>
       <Html position={[-floor.width / 2, 0.8, -floor.height / 2]} transform>
         <div className="scene-label">{adventure.name["en-US"]}</div>
       </Html>
@@ -573,15 +603,24 @@ function BattleScene(props: Props) {
 }
 
 export function DungeonScene(props: Props) {
+  const quality = useMemo(
+    () => selectSceneQualityProfile(props.floor),
+    [props.floor],
+  );
+
   return (
-    <div className="scene-shell">
+    <div
+      className="scene-shell"
+      data-testid="scene-shell"
+      data-render-profile={quality.name}
+    >
       <Canvas
-        shadows
-        dpr={[1, 1.75]}
+        shadows={quality.shadows}
+        dpr={[1, quality.maxDpr]}
         gl={{ antialias: true, powerPreference: "high-performance", preserveDrawingBuffer: true }}
         onPointerMissed={() => props.onSelectToken(null)}
       >
-        <BattleScene {...props} />
+        <BattleScene {...props} quality={quality} />
         <TelemetryProbe enabled={props.telemetryEnabled} onTelemetry={props.onTelemetry} />
       </Canvas>
     </div>

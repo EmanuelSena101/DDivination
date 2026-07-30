@@ -1,9 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { QRCodeSVG } from "qrcode.react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { closeSession, createSession, generateAdventure, joinSession, markdownURL, packageURL, printURL } from "./api";
-import { DungeonScene } from "./components/DungeonScene";
 import { VTTDiagnosticsPanel } from "./components/VTTDiagnosticsPanel";
 import { useAppStore } from "./store";
 import {
@@ -13,6 +12,12 @@ import {
   type RenderTelemetry,
 } from "./telemetry";
 import { DEFAULT_SPEC, type AdventureSpec, type Language } from "./types";
+
+const DungeonScene = lazy(() =>
+  import("./components/DungeonScene").then(({ DungeonScene: Scene }) => ({
+    default: Scene,
+  })),
+);
 
 function Brand() {
   const { t } = useTranslation();
@@ -574,46 +579,48 @@ function VTT() {
           </div>
         </div>
 
-        <DungeonScene
-          adventure={adventure}
-          floor={floor}
-          session={session}
-          role={role}
-          participantId={participantId}
-          selectedTokenId={selectedTokenId}
-          fogBrush={fogBrush}
-          latestRoll={latestRoll}
-          latestPing={latestPing}
-          pingMode={pingMode}
-          measureMode={measureMode}
-          measureStart={measureStart}
-          measureEnd={measureEnd}
-          telemetryEnabled={diagnosticsOpen}
-          onTelemetry={updateRenderTelemetry}
-          onSelectToken={setSelectedToken}
-          onMoveToken={(tokenId, nextFloorId, position) =>
-            send("token.move", { tokenId, floorId: nextFloorId, x: position.x, z: position.z })
-          }
-          onFog={(nextFloorId, position, revealed) =>
-            send(revealed ? "fog.reveal" : "fog.hide", {
-              floorId: nextFloorId,
-              x: position.x,
-              z: position.z,
-            })
-          }
-          onPing={(nextFloorId, position) => {
-            send("ping", { floorId: nextFloorId, x: position.x, z: position.z });
-            setPingMode(false);
-          }}
-          onMeasure={(position) => {
-            if (!measureStart || measureEnd) {
-              setMeasureStart(position);
-              setMeasureEnd(null);
-            } else {
-              setMeasureEnd(position);
+        <Suspense fallback={<div className="scene-loading">{t("loading")}</div>}>
+          <DungeonScene
+            adventure={adventure}
+            floor={floor}
+            session={session}
+            role={role}
+            participantId={participantId}
+            selectedTokenId={selectedTokenId}
+            fogBrush={fogBrush}
+            latestRoll={latestRoll}
+            latestPing={latestPing}
+            pingMode={pingMode}
+            measureMode={measureMode}
+            measureStart={measureStart}
+            measureEnd={measureEnd}
+            telemetryEnabled={diagnosticsOpen}
+            onTelemetry={updateRenderTelemetry}
+            onSelectToken={setSelectedToken}
+            onMoveToken={(tokenId, nextFloorId, position) =>
+              send("token.move", { tokenId, floorId: nextFloorId, x: position.x, z: position.z })
             }
-          }}
-        />
+            onFog={(nextFloorId, position, revealed) =>
+              send(revealed ? "fog.reveal" : "fog.hide", {
+                floorId: nextFloorId,
+                x: position.x,
+                z: position.z,
+              })
+            }
+            onPing={(nextFloorId, position) => {
+              send("ping", { floorId: nextFloorId, x: position.x, z: position.z });
+              setPingMode(false);
+            }}
+            onMeasure={(position) => {
+              if (!measureStart || measureEnd) {
+                setMeasureStart(position);
+                setMeasureEnd(null);
+              } else {
+                setMeasureEnd(position);
+              }
+            }}
+          />
+        </Suspense>
 
         {diagnosticsOpen && <VTTDiagnosticsPanel report={telemetryReport} />}
 

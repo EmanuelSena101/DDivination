@@ -211,7 +211,8 @@ Atalhos úteis:
 ```
 
 A suíte inclui testes Go, `go vet`, build do servidor, contratos OpenAPI,
-TypeScript strict, Vitest, build Vite e Playwright com mestre e jogador.
+TypeScript strict, Vitest, budgets do bundle, build Vite e Playwright com
+mestre, jogador e uma cena densa de referência.
 
 Consulte [docs/TESTING.md](docs/TESTING.md) para detalhes.
 
@@ -312,6 +313,7 @@ Leia também:
 - [arquitetura](docs/ARCHITECTURE.md);
 - [contratos da API](docs/API.md);
 - [diagnóstico da VTT](docs/VTT_DIAGNOSTICS.md).
+- [performance da VTT](docs/VTT_PERFORMANCE.md).
 
 ## Limites atuais
 

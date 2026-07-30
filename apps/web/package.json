@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
+    "check:bundle": "node ../../scripts/check-web-bundle.mjs",
     "api:generate": "orval --config orval.config.ts",
     "lint": "tsc -b --pretty false",
     "test": "vitest run",

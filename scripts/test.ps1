@@ -66,6 +66,9 @@ try {
     Invoke-DDivinationStep "Build frontend" {
         & $nodeTools.Npm run build:web
     }
+    Invoke-DDivinationStep "Budgets do bundle web" {
+        & $nodeTools.Npm run check:bundle
+    }
 
     if (-not $SkipE2E) {
         Assert-DDivinationPortAvailable -Port 8080

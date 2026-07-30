@@ -8,6 +8,9 @@ comparar cenários e orientar otimizações, principalmente na BATCH-004.
 As métricas são indicativas. Browsers, resolução, DPR, GPU, drivers e processos
 em segundo plano afetam o resultado.
 
+Os perfis de qualidade, fixtures densas, budgets de draw calls e divisão do
+bundle estão descritos em [VTT_PERFORMANCE.md](VTT_PERFORMANCE.md).
+
 ## Como usar
 
 1. Inicie a aplicação com `.\scripts\dev.ps1`.
@@ -74,6 +77,9 @@ persistido automaticamente.
 
 Enquanto o painel está aberto, o mesmo objeto sanitizado fica disponível em
 `window.__DDIVINATION_TELEMETRY__` para testes e benchmarks locais.
+
+O perfil ativo também pode ser inspecionado no atributo
+`data-render-profile` do elemento da cena.
 
 ## Validação automatizada
 

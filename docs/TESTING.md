@@ -54,9 +54,12 @@ Sem Playwright:
 ```
 
 O script executa testes, vet e build Go; verifica drift do OpenAPI e do cliente
-Orval; executa TypeScript strict, Vitest, build Vite e, por padrão, Playwright.
+Orval; executa TypeScript strict, Vitest, build Vite, budgets de bundle e, por
+padrão, Playwright.
 
 O E2E exige a porta 8080 livre porque inicia um servidor isolado.
+Os arquivos são executados em série: abrir uma mesa altera intencionalmente a
+interface de rede do único servidor local do teste.
 
 Se o ambiente de desenvolvimento estiver aberto, encerre-o antes:
 
@@ -73,6 +76,22 @@ aguarda amostras e valida o relatório durante o fluxo GM/jogador.
 As métricas observadas em modo headless validam o instrumento, mas não definem
 o budget de produto. Para medições manuais e interpretação, consulte
 [VTT_DIAGNOSTICS.md](VTT_DIAGNOSTICS.md).
+
+## Performance da cena
+
+Vitest valida as fixtures determinísticas e os perfis `quality`, `balanced` e
+`performance`. O Playwright renderiza 4.096 tiles, 100 tokens e 500 props,
+confirma o perfil `balanced` e bloqueia regressões acima de 24 draw calls.
+
+Depois do build, o manifesto do Vite também é verificado:
+
+```powershell
+npm run check:bundle
+```
+
+Esse gate confirma que aplicação, núcleo 3D e física dos dados permanecem
+separados e dentro dos budgets comprimidos. Consulte
+[VTT_PERFORMANCE.md](VTT_PERFORMANCE.md).
 
 ## Contrato da API
 

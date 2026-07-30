@@ -46,25 +46,20 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 ## Última batch concluída
 
-`BATCH-005 — Editor de grid e revisão visual do pack base`
-
-O mestre agora pode editar tiles, paredes e portas em um rascunho local com
-undo/redo. O pack procedural 0.2.0 apresenta arquitetura, superfícies, props,
-luzes e tokens mais legíveis. A validação incluiu 17 testes Vitest, 3 cenários
-Playwright, suíte Go, contratos, budgets, QA visual e todos os sete jobs do CI.
-
-Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-005-grid-editor-visual-pack.md](batches/BATCH-005-grid-editor-visual-pack.md).
-
-## Batch em validação
-
 `BATCH-006 — Editor de entidades e conteúdo`
 
-A implementação adiciona edição local de narrativa bilíngue, metadados do andar
-e entidades da cena, compartilhando undo/redo com o editor de grid. A validação
-local aprovou 22 testes Vitest, 4 cenários Playwright, suíte Go, contratos,
-budgets, build e QA visual sem erros no console. Falta apenas a validação do CI
-e o merge para concluir a batch.
+O mestre agora pode editar narrativa bilíngue, nome do andar e entidades no
+mesmo rascunho local do grid, com undo/redo compartilhado e atualização
+imediata da cena. A validação incluiu 22 testes Vitest, 4 cenários Playwright,
+suíte Go, contratos, budgets, QA visual e todos os sete jobs do CI.
 
-Persistência editorial continua reservada à BATCH-007 e o pipeline completo de
-GLB à BATCH-014.
+Consulte [ROADMAP.md](ROADMAP.md) e
+[BATCH-006-content-entity-editor.md](batches/BATCH-006-content-entity-editor.md).
+
+## Próxima batch planejada
+
+`BATCH-007 — Persistência editorial`
+
+O próximo passo é persistir o rascunho, implementar autosave, checkpoints e
+controle de concorrência. O pipeline completo de GLB permanece reservado à
+BATCH-014.

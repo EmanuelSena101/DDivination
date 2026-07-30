@@ -29,7 +29,7 @@ issue correspondente.
 | BATCH-002 | Contratos e fronteiras da API | DONE |
 | BATCH-003 | Instrumentação do VTT | DONE |
 | BATCH-004 | Spike e otimização 3D | DONE |
-| BATCH-005 | Editor de grid | PLANNED |
+| BATCH-005 | Editor de grid e revisão visual do pack base | VALIDATING |
 | BATCH-006 | Editor de entidades e conteúdo | PLANNED |
 | BATCH-007 | Persistência editorial | PLANNED |
 | BATCH-008 | Execuções de geração | PLANNED |

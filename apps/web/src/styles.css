@@ -840,6 +840,129 @@ button.secondary {
   backdrop-filter: blur(16px);
 }
 
+.grid-editor-panel {
+  width: min(330px, calc(100% - 24px));
+  max-height: calc(100% - 166px);
+  padding: 15px;
+  overflow-y: auto;
+  position: absolute;
+  top: 76px;
+  left: 12px;
+  z-index: 14;
+  color: #d7d2e2;
+  border: 1px solid rgba(243, 201, 105, 0.3);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(31, 27, 25, 0.96), rgba(10, 11, 17, 0.96));
+  box-shadow: 0 24px 65px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(18px);
+}
+
+.grid-editor-panel header,
+.grid-editor-panel footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.grid-editor-panel header {
+  justify-content: space-between;
+  margin-bottom: 13px;
+}
+
+.grid-editor-panel header small,
+.grid-editor-panel h3 {
+  color: #8e8794;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.grid-editor-panel h2 {
+  margin: 2px 0 0;
+  font-size: 18px;
+}
+
+.grid-editor-panel header i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f3c969;
+  box-shadow: 0 0 12px rgba(243, 201, 105, 0.75);
+}
+
+.grid-editor-panel section {
+  padding: 11px 0;
+  border-top: 1px solid var(--line);
+}
+
+.grid-editor-panel h3 {
+  margin: 0 0 8px;
+}
+
+.editor-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.editor-tool-grid button {
+  min-height: 38px;
+  padding: 7px 8px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #aaa5b3;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+}
+
+.editor-tool-grid button span {
+  width: 18px;
+  color: #c8a859;
+  font-size: 15px;
+  text-align: center;
+}
+
+.editor-tool-grid button.active {
+  color: #f3ead6;
+  border-color: rgba(243, 201, 105, 0.52);
+  background: rgba(243, 201, 105, 0.12);
+}
+
+.grid-editor-panel p {
+  margin: 2px 0 12px;
+  color: #8e8794;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.grid-editor-panel footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.grid-editor-panel footer button {
+  min-height: 34px;
+  color: #c7c1ce;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.grid-editor-panel footer .danger {
+  grid-column: 1 / -1;
+  color: #d99595;
+}
+
+.grid-editor-panel button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 .diagnostics-panel header {
   display: flex;
   align-items: center;

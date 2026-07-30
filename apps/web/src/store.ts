@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { sessionWebSocketURL } from "./api";
+import { applyGridEdit, type GridEdit } from "./gridEditor";
 import {
   createConnectionTelemetry,
   reduceConnectionTelemetry,
@@ -34,6 +35,9 @@ interface AppState {
   selectedTokenId: string | null;
   latestRoll: DiceRoll | null;
   latestPing: (GridPosition & { floorId: string; revision: number }) | null;
+  editorPast: AdventureDocument[];
+  editorFuture: AdventureDocument[];
+  editorDirty: boolean;
   connectionTelemetry: ConnectionTelemetry;
   error: string | null;
   socket: WebSocket | null;
@@ -42,6 +46,10 @@ interface AppState {
   clearAdventure: () => void;
   setFloor: (floorId: string) => void;
   setSelectedToken: (tokenId: string | null) => void;
+  editGrid: (edit: GridEdit) => void;
+  undoGridEdit: () => void;
+  redoGridEdit: () => void;
+  discardGridEdits: () => void;
   connect: (args: {
     sessionId: string;
     participantId: string;
@@ -120,6 +128,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   selectedTokenId: null,
   latestRoll: null,
   latestPing: null,
+  editorPast: [],
+  editorFuture: [],
+  editorDirty: false,
   connectionTelemetry: createConnectionTelemetry(),
   error: null,
   socket: null,
@@ -137,6 +148,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       session: null,
       latestRoll: null,
       latestPing: null,
+      editorPast: [],
+      editorFuture: [],
+      editorDirty: false,
     }),
   clearAdventure: () => {
     get().socket?.close();
@@ -152,6 +166,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       selectedTokenId: null,
       latestRoll: null,
       latestPing: null,
+      editorPast: [],
+      editorFuture: [],
+      editorDirty: false,
       connectionTelemetry: createConnectionTelemetry(),
       socket: null,
     });
@@ -163,6 +180,65 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
   setSelectedToken: (selectedTokenId) => set({ selectedTokenId }),
+  editGrid: (edit) => {
+    const current = get();
+    if (!current.adventure) return;
+    if (current.session) {
+      set({ error: "Grid editing is unavailable while a table is open" });
+      return;
+    }
+    const result = applyGridEdit(current.adventure, edit);
+    if (!result.changed) {
+      if (result.rejection) {
+        set({ error: gridEditError(result.rejection) });
+      }
+      return;
+    }
+    set({
+      adventure: result.document,
+      editorPast: [...current.editorPast, current.adventure].slice(-40),
+      editorFuture: [],
+      editorDirty: true,
+      error: null,
+      selectedTokenId: null,
+    });
+  },
+  undoGridEdit: () => {
+    const current = get();
+    if (current.session || !current.adventure || current.editorPast.length === 0) return;
+    const previous = current.editorPast.at(-1)!;
+    set({
+      adventure: previous,
+      editorPast: current.editorPast.slice(0, -1),
+      editorFuture: [current.adventure, ...current.editorFuture].slice(0, 40),
+      editorDirty: current.editorPast.length > 1,
+      error: null,
+    });
+  },
+  redoGridEdit: () => {
+    const current = get();
+    if (current.session || !current.adventure || current.editorFuture.length === 0) return;
+    const [next, ...remaining] = current.editorFuture;
+    set({
+      adventure: next,
+      editorPast: [...current.editorPast, current.adventure].slice(-40),
+      editorFuture: remaining,
+      editorDirty: true,
+      error: null,
+    });
+  },
+  discardGridEdits: () => {
+    const current = get();
+    if (current.session || current.editorPast.length === 0) return;
+    set({
+      adventure: current.editorPast[0],
+      editorPast: [],
+      editorFuture: [],
+      editorDirty: false,
+      error: null,
+      selectedTokenId: null,
+    });
+  },
   connect: ({ sessionId, participantId, token, role, state, adventure, reconnecting = false }) => {
     get().socket?.close();
     const socket = new WebSocket(sessionWebSocketURL(sessionId, token));
@@ -219,6 +295,9 @@ export const useAppStore = create<AppState>((set, get) => ({
           adventure: data.adventure,
           session: data.state,
           floorId: data.state.activeFloorId,
+          editorPast: [],
+          editorFuture: [],
+          editorDirty: false,
           connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, {
             type: "snapshot",
             revision: data.state.revision,
@@ -289,6 +368,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       session: state,
       adventure,
       floorId: state.activeFloorId || adventure.floors[0]?.id || null,
+      editorPast: [],
+      editorFuture: [],
+      editorDirty: false,
       connected: false,
       connectionTelemetry: initialConnectionTelemetry,
       error: null,
@@ -329,3 +411,18 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   clearError: () => set({ error: null }),
 }));
+
+function gridEditError(rejection: NonNullable<ReturnType<typeof applyGridEdit>["rejection"]>): string {
+  switch (rejection) {
+    case "occupied":
+      return "A tile containing an entity or portal cannot be removed";
+    case "missing-tile":
+      return "Add a tile before editing this edge";
+    case "out-of-bounds":
+      return "The selected cell is outside this floor";
+    case "missing-direction":
+      return "Select a valid grid edge";
+    case "floor-not-found":
+      return "The selected floor no longer exists";
+  }
+}

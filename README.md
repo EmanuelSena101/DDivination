@@ -36,7 +36,9 @@
 
 > [!IMPORTANT]
 > O DDivination ainda está em desenvolvimento. O vertical slice é funcional,
-> mas não existe instalador oficial e o editor completo ainda não está pronto.
+> mas não existe instalador oficial. O editor de grid já funciona como
+> rascunho local; salvamento editorial e edição de conteúdo ainda não estão
+> prontos.
 > O fluxo recomendado neste momento é Windows + PowerShell.
 
 ## O que já funciona
@@ -44,6 +46,8 @@
 - geração procedural bilíngue e reproduzível por `seed + generatorVersion`;
 - dungeons com vários andares, salas, corredores, paredes e portais;
 - visualizador 3D com câmera orbital, grid, fog manual e tokens;
+- pack visual procedural com pisos, portas, props, luzes e tokens distinguíveis;
+- editor local de tiles, paredes e portas com desfazer/refazer;
 - mesa pela rede local com papéis de mestre, jogador e display;
 - movimento autoritativo, ping, medição e iniciativa simples;
 - dados 3D `d4`, `d6`, `d8`, `d10`, `d12`, `d20` e `d100`;
@@ -314,19 +318,22 @@ Leia também:
 - [contratos da API](docs/API.md);
 - [diagnóstico da VTT](docs/VTT_DIAGNOSTICS.md).
 - [performance da VTT](docs/VTT_PERFORMANCE.md).
+- [editor de grid](docs/GRID_EDITOR.md);
+- [pack visual procedural](docs/VISUAL_PACK.md).
 
 ## Limites atuais
 
 Ainda não fazem parte do vertical slice:
 
-- editor completo de mapa e conteúdo;
+- persistência do editor, autosave e edição de entidades/conteúdo;
 - combate automatizado e fichas completas;
 - multiplayer pela internet;
 - line-of-sight dinâmico;
 - marketplace, macros, VR ou primeira pessoa;
 - instalador Windows.
 
-As otimizações formais do cenário 3D são o próximo marco. Acompanhe o
+O editor atual é um rascunho reversível: descarte as alterações antes de abrir
+uma mesa. A persistência chegará na BATCH-007. Acompanhe o
 [roadmap](docs/ROADMAP.md).
 
 ## Privacidade, IA e segurança

@@ -3,7 +3,9 @@ import { QRCodeSVG } from "qrcode.react";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { closeSession, createSession, generateAdventure, joinSession, markdownURL, packageURL, printURL } from "./api";
+import { GridEditorPanel } from "./components/GridEditorPanel";
 import { VTTDiagnosticsPanel } from "./components/VTTDiagnosticsPanel";
+import type { GridEditorTool } from "./gridEditor";
 import { useAppStore } from "./store";
 import {
   createTelemetryReport,
@@ -299,6 +301,13 @@ function VTT() {
   const send = useAppStore((state) => state.send);
   const connect = useAppStore((state) => state.connect);
   const clearAdventure = useAppStore((state) => state.clearAdventure);
+  const editGrid = useAppStore((state) => state.editGrid);
+  const undoGridEdit = useAppStore((state) => state.undoGridEdit);
+  const redoGridEdit = useAppStore((state) => state.redoGridEdit);
+  const discardGridEdits = useAppStore((state) => state.discardGridEdits);
+  const editorPast = useAppStore((state) => state.editorPast);
+  const editorFuture = useAppStore((state) => state.editorFuture);
+  const editorDirty = useAppStore((state) => state.editorDirty);
   const [fogBrush, setFogBrush] = useState(false);
   const [pingMode, setPingMode] = useState(false);
   const [measureMode, setMeasureMode] = useState(false);
@@ -309,6 +318,8 @@ function VTT() {
   const [share, setShare] = useState<{ code: string; url: string } | null>(null);
   const [initiativeScores, setInitiativeScores] = useState<Record<string, number>>({});
   const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorTool, setEditorTool] = useState<GridEditorTool>("tile-floor");
   const [renderTelemetry, setRenderTelemetry] = useState<RenderTelemetry>(() => emptyRenderTelemetry());
 
   const floor = adventure.floors.find((candidate) => candidate.id === floorId) || adventure.floors[0];
@@ -397,6 +408,15 @@ function VTT() {
       link.click();
       URL.revokeObjectURL(url);
     }, "image/png");
+  };
+  const toggleEditor = () => {
+    setEditorOpen((current) => !current);
+    setFogBrush(false);
+    setPingMode(false);
+    setMeasureMode(false);
+    setMeasureStart(null);
+    setMeasureEnd(null);
+    setSelectedToken(null);
   };
 
   return (
@@ -510,6 +530,16 @@ function VTT() {
       <section className="vtt-stage">
         <div className="stage-toolbar">
           <div className="tool-group">
+            <button
+              data-testid="toggle-grid-editor"
+              aria-pressed={editorOpen}
+              className={editorOpen ? "active" : ""}
+              disabled={role !== "gm" || Boolean(session)}
+              onClick={toggleEditor}
+            >
+              {editorOpen ? "◈" : "✎"}{" "}
+              <span>{editorOpen ? t("editorExit") : t("editorToggle")}</span>
+            </button>
             <button className={fogBrush ? "active" : ""} disabled={role !== "gm" || !session} onClick={() => setFogBrush(!fogBrush)}>
               ◐ <span>{t("revealFog")}</span>
             </button>
@@ -550,7 +580,12 @@ function VTT() {
           </div>
           <div className="tool-group">
             {role === "gm" && !session && (
-              <button className="accent" disabled={openMutation.isPending} onClick={() => openMutation.mutate()}>
+              <button
+                className="accent"
+                disabled={openMutation.isPending || editorDirty || editorOpen}
+                title={editorDirty || editorOpen ? t("editorOpenBlocked") : undefined}
+                onClick={() => openMutation.mutate()}
+              >
                 ◉ <span>{t("openTable")}</span>
               </button>
             )}
@@ -594,6 +629,8 @@ function VTT() {
             measureMode={measureMode}
             measureStart={measureStart}
             measureEnd={measureEnd}
+            editorEnabled={editorOpen}
+            editorTool={editorTool}
             telemetryEnabled={diagnosticsOpen}
             onTelemetry={updateRenderTelemetry}
             onSelectToken={setSelectedToken}
@@ -619,8 +656,29 @@ function VTT() {
                 setMeasureEnd(position);
               }
             }}
+            onEdit={(position, direction) =>
+              editGrid({
+                floorId: floor.id,
+                tool: editorTool,
+                position,
+                direction,
+              })
+            }
           />
         </Suspense>
+
+        {editorOpen && (
+          <GridEditorPanel
+            tool={editorTool}
+            canUndo={editorPast.length > 0}
+            canRedo={editorFuture.length > 0}
+            dirty={editorDirty}
+            onTool={setEditorTool}
+            onUndo={undoGridEdit}
+            onRedo={redoGridEdit}
+            onDiscard={discardGridEdits}
+          />
+        )}
 
         {diagnosticsOpen && <VTTDiagnosticsPanel report={telemetryReport} />}
 

@@ -325,6 +325,7 @@ Leia também:
 - [diagnóstico da VTT](docs/VTT_DIAGNOSTICS.md).
 - [performance da VTT](docs/VTT_PERFORMANCE.md).
 - [editor de grid](docs/GRID_EDITOR.md);
+- [documentação da Batch 6](docs/batches/BATCH-006-content-entity-editor.md);
 - [pack visual procedural](docs/VISUAL_PACK.md).
 
 ## Limites atuais

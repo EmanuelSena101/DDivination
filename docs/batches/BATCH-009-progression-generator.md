@@ -38,9 +38,9 @@ insolúveis.
 
 - budgets de encontros, tesouros e catálogo SRD 5E, reservados à Batch 10;
 - comandos de sessão para abrir portas ou consumir chaves;
-- regeneração parcial de etapas do gerador;
+- regeneração parcial de etapas do gerador, reservada à Batch 19;
 - editor visual da progressão;
-- line-of-sight dinâmico, combate automatizado ou IA.
+- line-of-sight dinâmico, combate automatizado (Batch 24) ou IA (Batch 21).
 
 ## Decisões
 

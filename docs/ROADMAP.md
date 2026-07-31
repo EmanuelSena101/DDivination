@@ -38,9 +38,53 @@ issue correspondente.
 | BATCH-011 | Administração da mesa | PLANNED |
 | BATCH-012 | Durabilidade em tempo real | PLANNED |
 | BATCH-013 | Remake de UX e controles da VTT | PLANNED |
-| BATCH-014 | Assets e pacote portátil | PLANNED |
-| BATCH-015 | IA opcional | PLANNED |
-| BATCH-016 | Release v1 | PLANNED |
+| BATCH-014 | Fundação de dados e rulesets | PLANNED |
+| BATCH-015 | Paridade do catálogo legado 2014 | PLANNED |
+| BATCH-016 | Compêndio SRD 5.2.1 | PLANNED |
+| BATCH-017 | Navegação e busca do compêndio | PLANNED |
+| BATCH-018 | Editor avançado de conteúdo | PLANNED |
+| BATCH-019 | Regeneração parcial | PLANNED |
+| BATCH-020 | Assets e pacote portátil | PLANNED |
+| BATCH-021 | IA opcional | PLANNED |
+| BATCH-022 | Release v1 | PLANNED |
+| BATCH-023 | Fichas e combate manual (pós-v1) | PLANNED |
+| BATCH-024 | Automação de combate (pós-v1) | PLANNED |
+
+## Fases restantes
+
+### Operação da mesa — Batches 11–13
+
+Administração autoritativa, durabilidade/reconexão e remake dos controles são
+concluídos antes de ampliar o domínio. Isso estabiliza papéis, eventos e UX que
+serão reutilizados pelo compêndio e pelos editores.
+
+### Dados e autoria — Batches 14–19
+
+A [auditoria do legado](audits/LEGACY-DND-DATA-GAP.md) encontrou 933 registros
+de monstros, itens e equipamentos usados pelo MVP e ausentes do rewrite. A
+fundação de packs separa 2014 de 2024; depois recuperamos paridade, criamos o
+compêndio SRD 5.2.1, sua UI, o editor completo e a regeneração parcial.
+
+### Portabilidade e release — Batches 20–22
+
+Assets e packs tornam-se portáteis, a IA opcional é finalizada e o release v1
+valida o conjunto. Release é gate de integração, não uma batch para absorver
+features incompletas.
+
+### Expansões pós-v1 — Batches 23–24
+
+Fichas e estado manual de combate vêm primeiro. Automação de ataques, dano e
+condições só começa depois que regras, atores e histórico estiverem versionados.
+
+## Dependências principais
+
+- Batch 12 depende da administração definida na Batch 11.
+- Batch 14 é fundação obrigatória das Batches 15 e 16.
+- Batch 17 depende dos packs 2014 e 2024 das Batches 15 e 16.
+- Batch 18 depende da navegação e das referências do compêndio.
+- Batch 19 depende do editor e da proveniência das gerações.
+- Batch 22 exige todas as Batches 11–21 concluídas.
+- Batch 23 depende das Batches 12 e 16–18; Batch 24 depende da Batch 23.
 
 ## Gates
 

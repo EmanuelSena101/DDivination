@@ -155,7 +155,7 @@ aventura persistida sem depender exclusivamente do WebSocket.
 
 - O algoritmo de progressão, locks, chaves e budgets permanece na BATCH-009.
 - O catálogo SRD ampliado permanece na BATCH-010.
-- Configuração completa de IA permanece na BATCH-015.
+- Configuração completa de IA permanece na BATCH-021.
 
 ## Documentação a atualizar
 

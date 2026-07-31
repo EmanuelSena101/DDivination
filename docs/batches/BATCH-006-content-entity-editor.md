@@ -40,7 +40,7 @@ ativo, mantendo o documento semântico como fonte da cena 3D.
 - persistência, autosave, checkpoints e optimistic locking, na BATCH-007;
 - edição completa de salas, encontros, tesouros ou análise;
 - movimentação livre por drag-and-drop;
-- upload, catálogo e LOD de GLB, na BATCH-014;
+- upload, catálogo e LOD de GLB, na BATCH-020;
 - edição colaborativa durante sessão LAN;
 - recalcular automaticamente progressão e budgets após a edição.
 
@@ -226,7 +226,7 @@ undo/redo usado pelo grid.
   pertence à BATCH-007.
 - Edição completa de salas, encontros, tesouros e análise não foi incorporada
   silenciosamente; continua fora do escopo desta batch.
-- Upload e pipeline completo de GLB continuam reservados à BATCH-014.
+- Upload e pipeline completo de GLB continuam reservados à BATCH-020.
 
 ## Documentação atualizada
 

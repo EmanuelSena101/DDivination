@@ -16,7 +16,7 @@ clareza.
 
 O plano original reservava a BATCH-005 somente ao editor de grid. Por solicitação
 do usuário, ela passa a incluir também uma revisão visual do pack procedural.
-Importação e LOD de GLB continuam pertencendo à BATCH-014.
+Importação e LOD de GLB continuam pertencendo à BATCH-020.
 
 ## Objetivo
 
@@ -45,7 +45,7 @@ para as próximas ferramentas da VTT.
 
 - persistência, autosave e checkpoints editoriais, reservados à BATCH-007;
 - edição de entidades, salas e conteúdo narrativo, reservada à BATCH-006;
-- importação, compressão ou LOD de GLB, reservados à BATCH-014;
+- importação, compressão ou LOD de GLB, reservados à BATCH-020;
 - edição durante sessão LAN ou sincronização colaborativa do editor;
 - recalcular automaticamente salas, encontros ou análise da dungeon;
 - modelos, texturas ou materiais de terceiros;
@@ -160,7 +160,7 @@ da BATCH-004.
 - O rascunho editorial ainda não pode ser persistido, conforme previsto para a
   BATCH-007.
 - O editor de conteúdo e entidades continua na BATCH-006.
-- GLB, LOD e catálogo binário continuam na BATCH-014.
+- GLB, LOD e catálogo binário continuam na BATCH-020.
 
 ## Documentação atualizada
 

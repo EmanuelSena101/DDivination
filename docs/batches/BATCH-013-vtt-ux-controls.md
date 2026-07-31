@@ -90,10 +90,11 @@ responsividade e superfícies específicas para mestre, jogador e display.
 
 ## Fora do escopo
 
-- novos modelos GLB ou pipeline binário completo de assets, reservados à Batch 14;
+- novos modelos GLB ou pipeline binário completo de assets, reservados à Batch 20;
 - reconstrução do gerador ou dos budgets 5E;
 - line-of-sight dinâmico;
-- combate automatizado;
+- fichas e combate manual, reservados à Batch 23;
+- combate automatizado, reservado à Batch 24;
 - primeira pessoa, realidade virtual ou suporte mobile equivalente a desktop 3D;
 - mudança do protocolo autoritativo de sessão sem necessidade comprovada.
 
@@ -131,7 +132,7 @@ responsividade e superfícies específicas para mestre, jogador e display.
 - Eventos do canvas atravessarem componentes sobrepostos. Mitigação: state
   machine central, captura explícita de ponteiro e testes de propagação.
 - Escopo visual crescer para o pack 3D. Mitigação: limitar esta batch ao chrome,
-  feedback de interação e legibilidade; assets permanecem na Batch 14.
+  feedback de interação e legibilidade; assets permanecem na Batch 20.
 - Touch exigir compromissos distintos. Mitigação: definir e testar os gestos
   antes de implementar a responsividade final.
 

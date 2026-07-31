@@ -37,11 +37,13 @@ bilíngue de combates, armadilhas, puzzles, descansos e recompensas.
 
 ## Fora do escopo
 
-- fichas completas, HP, ataques, condições ou combate automatizado;
-- cópia integral dos stat blocks ou de todo o catálogo do SRD;
-- compêndio ou editor visual completo;
-- tabelas oficiais de tesouro não presentes no SRD 5.2.1;
-- regeneração parcial;
+- fichas completas, HP, ataques, condições ou combate automatizado, planejados
+  para as Batches 23 e 24;
+- stat blocks e catálogo amplo, planejados nas Batches 15 e 16;
+- compêndio e editor visual completo, planejados nas Batches 17 e 18;
+- tabelas oficiais de tesouro não presentes no SRD 5.2.1; conteúdo original ou
+  customizado poderá ser criado na Batch 18;
+- regeneração parcial, planejada na Batch 19;
 - administração e durabilidade da mesa, reservadas às Batches 11 e 12;
 - remake de UX e controles, reservado à Batch 13.
 

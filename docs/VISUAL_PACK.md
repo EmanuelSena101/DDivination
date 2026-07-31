@@ -34,4 +34,4 @@ sob CC0 1.0. O manifesto completo está em
 `assets/base-pack/manifest.json`.
 
 Importação de GLB, validação de bounds, LOD e catálogo binário continuam
-reservados à BATCH-014.
+reservados à BATCH-020.

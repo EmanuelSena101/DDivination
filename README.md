@@ -334,13 +334,16 @@ Leia também:
 
 ## Limites atuais
 
-Ainda não fazem parte do vertical slice:
+Ainda não fazem parte do vertical slice, mas agora possuem destino explícito:
 
-- combate automatizado e fichas completas;
+- catálogo completo, compêndio e packs de ruleset — Batches 14–17;
+- editor semântico completo e regeneração parcial — Batches 18–19;
+- fichas e combate manual — Batch 23, após o v1;
+- combate automatizado — Batch 24, após fichas e regras versionadas;
 - multiplayer pela internet;
 - line-of-sight dinâmico;
 - marketplace, macros, VR ou primeira pessoa;
-- instalador Windows.
+- instalador Windows — Batch 22.
 
 O editor mantém um rascunho reversível e o salva automaticamente no SQLite.
 Checkpoints marcam versões importantes; conflitos nunca sobrescrevem dados
@@ -363,9 +366,12 @@ remotos sem confirmação. Acompanhe o [roadmap](docs/ROADMAP.md).
 > Commons Attribution 4.0 International License, available at
 > https://creativecommons.org/licenses/by/4.0/legalcode.
 
-O gerador usa os budgets oficiais de XP por personagem e referencia somente
-metadados selecionados de criaturas e armadilhas; fichas completas e combate
-automatizado não fazem parte do projeto.
+O gerador usa os budgets oficiais de XP por personagem e, no estado atual,
+referencia somente 28 criaturas e duas armadilhas selecionadas. A
+[auditoria do legado](docs/audits/LEGACY-DND-DATA-GAP.md) encontrou 933 registros
+que ainda não foram recuperados. As Batches 14–17 criarão packs versionados,
+recuperarão a paridade 2014 e construirão o compêndio SRD 5.2.1 sem misturar os
+dois rulesets. Fichas e combate ficam nas expansões pós-v1, Batches 23 e 24.
 
 As dificuldades são apresentadas como fácil, média, difícil e mortal. Para o
 cálculo, elas usam respectivamente as faixas `low`, `moderate`, `high` e `high`

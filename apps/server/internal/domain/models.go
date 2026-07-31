@@ -4,7 +4,8 @@ import "time"
 
 const (
 	SchemaVersion    = "1.0.0"
-	GeneratorVersion = "go-v1-alpha.2"
+	GeneratorVersion = "go-v1-alpha.3"
+	RulesVersion     = "srd-5.2.1-ddivination-1"
 )
 
 type LocalizedText struct {
@@ -127,16 +128,82 @@ type Encounter struct {
 	RoomID     string              `json:"roomId"`
 	Difficulty string              `json:"difficulty"`
 	Creatures  []EncounterCreature `json:"creatures"`
+	BudgetXP   int                 `json:"budgetXp"`
+	BudgetTier string              `json:"budgetTier" enum:"low,moderate,high"`
 	TotalXP    int                 `json:"totalXp"`
 }
 
+type Treasure struct {
+	ID          string          `json:"id"`
+	FloorID     string          `json:"floorId"`
+	RoomID      string          `json:"roomId"`
+	Name        LocalizedText   `json:"name"`
+	Description LocalizedText   `json:"description"`
+	Quality     string          `json:"quality" enum:"poor,standard,rich,legendary"`
+	ValueGP     int             `json:"valueGp" minimum:"1"`
+	Contents    []LocalizedText `json:"contents"`
+	Source      string          `json:"source"`
+}
+
+type Puzzle struct {
+	ID       string        `json:"id"`
+	FloorID  string        `json:"floorId"`
+	RoomID   string        `json:"roomId"`
+	Name     LocalizedText `json:"name"`
+	Prompt   LocalizedText `json:"prompt"`
+	Solution LocalizedText `json:"solution"`
+	Hint     LocalizedText `json:"hint"`
+	CheckDC  int           `json:"checkDc" minimum:"5" maximum:"30"`
+	Source   string        `json:"source"`
+}
+
+type Trap struct {
+	ID           string        `json:"id"`
+	FloorID      string        `json:"floorId"`
+	RoomID       string        `json:"roomId"`
+	CatalogIndex string        `json:"catalogIndex"`
+	Name         LocalizedText `json:"name"`
+	Severity     string        `json:"severity" enum:"nuisance,deadly"`
+	LevelTier    string        `json:"levelTier" enum:"1-4,5-10,11-16,17-20"`
+	Trigger      LocalizedText `json:"trigger"`
+	DetectionDC  int           `json:"detectionDc" minimum:"5" maximum:"30"`
+	DisableDC    int           `json:"disableDc" minimum:"5" maximum:"30"`
+	SaveDC       int           `json:"saveDc" minimum:"5" maximum:"30"`
+	Damage       LocalizedText `json:"damage"`
+	Source       string        `json:"source"`
+	License      string        `json:"license"`
+	Hidden       bool          `json:"hidden"`
+}
+
+type RestPoint struct {
+	ID          string        `json:"id"`
+	FloorID     string        `json:"floorId"`
+	RoomID      string        `json:"roomId"`
+	Kind        string        `json:"kind" enum:"short"`
+	Name        LocalizedText `json:"name"`
+	Description LocalizedText `json:"description"`
+	Source      string        `json:"source"`
+}
+
+type ContentCounts struct {
+	Encounters int `json:"encounters"`
+	Treasures  int `json:"treasures"`
+	Puzzles    int `json:"puzzles"`
+	Traps      int `json:"traps"`
+	RestPoints int `json:"restPoints"`
+}
+
 type DungeonAnalysis struct {
-	TotalRooms          int      `json:"totalRooms"`
-	TotalFloors         int      `json:"totalFloors"`
-	CriticalPath        []string `json:"criticalPath"`
-	DeadEnds            []string `json:"deadEnds"`
-	EstimatedDifficulty string   `json:"estimatedDifficulty"`
-	Invariants          []string `json:"invariants"`
+	TotalRooms          int           `json:"totalRooms"`
+	TotalFloors         int           `json:"totalFloors"`
+	CriticalPath        []string      `json:"criticalPath"`
+	DeadEnds            []string      `json:"deadEnds"`
+	EstimatedDifficulty string        `json:"estimatedDifficulty"`
+	EncounterBudgetXP   int           `json:"encounterBudgetXp"`
+	EncounterTotalXP    int           `json:"encounterTotalXp"`
+	TreasureValueGP     int           `json:"treasureValueGp"`
+	ContentCounts       ContentCounts `json:"contentCounts"`
+	Invariants          []string      `json:"invariants"`
 }
 
 type ProgressionStep struct {
@@ -180,6 +247,7 @@ type AdventureDocument struct {
 	ID               string             `json:"id"`
 	SchemaVersion    string             `json:"schemaVersion"`
 	GeneratorVersion string             `json:"generatorVersion"`
+	RulesVersion     string             `json:"rulesVersion,omitempty"`
 	Version          int64              `json:"version"`
 	Seed             uint64             `json:"seed"`
 	Name             LocalizedText      `json:"name"`
@@ -188,6 +256,10 @@ type AdventureDocument struct {
 	Narrative        AdventureNarrative `json:"narrative"`
 	Floors           []FloorMap         `json:"floors"`
 	Encounters       []Encounter        `json:"encounters"`
+	Treasures        []Treasure         `json:"treasures"`
+	Puzzles          []Puzzle           `json:"puzzles"`
+	Traps            []Trap             `json:"traps"`
+	RestPoints       []RestPoint        `json:"restPoints"`
 	Progression      DungeonProgression `json:"progression"`
 	Analysis         DungeonAnalysis    `json:"analysis"`
 	Attributions     []Attribution      `json:"attributions"`

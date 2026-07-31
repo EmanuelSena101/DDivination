@@ -13,6 +13,10 @@ import type { DungeonProgression } from './dungeonProgression';
 import type { Encounter } from './encounter';
 import type { FloorMap } from './floorMap';
 import type { LocalizedText } from './localizedText';
+import type { Puzzle } from './puzzle';
+import type { RestPoint } from './restPoint';
+import type { Trap } from './trap';
+import type { Treasure } from './treasure';
 
 export interface AdventureDocument {
   /** A URL to the JSON Schema for this object. */
@@ -30,11 +34,20 @@ export interface AdventureDocument {
   name: LocalizedText;
   narrative: AdventureNarrative;
   progression: DungeonProgression;
+  /** @nullable */
+  puzzles: Puzzle[] | null;
+  /** @nullable */
+  restPoints: RestPoint[] | null;
+  rulesVersion?: string;
   schemaVersion: string;
   /** @minimum 0 */
   seed: number;
   spec: AdventureSpec;
   summary: LocalizedText;
+  /** @nullable */
+  traps: Trap[] | null;
+  /** @nullable */
+  treasures: Treasure[] | null;
   updatedAt: string;
   version: number;
 }

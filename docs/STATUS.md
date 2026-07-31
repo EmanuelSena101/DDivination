@@ -39,7 +39,7 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 - edição completa de salas, encontros, tesouros e análise ainda não foi
   implementada;
 - regeneração parcial de estágios ainda não foi implementada;
-- catálogo SRD inicial é limitado;
+- catálogo usa metadados SRD selecionados e não inclui stat blocks completos;
 - pacote ainda não incorpora toda a biblioteca binária de assets;
 - configuração visual e keychain do adapter de IA pendentes;
 - FPS no hardware-alvo ainda precisa de validação formal;
@@ -61,12 +61,13 @@ cenários Playwright, QA bilíngue e todos os sete jobs do CI.
 Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-009-progression-generator.md](batches/BATCH-009-progression-generator.md).
 
-## Próxima batch
+## Batch em execução
 
 `BATCH-010 — Catálogo e regras 5E`
 
-O próximo passo é ampliar o catálogo SRD 5.2.1 e aplicar budgets de encontros,
-tesouros, armadilhas, puzzles, descansos e recompensas sobre a progressão já
-validada. O escopo detalhado será fechado antes da implementação.
+A [Batch 10](batches/BATCH-010-catalog-rules.md) ampliou o catálogo SRD 5.2.1 e
+aplicou budgets de encontros, tesouros, armadilhas, puzzles, descansos e
+recompensas sobre a progressão já validada. A regressão local passou e a batch
+aguarda os gates do CI na issue #37.
 
 O pipeline completo de GLB permanece reservado à BATCH-014.

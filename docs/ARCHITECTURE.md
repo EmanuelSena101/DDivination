@@ -28,6 +28,14 @@ entram pela rede local somente depois que o mestre abre uma sessão.
 - O validador simula a aquisição de chaves antes de cada lock, confere pares de
   portais, mantém segredos fora do caminho obrigatório e exige o boss no clímax
   do último andar. Documentos inválidos não são gerados nem persistidos.
+- `rulesVersion` ativa as invariantes da camada 5E sem invalidar documentos
+  legados. O catálogo incorporado é a fonte única de IDs, CR e XP usados pelo
+  gerador, pela API e pelo validador.
+- Encontros guardam teto, faixa oficial e XP gasto. As dificuldades do produto
+  mapeiam para `low`, `moderate` e `high` do SRD 5.2.1; `deadly` reserva a faixa
+  `high` para o clímax em vez de criar uma quarta tabela não oficial.
+- Tesouros, puzzles, armadilhas e descansos são objetos semânticos vinculados a
+  salas. Templates originais e material SRD declaram fontes separadas.
 - O editor altera uma cópia imutável local do documento semântico. Grid,
   conteúdo bilíngue e entidades compartilham o mesmo histórico limitado de
   undo/redo.
@@ -66,9 +74,10 @@ cena, [GRID_EDITOR.md](GRID_EDITOR.md) para as proteções editoriais e
 
 ## Persistência
 
-O documento armazena tiles, paredes, portais, salas, entidades e referências de
-assets, além da progressão entre esses elementos. Geometrias derivadas, buffers
-WebGL e meshes não são persistidos.
+O documento armazena tiles, paredes, portais, salas, entidades, encontros,
+tesouros, puzzles, armadilhas, descansos e referências de assets, além da
+progressão entre esses elementos. Geometrias derivadas, buffers WebGL e meshes
+não são persistidos.
 
 Cada edição persistida gera uma versão monotônica e um snapshot imutável.
 Checkpoints manuais não alteram a versão; restaurações criam uma versão nova.

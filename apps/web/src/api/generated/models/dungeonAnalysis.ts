@@ -5,15 +5,20 @@
  * Local-first 3D VTT and deterministic 5E-compatible adventure generator.
  * OpenAPI spec version: 1.0.0-alpha.1
  */
+import type { ContentCounts } from './contentCounts';
 
 export interface DungeonAnalysis {
+  contentCounts: ContentCounts;
   /** @nullable */
   criticalPath: string[] | null;
   /** @nullable */
   deadEnds: string[] | null;
+  encounterBudgetXp: number;
+  encounterTotalXp: number;
   estimatedDifficulty: string;
   /** @nullable */
   invariants: string[] | null;
   totalFloors: number;
   totalRooms: number;
+  treasureValueGp: number;
 }

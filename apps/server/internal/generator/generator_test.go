@@ -91,6 +91,79 @@ func TestGeneratedDungeonInvariants(t *testing.T) {
 	}
 }
 
+func TestGeneratedRulesContentAcrossLevelsAndDifficulties(t *testing.T) {
+	now := time.Date(2026, 7, 31, 12, 0, 0, 0, time.UTC)
+	difficulties := []string{"easy", "medium", "hard", "deadly"}
+	qualities := []string{"poor", "standard", "rich", "legendary"}
+	for seed := uint64(0); seed < 320; seed++ {
+		spec := domain.DefaultAdventureSpec()
+		spec.PartyLevel = 1 + int(seed%20)
+		spec.PartySize = 1 + int(seed%8)
+		spec.FloorCount = 1 + int(seed%5)
+		spec.DurationHours = 1 + int(seed%12)
+		spec.Difficulty = difficulties[seed%uint64(len(difficulties))]
+		spec.TreasureQuality = qualities[(seed/4)%uint64(len(qualities))]
+		doc, err := Generate(spec, 10_000+seed, now)
+		if err != nil {
+			t.Fatalf("seed %d: %v", seed, err)
+		}
+		if doc.RulesVersion != domain.RulesVersion || len(doc.Treasures) != spec.FloorCount || len(doc.Puzzles) != spec.FloorCount || len(doc.Traps) != spec.FloorCount {
+			t.Fatalf("seed %d: incomplete rules content", seed)
+		}
+		for _, encounter := range doc.Encounters {
+			if encounter.TotalXP > encounter.BudgetXP {
+				t.Fatalf("seed %d: encounter exceeded budget", seed)
+			}
+			for _, creature := range encounter.Creatures {
+				item, ok := domain.CatalogItemByIndex(creature.Index)
+				if !ok || item.XP != creature.XP {
+					t.Fatalf("seed %d: invalid creature reference", seed)
+				}
+			}
+		}
+		for _, trap := range doc.Traps {
+			if trap.LevelTier != domain.LevelTier(spec.PartyLevel) {
+				t.Fatalf("seed %d: invalid trap tier", seed)
+			}
+		}
+	}
+}
+
+func TestRulesValidationRejectsBrokenCatalogAndBudgets(t *testing.T) {
+	doc, err := Generate(domain.DefaultAdventureSpec(), 77, time.Date(2026, 7, 31, 12, 0, 0, 0, time.UTC))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	unknown := doc
+	unknown.Encounters = append([]domain.Encounter(nil), doc.Encounters...)
+	unknown.Encounters[0].Creatures = append([]domain.EncounterCreature(nil), doc.Encounters[0].Creatures...)
+	unknown.Encounters[0].Creatures[0].Index = "not-in-catalog"
+	if err := domain.ValidateAdventure(unknown); err == nil {
+		t.Fatal("unknown catalog creature was accepted")
+	}
+
+	overBudget := doc
+	overBudget.Encounters = append([]domain.Encounter(nil), doc.Encounters...)
+	overBudget.Encounters[0].TotalXP = overBudget.Encounters[0].BudgetXP + 1
+	if err := domain.ValidateAdventure(overBudget); err == nil {
+		t.Fatal("over-budget encounter was accepted")
+	}
+
+	wrongTier := doc
+	wrongTier.Traps = append([]domain.Trap(nil), doc.Traps...)
+	wrongTier.Traps[0].LevelTier = "17-20"
+	if err := domain.ValidateAdventure(wrongTier); err == nil {
+		t.Fatal("wrong trap tier was accepted")
+	}
+
+	missingAttribution := doc
+	missingAttribution.Attributions = nil
+	if err := domain.ValidateAdventure(missingAttribution); err == nil {
+		t.Fatal("missing attribution was accepted")
+	}
+}
+
 func flood(start domain.GridPosition, walkable map[domain.GridPosition]bool) map[domain.GridPosition]bool {
 	reached := map[domain.GridPosition]bool{start: true}
 	queue := []domain.GridPosition{start}

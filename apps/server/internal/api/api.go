@@ -104,24 +104,8 @@ func (s *Server) getHealth(_ context.Context, _ *struct{}) (*healthOutput, error
 	}}, nil
 }
 
-type CatalogItem struct {
-	Index   string               `json:"index"`
-	Name    domain.LocalizedText `json:"name"`
-	Kind    string               `json:"kind"`
-	CR      float64              `json:"cr,omitempty"`
-	Source  string               `json:"source"`
-	License string               `json:"license"`
-}
-
-type Catalog struct {
-	Version     string             `json:"version"`
-	Ruleset     string             `json:"ruleset"`
-	Items       []CatalogItem      `json:"items"`
-	Attribution domain.Attribution `json:"attribution"`
-}
-
 type catalogOutput struct {
-	Body Catalog
+	Body domain.Catalog
 }
 
 func (s *Server) getCatalog(_ context.Context, _ *struct{}) (*catalogOutput, error) {
@@ -880,24 +864,8 @@ func cleanURLPath(value string) string {
 	return strings.TrimPrefix(cleaned, "/")
 }
 
-func starterCatalog() Catalog {
-	attribution := domain.Attribution{
-		Title:   "System Reference Document 5.2.1",
-		Creator: "Wizards of the Coast LLC",
-		Source:  "https://www.dndbeyond.com/srd",
-		License: "CC-BY-4.0",
-		Notice:  "This work includes material from the System Reference Document 5.2.1 by Wizards of the Coast LLC.",
-	}
-	return Catalog{
-		Version: "starter-2024.1",
-		Ruleset: "5E 2024 / SRD 5.2.1",
-		Items: []CatalogItem{
-			{Index: "skeleton", Name: domain.LocalizedText{PTBR: "Esqueleto", ENUS: "Skeleton"}, Kind: "monster", CR: .25, Source: attribution.Title, License: attribution.License},
-			{Index: "goblin-warrior", Name: domain.LocalizedText{PTBR: "Guerreiro Goblin", ENUS: "Goblin Warrior"}, Kind: "monster", CR: .25, Source: attribution.Title, License: attribution.License},
-			{Index: "ogre", Name: domain.LocalizedText{PTBR: "Ogro", ENUS: "Ogre"}, Kind: "monster", CR: 2, Source: attribution.Title, License: attribution.License},
-		},
-		Attribution: attribution,
-	}
+func starterCatalog() domain.Catalog {
+	return domain.BundledCatalog()
 }
 
 func decodeJSON(w http.ResponseWriter, r *http.Request, target any, limit int64) error {

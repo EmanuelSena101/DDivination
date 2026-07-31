@@ -35,6 +35,26 @@ func newContractTestServer(t *testing.T) (*Server, Handlers) {
 	return server, server.Handlers()
 }
 
+func TestCatalogEndpointReturnsVersionedSRDMetadata(t *testing.T) {
+	_, handlers := newContractTestServer(t)
+	response := httptest.NewRecorder()
+	handlers.Local.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/api/v1/catalog", nil))
+	if response.Code != http.StatusOK {
+		t.Fatalf("expected catalog 200, got %d: %s", response.Code, response.Body.String())
+	}
+	var catalog domain.Catalog
+	if err := json.Unmarshal(response.Body.Bytes(), &catalog); err != nil {
+		t.Fatal(err)
+	}
+	if catalog.Version != domain.RulesVersion || len(catalog.Items) < 30 || catalog.Attribution.License != domain.SRDLicense {
+		t.Fatal("catalog response is incomplete")
+	}
+	item, ok := domain.CatalogItemByIndex("tarrasque")
+	if !ok || item.XP != 155000 {
+		t.Fatal("high-level catalog coverage is missing")
+	}
+}
+
 func TestOpenAPIContainsEveryRESTContractWithStableOperationID(t *testing.T) {
 	_, handlers := newContractTestServer(t)
 	response := httptest.NewRecorder()

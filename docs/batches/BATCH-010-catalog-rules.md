@@ -1,10 +1,13 @@
 # BATCH-010 — Catálogo e regras 5E
 
-Estado: `VALIDATING`
+Estado: `DONE`
 
 Issue: [#37](https://github.com/EmanuelSena101/DDivination/issues/37)
 
-Pull Request: a criar
+Pull Requests:
+
+- implementação: [#38](https://github.com/EmanuelSena101/DDivination/pull/38);
+- conclusão documental: [#39](https://github.com/EmanuelSena101/DDivination/pull/39).
 
 ## Contexto
 
@@ -67,7 +70,7 @@ bilíngue de combates, armadilhas, puzzles, descansos e recompensas.
 - [x] referências inválidas, conteúdo vazio ou budgets excedidos são rejeitados;
 - [x] catálogo e aventuras exibem a atribuição exigida pelo SRD 5.2.1;
 - [x] o mestre visualiza o conteúdo e o jogador não recebe segredos;
-- [ ] testes locais, QA visual e sete gates do CI são aprovados.
+- [x] testes locais, QA visual e sete gates do CI são aprovados.
 
 ## Testes obrigatórios
 
@@ -137,7 +140,20 @@ bilíngue de combates, armadilhas, puzzles, descansos e recompensas.
 - Bundle aprovado: 108,3 KiB inicial, 245,2 KiB do VTT, 819,1 KiB da física e
   1172,6/1200 KiB total.
 - Sete cenários Playwright passaram em 3,5 minutos.
-- A batch permanece em `VALIDATING` até a aprovação dos gates do GitHub Actions.
+- A implementação seguiu para validação no GitHub Actions após a regressão local.
+
+### 2026-07-31 — publicação e conclusão
+
+- O PR de implementação [#38](https://github.com/EmanuelSena101/DDivination/pull/38)
+  foi aprovado pelos sete gates do projeto e integrado à `main` por squash.
+- Os jobs de contrato, fluxo de desenvolvimento, web, E2E e Go em Ubuntu,
+  macOS e Windows passaram; o E2E completo terminou em 5m16s.
+- O deployment externo da Vercel falhou, mas não é um gate do projeto nem faz
+  parte da distribuição local-first do DDivination.
+- A issue [#37](https://github.com/EmanuelSena101/DDivination/issues/37) foi
+  encerrada automaticamente pelo merge da implementação.
+- O PR [#39](https://github.com/EmanuelSena101/DDivination/pull/39) consolidou
+  o estado `DONE` no roadmap, no índice de batches e no status do projeto.
 
 ## Resultado
 

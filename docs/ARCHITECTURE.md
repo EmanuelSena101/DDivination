@@ -2,13 +2,12 @@
 
 ## Visão
 
-Até a Batch 11, DDivination está implementado como aplicação web local-first. Um
-servidor Go mantém o estado autoritativo, persiste os documentos e hospeda o
-frontend. Clientes de jogador entram pela rede local somente depois que o
-mestre abre uma sessão.
+DDivination é uma aplicação web com servidor Go autoritativo, frontend React e
+PostgreSQL. O ambiente atual executa localmente e clientes de jogador entram
+pela rede local depois que o mestre abre uma sessão.
 
-O destino aprovado para o v1 é online-first. A Batch 12 substituirá SQLite por
-PostgreSQL e criará as fronteiras de persistência; a Batch 22 publicará o
+O destino aprovado para o v1 é online-first. A Batch 12 substituiu SQLite por
+PostgreSQL e criou as fronteiras de persistência; a Batch 22 publicará o
 frontend na Vercel e integrará Supabase PostgreSQL, Auth, Realtime e Storage.
 Durante a transição, esta documentação distingue o que já existe do que está
 planejado. Consulte o
@@ -27,8 +26,8 @@ planejado. Consulte o
 - REST gerencia recursos persistentes e é integralmente contratado com Huma.
 - WebSocket transporta comandos/eventos de sessão e snapshots de progresso da
   geração.
-- SQLite é a fonte de persistência implementada até a Batch 11; PostgreSQL a
-  substituirá na Batch 12.
+- PostgreSQL é a única fonte de persistência operacional. Serviços dependem de
+  interfaces próprias e não do driver ou SDK de um provedor.
 - O servidor é autoritativo para permissões, movimento, fog e dados.
 - O frontend deriva meshes a partir do documento semântico.
 - A progressão também faz parte do documento semântico: etapas ordenadas ligam
@@ -55,9 +54,8 @@ planejado. Consulte o
   recentes preservam o conteúdo local e são rebaseadas sobre a versão salva.
 - Conflitos pausam o autosave e exigem uma escolha explícita; não existe merge
   silencioso campo a campo.
-- Gerações são enfileiradas por um coordenador local. No estado atual, SQLite
-  guarda o estado durável; memória guarda somente funções de cancelamento e
-  assinantes ativos. As stores migrarão para PostgreSQL na Batch 12.
+- Gerações são enfileiradas por um coordenador local. PostgreSQL guarda o estado
+  durável; memória guarda somente funções de cancelamento e assinantes ativos.
 - O pipeline publica estágios monotônicos entre validação, construção dos
   andares, enriquecimento opcional, validação semântica e persistência.
 - Cancelamento usa `context.Context` e é verificado entre andares e antes da
@@ -76,6 +74,17 @@ planejado. Consulte o
   admissões e atribuições de token mudam somente por comandos validados pelo hub.
 - Remoção revoga a credencial persistida e fecha assinantes ativos; rotação do
   código afeta somente novas admissões.
+- Cada comando de sessão é confirmado em uma transação serializável antes do
+  broadcast. A transação grava evento, idempotência, revisão e estado corrente.
+- Snapshots imutáveis são criados na revisão zero, a cada 100 eventos e no
+  encerramento. O log recente é compactado somente depois de existir snapshot.
+- Reconexões enviam `lastRevision`: revisões recentes recebem replay contíguo;
+  clientes anteriores à janela preservada recebem snapshot filtrado por papel.
+- O servidor persiste hash do código de entrada e credenciais, restaura mesas
+  abertas após reinício e rejeita cabeçalhos semânticos inconsistentes como
+  corrupção em vez de sobrescrevê-los.
+- Heartbeats detectam conexões mortas. Presença, revisões e mudanças secretas
+  também avançam o estado do jogador sem expor o payload restrito.
 - A instrumentação do VTT é opt-in, permanece no navegador e exporta somente
   um relatório sanitizado construído por allowlist.
 
@@ -101,6 +110,12 @@ Sessões usam revisões monotônicas, eventos persistidos e snapshots. Assets s�
 endereçados por SHA-256. Execuções de geração persistem o snapshot completo de
 seu estado e histórico a cada transição relevante.
 
+O servidor recebe o banco somente por `DATABASE_URL`. O pool pode ser ajustado
+por `DDIVINATION_DB_MAX_CONNS` e `DDIVINATION_DB_MAX_IDLE_CONNS`; a janela do log
+por `DDIVINATION_SESSION_EVENT_RETENTION`; e mesas encerradas são removidas após
+`DDIVINATION_CLOSED_SESSION_RETENTION` (padrão `24h`, `0` desativa). Migrations
+embutidas usam lock consultivo, transação e checksum para impedir drift.
+
 ## Segurança do runtime local atual
 
 - O servidor inicia somente em loopback.
@@ -108,7 +123,7 @@ seu estado e histórico a cada transição relevante.
 - Códigos de entrada expiram.
 - Tokens são armazenados somente como hashes.
 - Importações validam tamanho, formato, hashes e caminhos.
-- Chaves de IA não entram no SQLite, logs ou pacotes.
+- Chaves de IA não entram no PostgreSQL, logs ou pacotes.
 
 Auth, RLS, políticas de Storage, secrets e isolamento entre mesas no ambiente
 cloud pertencem à Batch 22. Até lá, nenhuma credencial real de Supabase faz parte

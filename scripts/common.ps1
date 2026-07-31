@@ -85,21 +85,11 @@ function Assert-DDivinationPortAvailable {
         [int]$Port
     )
 
-    $connections = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
-    if ($null -eq $connections) {
+    $listeners = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties().GetActiveTcpListeners()
+    if (-not ($listeners | Where-Object { $_.Port -eq $Port })) {
         return
     }
-    $owners = $connections |
-        Select-Object -ExpandProperty OwningProcess -Unique |
-        ForEach-Object {
-            $process = Get-Process -Id $_ -ErrorAction SilentlyContinue
-            if ($null -ne $process) {
-                "$($process.ProcessName) (PID $($process.Id))"
-            } else {
-                "PID $_"
-            }
-        }
-    throw "A porta $Port ja esta em uso por: $($owners -join ', '). Execute .\scripts\stop.ps1 ou encerre o processo responsavel."
+    throw "A porta $Port ja esta em uso. Execute .\scripts\stop.ps1 ou encerre o processo responsavel."
 }
 
 function Wait-DDivinationEndpoint {
@@ -133,5 +123,13 @@ function Stop-DDivinationProcessTree {
     if ($Process.HasExited) {
         return
     }
-    & taskkill.exe /PID $Process.Id /T /F 2>$null | Out-Null
+    if ($env:OS -eq "Windows_NT") {
+        & taskkill.exe /PID $Process.Id /T /F 2>$null | Out-Null
+    } else {
+        $pkill = Get-Command pkill -ErrorAction SilentlyContinue
+        if ($null -ne $pkill) {
+            & $pkill.Source -TERM -P $Process.Id 2>$null
+        }
+        Stop-Process -Id $Process.Id -Force -ErrorAction SilentlyContinue
+    }
 }

@@ -38,9 +38,8 @@
 > O DDivination ainda está em desenvolvimento. O vertical slice é funcional,
 > mas não existe instalador oficial. O editor de mapa, conteúdo bilíngue e
 > entidades já possui autosave versionado, checkpoints e resolução de conflitos.
-> O fluxo recomendado neste momento é Windows + PowerShell. SQLite e LAN ainda
-> descrevem o build atual; a migração para PostgreSQL começa na Batch 12 e o
-> deploy Vercel + Supabase pertence à Batch 22.
+> O fluxo recomendado neste momento é Windows + PowerShell. O build atual usa
+> PostgreSQL local e LAN; o deploy Vercel + Supabase pertence à Batch 22.
 
 ## O que já funciona
 
@@ -54,15 +53,15 @@
 - pack visual procedural com pisos, portas, props, luzes e tokens distinguíveis;
 - editor local de tiles, paredes, portas, narrativa bilíngue e entidades com
   desfazer/refazer compartilhado;
-- autosave no SQLite, checkpoints imutáveis e recuperação após recarregar;
+- autosave no PostgreSQL, checkpoints imutáveis e recuperação após recarregar;
 - mesa pela rede local com papéis de mestre, jogador e display;
 - movimento autoritativo, ping, medição e iniciativa simples;
 - dados 3D `d4`, `d6`, `d8`, `d10`, `d12`, `d20` e `d100`;
 - histórico das últimas 100 rolagens;
 - diagnóstico local de FPS, renderer, cena e WebSocket;
-- SQLite, checkpoints, exportações e pacotes `.ddivination`;
+- PostgreSQL, checkpoints, exportações e pacotes `.ddivination`;
 - interface em `pt-BR` e `en-US`;
-- uso offline sem conta ou serviço externo.
+- recuperação de mesas após reinício, replay por revisão e reconexão automática.
 
 ## Início rápido
 
@@ -73,6 +72,8 @@ Instale:
 - [Git](https://git-scm.com/downloads);
 - [Go 1.26 ou mais recente](https://go.dev/dl/);
 - [Node.js 24 ou mais recente](https://nodejs.org/), com npm 11+;
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) para o
+  PostgreSQL local, ou uma `DATABASE_URL` de PostgreSQL existente;
 - Windows PowerShell 5.1 ou PowerShell 7.
 
 Confirme as versões:
@@ -98,8 +99,9 @@ Na raiz do repositório:
 .\scripts\dev.ps1
 ```
 
-Na primeira execução, o script instala as dependências, compila o servidor e
-compila um snapshot do frontend para os jogadores LAN e inicia backend e Vite.
+Na primeira execução, o script sobe o PostgreSQL local, instala as dependências,
+compila o servidor e um snapshot do frontend para os jogadores LAN e inicia
+backend e Vite.
 Ao terminar, ele mostra:
 
 ```text
@@ -121,7 +123,20 @@ Quando terminar:
 ```
 
 Esse comando encerra somente os processos registrados pelo DDivination e
-preserva os logs para diagnóstico.
+preserva os logs e o volume do PostgreSQL. Quando o banco foi iniciado pelo
+script, ele também é parado com segurança.
+
+### Controle do banco local
+
+```powershell
+npm run db:up       # inicia e aguarda o PostgreSQL
+npm run db:status   # mostra saúde e porta
+npm run db:down     # para sem apagar dados
+npm run db:reset    # apaga o volume local e recria o banco
+```
+
+`db:reset` é destrutivo apenas para o volume Docker de desenvolvimento deste
+projeto. As migrations são reaplicadas automaticamente pelo servidor.
 
 ## Sua primeira aventura
 
@@ -192,7 +207,8 @@ No modo de desenvolvimento:
 
 | Conteúdo | Local padrão |
 | --- | --- |
-| Banco e assets locais | `.tmp/dev-data` |
+| Banco PostgreSQL | volume Docker `ddivination_ddivination-postgres` |
+| Assets locais | `.tmp/dev-data` |
 | Logs e registro de processos | `.tmp/dev-runtime` |
 | Build web | `apps/web/dist` |
 | Binários portáteis | `release` |
@@ -203,7 +219,9 @@ Para iniciar com outro diretório de dados:
 .\scripts\dev.ps1 -DataDir ".tmp\campanha-teste"
 ```
 
-Isso é útil para testar uma campanha nova sem misturar o banco anterior.
+Isso troca o diretório de assets e dados auxiliares. Para recriar o banco local,
+use `npm run db:reset`; para usar outra instância, defina `DATABASE_URL` antes de
+iniciar.
 
 ## Testes
 
@@ -232,7 +250,8 @@ Atalhos úteis:
 .\scripts\check-contract.ps1
 ```
 
-A suíte inclui testes Go, `go vet`, build do servidor, contratos OpenAPI,
+A suíte inicia PostgreSQL quando necessário e inclui testes Go, `go vet`, build
+do servidor, contratos OpenAPI,
 TypeScript strict, Vitest, budgets do bundle, build Vite e Playwright com
 mestre, jogador e uma cena densa de referência.
 
@@ -277,6 +296,8 @@ DDivination, o erro informa o nome e o PID do responsável pela porta.
 Use o comando a partir da raiz atual do projeto:
 
 ```powershell
+npm run db:up
+$env:DATABASE_URL = "postgres://ddivination:ddivination@127.0.0.1:54329/ddivination?sslmode=disable"
 go run ./apps/server/cmd/ddivination
 ```
 
@@ -310,7 +331,7 @@ flowchart LR
   GM["Mestre<br/>localhost"] -->|REST + WebSocket| Go["Servidor Go<br/>Huma"]
   Player["Jogadores<br/>rede local"] -->|Join + WebSocket| Go
   Display["Display<br/>rede local"] -->|Join + WebSocket| Go
-  Go --> DB[("SQLite WAL")]
+  Go --> DB[("PostgreSQL")]
   Go --> Generator["Gerador<br/>determinístico"]
   Go --> Packages["Pacotes e assets"]
   GM --> Scene["React Three Fiber<br/>+ Rapier"]
@@ -354,22 +375,21 @@ Ainda não fazem parte do vertical slice, mas agora possuem destino explícito:
 - deploy cloud e release 1.0 — Batch 22;
 - instalador desktop — não é requisito do v1.
 
-O editor mantém um rascunho reversível e o salva automaticamente no SQLite.
+O editor mantém um rascunho reversível e o salva automaticamente no PostgreSQL.
 Checkpoints marcam versões importantes; conflitos nunca sobrescrevem dados
 remotos sem confirmação. Acompanhe o [roadmap](docs/ROADMAP.md).
 
 ## Privacidade, IA e segurança
 
-- O build atual funciona offline e não exige conta; isso não é um requisito do
-  v1 online.
+- O ambiente local não exige conta, mas operação offline não é requisito do v1.
 - Códigos de entrada expiram e tokens de sessão são efêmeros.
-- Chaves de IA não entram no SQLite, logs ou pacotes.
+- Chaves de IA não entram no PostgreSQL, logs ou pacotes.
 - A IA é opcional; falhas nunca bloqueiam a geração procedural.
 - Imports validam tamanho, formato, hashes e caminhos.
 - O relatório de diagnóstico é local e não contém narrativa ou credenciais.
 
-A migração de SQLite para PostgreSQL está planejada na Batch 12. Credenciais e
-infraestrutura reais de Vercel/Supabase só entram na Batch 22. Consulte o
+O runtime SQLite foi removido na Batch 12. Credenciais e infraestrutura reais de
+Vercel/Supabase só entram na Batch 22. Consulte o
 [ADR-003](docs/decisions/ADR-003-online-first-postgresql.md).
 
 ## SRD e atribuição

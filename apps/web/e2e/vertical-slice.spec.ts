@@ -44,10 +44,23 @@ test("GM and player share an authoritative 3D dice roll", async ({ browser, page
   await player.getByRole("button", { name: "Rolar" }).click();
   await expect(player.locator(".last-roll")).toBeVisible();
   await expect(page.locator(".last-roll")).toBeVisible();
-  expect(await player.locator(".last-roll").innerText()).toBe(await page.locator(".last-roll").innerText());
+  const confirmedRoll = await player.locator(".last-roll").innerText();
+  expect(confirmedRoll).toBe(await page.locator(".last-roll").innerText());
   await expect
     .poll(async () =>
       page.evaluate(() => window.__DDIVINATION_TELEMETRY__?.connection.eventsReceived ?? 0),
     )
     .toBeGreaterThan(0);
+
+  await player.getByTestId("toggle-vtt-diagnostics").click();
+  await expect(player.getByTestId("vtt-diagnostics-panel")).toBeVisible();
+  await player.evaluate(() => window.__DDIVINATION_INTERRUPT_CONNECTION__?.());
+  await expect
+    .poll(async () =>
+      player.evaluate(() => window.__DDIVINATION_TELEMETRY__?.connection.reconnectAttempts ?? 0),
+    )
+    .toBeGreaterThan(0);
+  await expect(player.getByText("LIVE", { exact: true })).toBeVisible({ timeout: 15_000 });
+  await expect(player.locator(".last-roll")).toBeVisible();
+  expect(await player.locator(".last-roll").innerText()).toBe(confirmedRoll);
 });

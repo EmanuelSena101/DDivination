@@ -23,6 +23,7 @@ import (
 
 var (
 	ErrSessionNotFound = errors.New("session not found")
+	ErrSessionCorrupt  = errors.New("session durable state is corrupt")
 	ErrInvalidCode     = errors.New("invalid or expired join code")
 	ErrUnauthorized    = errors.New("unauthorized")
 	ErrRevision        = errors.New("session revision conflict")
@@ -63,9 +64,11 @@ type Subscriber struct {
 }
 
 type persistence interface {
-	SaveSessionEvent(context.Context, string, domain.SessionEvent) error
-	SaveSessionSnapshot(context.Context, domain.SessionState) error
-	LoadSessionSnapshot(context.Context, string) (domain.SessionState, error)
+	InitializeSession(context.Context, store.SessionInitialization) error
+	CommitSession(context.Context, store.SessionCommit) (store.SessionCommitResult, error)
+	LoadSession(context.Context, string) (store.SessionRecord, error)
+	LoadSessionEventByCommand(context.Context, string, string) (domain.SessionEvent, error)
+	LoadSessionReplay(context.Context, string, int64, int) (store.SessionReplay, error)
 	SaveSessionCredential(context.Context, string, string, string) error
 	DeleteSessionCredential(context.Context, string, string) error
 	LoadSessionCredentials(context.Context, string) (map[string]string, error)
@@ -76,7 +79,7 @@ type liveSession struct {
 	mu              sync.RWMutex
 	state           domain.SessionState
 	adventure       domain.AdventureDocument
-	code            string
+	codeHash        string
 	codeExpires     time.Time
 	byToken         map[string]string
 	admissionTokens map[string]string
@@ -89,7 +92,7 @@ type Hub struct {
 	store    persistence
 }
 
-func NewHub(s *store.Store) *Hub {
+func NewHub(s persistence) *Hub {
 	return &Hub{sessions: make(map[string]*liveSession), store: s}
 }
 
@@ -156,7 +159,7 @@ func (h *Hub) Create(ctx context.Context, adventure domain.AdventureDocument, gm
 	s := &liveSession{
 		state:           state,
 		adventure:       adventure,
-		code:            codeValue,
+		codeHash:        hashJoinCode(codeValue),
 		codeExpires:     now.Add(15 * time.Minute),
 		byToken:         map[string]string{gmToken: gm.ID},
 		admissionTokens: make(map[string]string),
@@ -165,10 +168,16 @@ func (h *Hub) Create(ctx context.Context, adventure domain.AdventureDocument, gm
 	h.mu.Lock()
 	h.sessions[sessionID] = s
 	h.mu.Unlock()
-	if err := h.store.SaveSessionSnapshot(ctx, state); err != nil {
-		return Created{}, err
-	}
-	if err := h.store.SaveSessionCredential(ctx, sessionID, gm.ID, gmToken); err != nil {
+	if err := h.store.InitializeSession(ctx, store.SessionInitialization{
+		State:                   state,
+		JoinCodeHash:            s.codeHash,
+		JoinCodeExpiresAt:       s.codeExpires,
+		CredentialParticipantID: gm.ID,
+		CredentialToken:         gmToken,
+	}); err != nil {
+		h.mu.Lock()
+		delete(h.sessions, sessionID)
+		h.mu.Unlock()
 		return Created{}, err
 	}
 	return Created{
@@ -188,7 +197,7 @@ func (h *Hub) Join(ctx context.Context, sessionID, codeValue, name, role string)
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if !s.state.Open || time.Now().UTC().After(s.codeExpires) || !sameCode(s.code, codeValue) {
+	if !s.state.Open || time.Now().UTC().After(s.codeExpires) || !sameCodeHash(s.codeHash, codeValue) {
 		return Joined{}, ErrInvalidCode
 	}
 	if !s.state.JoinOpen {
@@ -219,7 +228,7 @@ func (h *Hub) Join(ctx context.Context, sessionID, codeValue, name, role string)
 		request := domain.AdmissionRequest{ID: participantID, Name: participant.Name, Role: role, Status: "pending", CreatedAt: now, ExpiresAt: expiresAt}
 		s.state.Admissions[participantID] = request
 		s.admissionTokens[token] = participantID
-		event, err := h.commitLocked(ctx, s, participantID, "admission.requested", map[string]any{"request": request})
+		event, _, err := h.commitLocked(ctx, s, "", participantID, "admission.requested", map[string]any{"request": request}, nil, false)
 		if err != nil {
 			delete(s.state.Admissions, participantID)
 			delete(s.admissionTokens, token)
@@ -228,12 +237,16 @@ func (h *Hub) Join(ctx context.Context, sessionID, codeValue, name, role string)
 		h.broadcastLocked(s, event)
 		return Joined{SessionID: sessionID, ParticipantID: participantID, Token: token, Status: "pending", RequestID: participantID, ExpiresAt: &expiresAt}, nil
 	}
+	previousState := cloneSessionState(s.state)
+	previousTokens := cloneStringMap(s.byToken)
 	s.state.Participants[participant.ID] = participant
 	s.byToken[token] = participant.ID
 	if err := h.store.SaveSessionCredential(ctx, sessionID, participant.ID, token); err != nil {
+		s.state = previousState
+		s.byToken = previousTokens
 		return Joined{}, err
 	}
-	event, err := h.commitLocked(ctx, s, participant.ID, "participant.joined", map[string]any{
+	event, _, err := h.commitLocked(ctx, s, "", participant.ID, "participant.joined", map[string]any{
 		"participant": map[string]any{
 			"id":         participant.ID,
 			"name":       participant.Name,
@@ -242,8 +255,11 @@ func (h *Hub) Join(ctx context.Context, sessionID, codeValue, name, role string)
 			"joinedAt":   participant.JoinedAt,
 			"lastSeenAt": participant.LastSeenAt,
 		},
-	})
+	}, nil, false)
 	if err != nil {
+		_ = h.store.DeleteSessionCredential(context.Background(), sessionID, participant.ID)
+		s.state = previousState
+		s.byToken = previousTokens
 		return Joined{}, err
 	}
 	h.broadcastLocked(s, event)
@@ -279,27 +295,58 @@ func (h *Hub) AdmissionStatus(sessionID, requestID, token string) (Joined, error
 }
 
 func (h *Hub) Subscribe(sessionID, token string) (*Subscriber, Snapshot, error) {
-	s, err := h.find(sessionID)
+	sub, messages, err := h.SubscribeFrom(sessionID, token, nil)
 	if err != nil {
 		return nil, Snapshot{}, err
+	}
+	if len(messages) != 1 {
+		h.Unsubscribe(sessionID, sub)
+		return nil, Snapshot{}, errors.New("initial subscription did not produce a snapshot")
+	}
+	snapshot, ok := messages[0].(Snapshot)
+	if !ok {
+		h.Unsubscribe(sessionID, sub)
+		return nil, Snapshot{}, errors.New("initial subscription produced an invalid snapshot")
+	}
+	return sub, snapshot, nil
+}
+
+func (h *Hub) SubscribeFrom(sessionID, token string, lastRevision *int64) (*Subscriber, []any, error) {
+	s, err := h.find(sessionID)
+	if err != nil {
+		return nil, nil, err
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	participant, ok := participantByToken(s, token)
 	if !ok {
-		return nil, Snapshot{}, ErrUnauthorized
+		return nil, nil, ErrUnauthorized
 	}
 	now := time.Now().UTC()
+	previousState := cloneSessionState(s.state)
 	participant.Connected = true
 	participant.LastSeenAt = now
 	s.state.Participants[participant.ID] = participant
-	if event, commitErr := h.commitLocked(context.Background(), s, participant.ID, "participant.presence", map[string]any{"participantId": participant.ID, "connected": true, "lastSeenAt": participant.LastSeenAt}); commitErr == nil {
+	if event, _, commitErr := h.commitLocked(context.Background(), s, "", participant.ID, "participant.presence", map[string]any{"participantId": participant.ID, "connected": true, "lastSeenAt": participant.LastSeenAt}, nil, false); commitErr == nil {
 		h.broadcastLocked(s, event)
+	} else {
+		s.state = previousState
+		return nil, nil, commitErr
 	}
 	sub := &Subscriber{Participant: participant, Events: make(chan domain.SessionEvent, 128), Revoked: make(chan struct{})}
 	s.subscribers[sub] = struct{}{}
+	if lastRevision != nil && *lastRevision >= 0 && *lastRevision <= s.state.Revision {
+		replay, replayErr := h.store.LoadSessionReplay(context.Background(), sessionID, *lastRevision, 500)
+		if replayErr == nil && replay.Complete {
+			messages := make([]any, 0, len(replay.Events))
+			for _, event := range replay.Events {
+				messages = append(messages, projectEvent(participant, event, s.adventure))
+			}
+			return sub, messages, nil
+		}
+	}
 	state, adventure := filteredSnapshot(s.state, s.adventure, participant)
-	return sub, Snapshot{Type: "session.snapshot", State: state, Adventure: adventure}, nil
+	return sub, []any{Snapshot{Type: "session.snapshot", State: state, Adventure: adventure}}, nil
 }
 
 func (h *Hub) Unsubscribe(sessionID string, sub *Subscriber) {
@@ -320,12 +367,15 @@ func (h *Hub) Unsubscribe(sessionID string, sub *Subscriber) {
 				return
 			}
 		}
+		previousState := cloneSessionState(s.state)
 		participant.Connected = false
 		participant.LastSeenAt = time.Now().UTC()
 		s.state.Participants[participant.ID] = participant
-		event, commitErr := h.commitLocked(context.Background(), s, participant.ID, "participant.presence", map[string]any{"participantId": participant.ID, "connected": false, "lastSeenAt": participant.LastSeenAt})
+		event, _, commitErr := h.commitLocked(context.Background(), s, "", participant.ID, "participant.presence", map[string]any{"participantId": participant.ID, "connected": false, "lastSeenAt": participant.LastSeenAt}, nil, false)
 		if commitErr == nil {
 			h.broadcastLocked(s, event)
+		} else {
+			s.state = previousState
 		}
 	}
 	s.mu.Unlock()
@@ -342,21 +392,72 @@ func (h *Hub) HandleCommand(ctx context.Context, sessionID, token string, comman
 	if !ok {
 		return domain.SessionEvent{}, ErrUnauthorized
 	}
+	if strings.TrimSpace(command.ID) == "" {
+		return domain.SessionEvent{}, ErrInvalidCommand
+	}
+	if existing, lookupErr := h.store.LoadSessionEventByCommand(ctx, sessionID, command.ID); lookupErr == nil {
+		return existing, nil
+	} else if !errors.Is(lookupErr, store.ErrNotFound) {
+		return domain.SessionEvent{}, lookupErr
+	}
 	if command.ExpectedRevision != s.state.Revision {
 		return domain.SessionEvent{}, ErrRevision
 	}
+	previousState := cloneSessionState(s.state)
+	previousTokens := cloneStringMap(s.byToken)
+	previousAdmissionTokens := cloneStringMap(s.admissionTokens)
 	participant.LastSeenAt = time.Now().UTC()
 	s.state.Participants[participant.ID] = participant
-	payload, revokedID, err := h.applyAdminCommandLocked(ctx, s, participant, command)
+	payload, revokedID, err := h.applyAdminCommandLocked(s, participant, command)
 	if errors.Is(err, errNotAdminCommand) {
 		payload, err = applyCommand(&s.state, s.adventure, participant, command)
 	}
 	if err != nil {
+		s.state = previousState
+		s.byToken = previousTokens
+		s.admissionTokens = previousAdmissionTokens
 		return domain.SessionEvent{}, err
 	}
-	event, err := h.commitLocked(ctx, s, participant.ID, eventType(command.Type), payload)
+	credentialParticipantID, credentialToken := "", ""
+	if command.Type == "admission.approve" {
+		credentialParticipantID, _ = command.Payload["requestId"].(string)
+		for candidate, participantID := range s.byToken {
+			if participantID == credentialParticipantID && !strings.HasPrefix(candidate, "sha256:") {
+				credentialToken = candidate
+				break
+			}
+		}
+		if credentialToken == "" {
+			s.state = previousState
+			s.byToken = previousTokens
+			s.admissionTokens = previousAdmissionTokens
+			return domain.SessionEvent{}, ErrInvalidCommand
+		}
+		if err := h.store.SaveSessionCredential(ctx, sessionID, credentialParticipantID, credentialToken); err != nil {
+			s.state = previousState
+			s.byToken = previousTokens
+			s.admissionTokens = previousAdmissionTokens
+			return domain.SessionEvent{}, err
+		}
+	}
+	event, duplicate, err := h.commitLocked(ctx, s, command.ID, participant.ID, eventType(command.Type), payload, nil, false)
 	if err != nil {
+		if credentialParticipantID != "" {
+			_ = h.store.DeleteSessionCredential(context.Background(), sessionID, credentialParticipantID)
+		}
+		s.state = previousState
+		s.byToken = previousTokens
+		s.admissionTokens = previousAdmissionTokens
 		return domain.SessionEvent{}, err
+	}
+	if duplicate {
+		if credentialParticipantID != "" {
+			_ = h.store.DeleteSessionCredential(context.Background(), sessionID, credentialParticipantID)
+		}
+		s.state = previousState
+		s.byToken = previousTokens
+		s.admissionTokens = previousAdmissionTokens
+		return event, nil
 	}
 	for sub := range s.subscribers {
 		if changed, ok := s.state.Participants[sub.Participant.ID]; ok {
@@ -365,6 +466,7 @@ func (h *Hub) HandleCommand(ctx context.Context, sessionID, token string, comman
 	}
 	h.broadcastLocked(s, event)
 	if revokedID != "" {
+		_ = h.store.DeleteSessionCredential(context.Background(), sessionID, revokedID)
 		for sub := range s.subscribers {
 			if sub.Participant.ID == revokedID {
 				sub.revokeOnce.Do(func() { close(sub.Revoked) })
@@ -376,7 +478,7 @@ func (h *Hub) HandleCommand(ctx context.Context, sessionID, token string, comman
 
 var errNotAdminCommand = errors.New("not an administrative command")
 
-func (h *Hub) applyAdminCommandLocked(ctx context.Context, s *liveSession, actor domain.Participant, command domain.SessionCommand) (map[string]any, string, error) {
+func (h *Hub) applyAdminCommandLocked(s *liveSession, actor domain.Participant, command domain.SessionCommand) (map[string]any, string, error) {
 	switch command.Type {
 	case "participant.role.set", "participant.remove", "token.assign", "permissions.set", "admission.set", "admission.approve", "admission.deny":
 		if actor.Role != "gm" {
@@ -419,9 +521,6 @@ func (h *Hub) applyAdminCommandLocked(ctx context.Context, s *liveSession, actor
 			if participantID == id {
 				delete(s.byToken, storedToken)
 			}
-		}
-		if err := h.store.DeleteSessionCredential(ctx, s.state.ID, id); err != nil {
-			return nil, "", err
 		}
 		return map[string]any{"participantId": id, "tokenOwners": s.state.TokenOwners}, id, nil
 	case "token.assign":
@@ -475,9 +574,6 @@ func (h *Hub) applyAdminCommandLocked(ctx context.Context, s *liveSession, actor
 		s.state.Participants[id], s.byToken[pendingToken] = participant, id
 		request.Status = "approved"
 		s.state.Admissions[id] = request
-		if err := h.store.SaveSessionCredential(ctx, s.state.ID, id, pendingToken); err != nil {
-			return nil, "", err
-		}
 		return map[string]any{"requestId": id, "participant": participant}, "", nil
 	case "admission.deny":
 		id, _ := command.Payload["requestId"].(string)
@@ -514,36 +610,80 @@ func (h *Hub) RotateCode(ctx context.Context, sessionID, token string) (CodeStat
 	if err != nil {
 		return CodeStatus{}, err
 	}
-	s.code, s.codeExpires = code, time.Now().UTC().Add(15*time.Minute)
-	event, err := h.commitLocked(ctx, s, participant.ID, "session.code.rotated", map[string]any{"expiresAt": s.codeExpires})
+	previousHash, previousExpiry := s.codeHash, s.codeExpires
+	s.codeHash, s.codeExpires = hashJoinCode(code), time.Now().UTC().Add(15*time.Minute)
+	event, _, err := h.commitLocked(
+		ctx,
+		s,
+		"",
+		participant.ID,
+		"session.code.rotated",
+		map[string]any{"expiresAt": s.codeExpires},
+		&store.SessionAccessUpdate{CodeHash: s.codeHash, ExpiresAt: s.codeExpires},
+		false,
+	)
 	if err != nil {
+		s.codeHash, s.codeExpires = previousHash, previousExpiry
 		return CodeStatus{}, err
 	}
 	h.broadcastLocked(s, event)
 	return CodeStatus{Code: code, ExpiresAt: s.codeExpires, JoinOpen: s.state.JoinOpen, ApprovalRequired: s.state.ApprovalRequired}, nil
 }
 
-func (h *Hub) commitLocked(ctx context.Context, s *liveSession, actorID, eventType string, payload map[string]any) (domain.SessionEvent, error) {
+func (h *Hub) commitLocked(
+	ctx context.Context,
+	s *liveSession,
+	commandID, actorID, eventType string,
+	payload map[string]any,
+	access *store.SessionAccessUpdate,
+	forceSnapshot bool,
+) (domain.SessionEvent, bool, error) {
+	expectedRevision := s.state.Revision
 	s.state.Revision++
 	event := domain.SessionEvent{Revision: s.state.Revision, Type: eventType, ActorID: actorID, OccurredAt: time.Now().UTC(), Payload: payload}
-	if err := h.store.SaveSessionEvent(ctx, s.state.ID, event); err != nil {
-		s.state.Revision--
-		return domain.SessionEvent{}, err
+	result, err := h.store.CommitSession(ctx, store.SessionCommit{
+		SessionID:        s.state.ID,
+		CommandID:        commandID,
+		ExpectedRevision: expectedRevision,
+		Event:            event,
+		State:            s.state,
+		ForceSnapshot:    forceSnapshot,
+		Access:           access,
+	})
+	if err != nil {
+		s.state.Revision = expectedRevision
+		if errors.Is(err, store.ErrRevisionConflict) {
+			return domain.SessionEvent{}, false, ErrRevision
+		}
+		return domain.SessionEvent{}, false, err
 	}
-	if err := h.store.SaveSessionSnapshot(ctx, s.state); err != nil {
-		return domain.SessionEvent{}, err
+	if result.Duplicate {
+		s.state.Revision = expectedRevision
+		return result.Event, true, nil
 	}
-	return event, nil
+	return result.Event, false, nil
 }
 
 func (h *Hub) broadcastLocked(s *liveSession, event domain.SessionEvent) {
 	for sub := range s.subscribers {
-		if canReceive(sub.Participant, event, s.adventure) {
-			select {
-			case sub.Events <- event:
-			default:
-			}
+		projected := projectEvent(sub.Participant, event, s.adventure)
+		select {
+		case sub.Events <- projected:
+		default:
 		}
+	}
+}
+
+func projectEvent(participant domain.Participant, event domain.SessionEvent, adventure domain.AdventureDocument) domain.SessionEvent {
+	if canReceive(participant, event, adventure) {
+		return event
+	}
+	return domain.SessionEvent{
+		Revision:   event.Revision,
+		Type:       "session.revision",
+		ActorID:    "",
+		OccurredAt: event.OccurredAt,
+		Payload:    map[string]any{},
 	}
 }
 
@@ -559,18 +699,9 @@ func (h *Hub) Close(ctx context.Context, sessionID, token string) error {
 		return ErrUnauthorized
 	}
 	s.state.Open = false
-	s.state.Revision++
-	event := domain.SessionEvent{
-		Revision:   s.state.Revision,
-		Type:       "session.closed",
-		ActorID:    participant.ID,
-		OccurredAt: time.Now().UTC(),
-		Payload:    map[string]any{},
-	}
-	if err := h.store.SaveSessionEvent(ctx, sessionID, event); err != nil {
-		return err
-	}
-	if err := h.store.SaveSessionSnapshot(ctx, s.state); err != nil {
+	event, _, err := h.commitLocked(ctx, s, "", participant.ID, "session.closed", map[string]any{}, nil, true)
+	if err != nil {
+		s.state.Open = true
 		return err
 	}
 	for sub := range s.subscribers {
@@ -590,22 +721,32 @@ func (h *Hub) find(id string) (*liveSession, error) {
 		return s, nil
 	}
 	ctx := context.Background()
-	state, err := h.store.LoadSessionSnapshot(ctx, id)
+	record, err := h.store.LoadSession(ctx, id)
 	if err != nil {
-		return nil, ErrSessionNotFound
+		if errors.Is(err, store.ErrNotFound) {
+			return nil, ErrSessionNotFound
+		}
+		if errors.Is(err, store.ErrCorruptSession) {
+			return nil, fmt.Errorf("%w: %v", ErrSessionCorrupt, err)
+		}
+		return nil, fmt.Errorf("restore session head: %w", err)
 	}
-	adventure, err := h.store.GetAdventure(ctx, state.AdventureID)
+	adventure, err := h.store.GetAdventure(ctx, record.State.AdventureID)
 	if err != nil {
-		return nil, ErrSessionNotFound
+		if errors.Is(err, store.ErrNotFound) {
+			return nil, fmt.Errorf("%w: referenced adventure %s is missing", ErrSessionCorrupt, record.State.AdventureID)
+		}
+		return nil, fmt.Errorf("restore session adventure: %w", err)
 	}
 	credentials, err := h.store.LoadSessionCredentials(ctx, id)
 	if err != nil {
-		return nil, ErrSessionNotFound
+		return nil, fmt.Errorf("restore session credentials: %w", err)
 	}
 	restored := &liveSession{
-		state:           state,
+		state:           record.State,
 		adventure:       adventure,
-		codeExpires:     time.Time{},
+		codeHash:        record.JoinCodeHash,
+		codeExpires:     record.JoinCodeExpiresAt,
 		byToken:         credentials,
 		admissionTokens: make(map[string]string),
 		subscribers:     make(map[*Subscriber]struct{}),
@@ -771,6 +912,33 @@ func filteredSnapshot(state domain.SessionState, adventure domain.AdventureDocum
 	}
 	cleanState.Admissions = nil
 	cleanState.Rolls = filterRolls(cleanState.Rolls, participant)
+	for floorID, cells := range cleanState.RevealedCells {
+		visibleCells := cells[:0]
+		for _, cell := range cells {
+			if !cellIsSecret(adventure, floorID, cell.X, cell.Z) {
+				visibleCells = append(visibleCells, cell)
+			}
+		}
+		cleanState.RevealedCells[floorID] = visibleCells
+	}
+	for tokenID, position := range cleanState.TokenPositions {
+		floorID := cleanState.TokenFloors[tokenID]
+		if tokenIsHiddenOrSecret(adventure, tokenID) || cellIsSecret(adventure, floorID, position.X, position.Z) {
+			delete(cleanState.TokenPositions, tokenID)
+			delete(cleanState.TokenFloors, tokenID)
+			delete(cleanState.TokenOwners, tokenID)
+		}
+	}
+	visibleInitiative := cleanState.Initiative.Entries[:0]
+	for _, entry := range cleanState.Initiative.Entries {
+		if _, visible := cleanState.TokenPositions[entry.TokenID]; visible {
+			visibleInitiative = append(visibleInitiative, entry)
+		}
+	}
+	cleanState.Initiative.Entries = visibleInitiative
+	if cleanState.Initiative.ActiveIndex >= len(visibleInitiative) {
+		cleanState.Initiative.ActiveIndex = 0
+	}
 
 	encodedAdventure, _ := json.Marshal(adventure)
 	var cleanAdventure domain.AdventureDocument
@@ -831,17 +999,18 @@ func canReceive(participant domain.Participant, event domain.SessionEvent, adven
 	if strings.HasPrefix(event.Type, "admission.") && event.Type != "admission.approved" {
 		return participant.Role == "gm"
 	}
+	if participant.Role != "gm" && (event.Type == "token.moved" || event.Type == "fog.changed" || event.Type == "map.pinged") {
+		floorID, _ := event.Payload["floorId"].(string)
+		x, okX := intValue(event.Payload["x"])
+		z, okZ := intValue(event.Payload["z"])
+		if okX && okZ && cellIsSecret(adventure, floorID, x, z) {
+			return false
+		}
+	}
 	if participant.Role != "gm" && event.Type == "token.moved" {
 		tokenID, _ := event.Payload["tokenId"].(string)
-		for _, floor := range adventure.Floors {
-			for _, entity := range floor.Entities {
-				if entity.ID != tokenID {
-					continue
-				}
-				if entity.Hidden || roomIsSecret(floor, entity.RoomID) {
-					return false
-				}
-			}
+		if tokenIsHiddenOrSecret(adventure, tokenID) {
+			return false
 		}
 	}
 	if event.Type != "dice.rolled" {
@@ -857,6 +1026,31 @@ func canReceive(participant domain.Participant, event domain.SessionEvent, adven
 	default:
 		return true
 	}
+}
+
+func tokenIsHiddenOrSecret(adventure domain.AdventureDocument, tokenID string) bool {
+	for _, floor := range adventure.Floors {
+		for _, entity := range floor.Entities {
+			if entity.ID == tokenID {
+				return entity.Hidden || roomIsSecret(floor, entity.RoomID)
+			}
+		}
+	}
+	return false
+}
+
+func cellIsSecret(adventure domain.AdventureDocument, floorID string, x, z int) bool {
+	for _, floor := range adventure.Floors {
+		if floor.ID != floorID {
+			continue
+		}
+		for _, tile := range floor.Tiles {
+			if tile.X == x && tile.Z == z {
+				return roomIsSecret(floor, tile.RoomID)
+			}
+		}
+	}
+	return false
 }
 
 func roomIsSecret(floor domain.FloorMap, roomID string) bool {
@@ -1032,4 +1226,35 @@ func sameCode(expected, actual string) bool {
 	actual = strings.TrimSpace(actual)
 	return len(expected) == len(actual) &&
 		subtle.ConstantTimeCompare([]byte(expected), []byte(actual)) == 1
+}
+
+func hashJoinCode(code string) string {
+	hash := sha256.Sum256([]byte(strings.TrimSpace(code)))
+	return hex.EncodeToString(hash[:])
+}
+
+func sameCodeHash(expectedHash, actual string) bool {
+	actualHash := hashJoinCode(actual)
+	return len(expectedHash) == len(actualHash) &&
+		subtle.ConstantTimeCompare([]byte(expectedHash), []byte(actualHash)) == 1
+}
+
+func cloneSessionState(state domain.SessionState) domain.SessionState {
+	payload, err := json.Marshal(state)
+	if err != nil {
+		return state
+	}
+	var cloned domain.SessionState
+	if err := json.Unmarshal(payload, &cloned); err != nil {
+		return state
+	}
+	return cloned
+}
+
+func cloneStringMap(source map[string]string) map[string]string {
+	cloned := make(map[string]string, len(source))
+	for key, value := range source {
+		cloned[key] = value
+	}
+	return cloned
 }

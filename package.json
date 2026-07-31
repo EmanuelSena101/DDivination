@@ -8,6 +8,10 @@
   "scripts": {
     "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev.ps1",
     "stop": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/stop.ps1",
+    "db:up": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/database.ps1 -Action Up",
+    "db:down": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/database.ps1 -Action Down",
+    "db:reset": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/database.ps1 -Action Reset",
+    "db:status": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/database.ps1 -Action Status",
     "test:all": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1",
     "dev:web": "npm --workspace apps/web run dev",
     "build:web": "npm --workspace apps/web run build",

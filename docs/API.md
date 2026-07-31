@@ -124,6 +124,16 @@ Conexão:
 GET /api/v1/sessions/{id}/stream?token={token}
 ```
 
+Ao reconectar, o cliente acrescenta a última revisão aplicada:
+
+```text
+GET /api/v1/sessions/{id}/stream?token={token}&lastRevision=12
+```
+
+Se todos os eventos seguintes ainda estiverem na janela do log, o servidor os
+envia em ordem. Caso a revisão seja anterior à compactação, envia um
+`session.snapshot` consistente. Um heartbeat WebSocket detecta clientes mortos.
+
 O cliente envia comandos:
 
 ```json
@@ -136,7 +146,13 @@ O cliente envia comandos:
 ```
 
 O servidor transmite snapshots e eventos autoritativos. Permissões e conteúdo
-secreto são filtrados no servidor.
+secreto são filtrados no servidor tanto no fluxo ao vivo quanto em replay e
+snapshot. Eventos restritos viram `session.revision` sem payload para que o
+cliente avance a revisão sem receber o segredo.
+
+O identificador do comando é obrigatório e idempotente. Um retry devolve o
+evento originalmente confirmado; `expectedRevision` divergente é rejeitada sem
+gravação. O evento só é transmitido depois que PostgreSQL confirma a transação.
 
 Comandos administrativos são exclusivos do GM: `participant.role.set`,
 `participant.remove`, `token.assign`, `permissions.set`, `admission.set`,

@@ -28,6 +28,9 @@ export default defineConfig({
     env: {
       DDIVINATION_WEB_DIR: path.resolve("dist"),
       DDIVINATION_DATA_DIR: path.resolve("../../.tmp/e2e-data"),
+      DATABASE_URL:
+        process.env.DATABASE_URL ??
+        "postgres://ddivination:ddivination@127.0.0.1:54329/ddivination?sslmode=disable",
     },
   },
 });

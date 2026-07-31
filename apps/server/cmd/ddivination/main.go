@@ -22,8 +22,7 @@ import (
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
 	dataDir := applicationDataDir()
-	dbPath := filepath.Join(dataDir, "ddivination.sqlite3")
-	db, err := store.Open(dbPath)
+	db, err := store.Open(os.Getenv("DATABASE_URL"))
 	if err != nil {
 		logger.Error("database startup failed", "error", err)
 		os.Exit(1)

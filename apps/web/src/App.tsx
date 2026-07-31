@@ -738,6 +738,15 @@ function VTT() {
   const canPing = role === "gm" || (role === "player" && Boolean(session?.permissions.playerCanPing));
   const canRollDice = role === "gm" || (role === "player" && Boolean(session?.permissions.playerCanRollDice));
   const canManageInitiative = role === "gm" || (role === "player" && Boolean(session?.permissions.playerCanManageInitiative));
+  const connectionLabel = !session
+    ? "SOLO"
+    : connected
+      ? "LIVE"
+      : connectionTelemetry.status === "reconnecting"
+        ? "RECONNECTING"
+        : connectionTelemetry.status === "error" || connectionTelemetry.status === "closed"
+          ? "OFFLINE"
+          : "CONNECTING";
 
   return (
     <main className="vtt-layout">
@@ -913,7 +922,7 @@ function VTT() {
           </div>
           <div className="connection-pill">
             <i className={connected ? "online" : ""} />
-            {session ? (connected ? "LIVE" : "CONNECTING") : "SOLO"}
+            {connectionLabel}
           </div>
           <div className="tool-group">
             {role === "gm" && !session && (

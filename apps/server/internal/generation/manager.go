@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/EmanuelSena101/DDivination/apps/server/internal/domain"
-	"github.com/EmanuelSena101/DDivination/apps/server/internal/store"
 )
 
 var ErrInvalidTransition = errors.New("invalid generation run transition")
@@ -17,8 +16,14 @@ type Reporter func(stage string, progress int, diagnostics ...string) error
 
 type Executor func(ctx context.Context, report Reporter) (adventureID string, err error)
 
+type persistence interface {
+	SaveGenerationRun(context.Context, domain.GenerationRun) error
+	GetGenerationRun(context.Context, string) (domain.GenerationRun, error)
+	ListGenerationRuns(context.Context, int) ([]domain.GenerationRun, error)
+}
+
 type Manager struct {
-	store  *store.Store
+	store  persistence
 	logger *slog.Logger
 
 	stateMu sync.Mutex
@@ -27,7 +32,7 @@ type Manager struct {
 	streams map[string]map[chan domain.GenerationRun]struct{}
 }
 
-func NewManager(database *store.Store, logger *slog.Logger) *Manager {
+func NewManager(database persistence, logger *slog.Logger) *Manager {
 	return &Manager{
 		store:   database,
 		logger:  logger,

@@ -10,7 +10,7 @@ na tag `legacy-python-mvp`.
 O rewrite possui uma fundação executável e um vertical slice funcional:
 
 - servidor Go 1.26 com API Huma/OpenAPI;
-- persistência SQLite em WAL e migrations incorporadas;
+- persistência PostgreSQL com migrations incorporadas e checksum;
 - geração procedural determinística e bilíngue;
 - execuções de geração assíncronas, observáveis e canceláveis;
 - mapas semânticos com múltiplos andares;
@@ -18,6 +18,8 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 - sessões LAN com papéis `gm`, `player` e `display`;
 - movimento autoritativo, fog manual, ping, medição e iniciativa;
 - dados 3D com resultado autoritativo e histórico;
+- log transacional de sessão, idempotência, snapshots, replay e recuperação após
+  reinício;
 - importação validada de PNG, WebP e GLB;
 - pacotes `.ddivination` e exportações Markdown, HTML e PNG;
 - adapter opcional de IA com fallback procedural;
@@ -66,14 +68,15 @@ validação incluiu 32 testes Vitest, 8 cenários Playwright e todos os gates lo
 Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-011-table-administration.md](batches/BATCH-011-table-administration.md).
 
-## Próxima batch
+## Batch em validação
 
 `BATCH-012 — Durabilidade em tempo real e migração para PostgreSQL`
 
-A próxima batch migrará a persistência operacional de SQLite para PostgreSQL e
-consolidará replay, snapshots periódicos, reconexão por revisão e recuperação de
-sessões abertas após reinício. Ela prepara contratos compatíveis com Supabase,
-mas continuará local/CI e não criará infraestrutura cloud. Seu escopo está no
+A implementação substituiu toda a persistência operacional por PostgreSQL e
+consolidou replay, snapshots periódicos, reconexão por revisão, heartbeat,
+retenção e recuperação de sessões abertas após reinício. Contratos permanecem
+independentes do Supabase; infraestrutura cloud continua na Batch 22. A batch
+aguarda PR e CI remoto para mudar de `VALIDATING` para `DONE`. Consulte o
 [diário da Batch 12](batches/BATCH-012-realtime-durability.md).
 
 ## Roadmap ampliado após auditoria do legado
@@ -90,8 +93,7 @@ combate manual e automação permanecem expansões pós-v1 nas Batches 23 e 24.
 
 ## Direção de arquitetura aprovada
 
-O requisito de operação offline-first foi removido. O estado atual continua
-executável com Go, SQLite e LAN enquanto a transição é construída, mas o destino
-do v1 é online-first: PostgreSQL a partir da Batch 12 e Vercel + Supabase na
+O requisito de operação offline-first foi removido. O estado atual executa com
+Go, PostgreSQL e LAN; o destino do v1 é online-first com Vercel + Supabase na
 Batch 22. A decisão e seus limites estão no
 [ADR-003](decisions/ADR-003-online-first-postgresql.md).

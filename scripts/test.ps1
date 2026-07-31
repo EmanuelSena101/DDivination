@@ -10,6 +10,9 @@ $repoRoot = Get-DDivinationRepoRoot
 $testOutputDir = Join-Path $repoRoot ".tmp\test-bin"
 $testBinary = Join-Path $testOutputDir "ddivination-test.exe"
 $previousPath = $env:PATH
+$previousDatabaseURL = [Environment]::GetEnvironmentVariable("DATABASE_URL", "Process")
+$previousTestDatabaseURL = [Environment]::GetEnvironmentVariable("TEST_DATABASE_URL", "Process")
+$databaseManaged = $false
 
 function Invoke-DDivinationStep {
     param(
@@ -33,6 +36,13 @@ try {
     $nodeTools = Resolve-DDivinationNodeTools
     $goDir = Split-Path -Parent $goExe
     $env:PATH = $goDir + [System.IO.Path]::PathSeparator + $previousPath
+
+    if ([string]::IsNullOrWhiteSpace($env:DATABASE_URL)) {
+        & (Join-Path $repoRoot "scripts\database.ps1") -Action Up
+        $env:DATABASE_URL = "postgres://ddivination:ddivination@127.0.0.1:54329/ddivination?sslmode=disable"
+        $databaseManaged = $true
+    }
+    $env:TEST_DATABASE_URL = $env:DATABASE_URL
 
     if (-not (Test-Path -LiteralPath (Join-Path $repoRoot "node_modules"))) {
         if ($SkipInstall) {
@@ -81,5 +91,18 @@ try {
     Write-Host "Todos os testes selecionados passaram." -ForegroundColor Green
 } finally {
     $env:PATH = $previousPath
+    if ($databaseManaged) {
+        & (Join-Path $repoRoot "scripts\database.ps1") -Action Down 2>$null
+    }
+    if ($null -eq $previousDatabaseURL) {
+        Remove-Item Env:DATABASE_URL -ErrorAction SilentlyContinue
+    } else {
+        $env:DATABASE_URL = $previousDatabaseURL
+    }
+    if ($null -eq $previousTestDatabaseURL) {
+        Remove-Item Env:TEST_DATABASE_URL -ErrorAction SilentlyContinue
+    } else {
+        $env:TEST_DATABASE_URL = $previousTestDatabaseURL
+    }
     Pop-Location
 }

@@ -31,7 +31,8 @@ antes de o restante do produto estar pronto.
 - O servidor continuará autoritativo. Realtime distribui eventos, mas não permite
   que clientes gravem comandos confirmados diretamente no banco.
 - Estado durável de sessões usa eventos, revisões monotônicas, idempotência e
-  snapshots. A retenção será curta e configurável, adequada a mesas temporárias.
+  snapshots. A retenção é curta e configurável, adequada a mesas temporárias:
+  500 eventos recentes e 24 horas para mesas encerradas por padrão.
 - A integração real com Supabase e Vercel, incluindo Auth, RLS, Realtime, Storage,
   secrets, observabilidade e deploy, será feita na Batch 22 como release v1.
 
@@ -53,7 +54,6 @@ antes de o restante do produto estar pronto.
 
 ## Não decidido aqui
 
-- janela final de retenção de mesas encerradas;
 - provedor alternativo para o servidor Go caso o runtime da Vercel não passe no
   gate técnico;
 - política comercial, quotas e planos pagos;

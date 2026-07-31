@@ -31,6 +31,12 @@ import type {
   SessionState,
 } from "./types";
 
+declare global {
+  interface Window {
+    __DDIVINATION_INTERRUPT_CONNECTION__?: () => void;
+  }
+}
+
 interface SessionSnapshotMessage {
   type: "session.snapshot";
   state: SessionState;
@@ -409,8 +415,12 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
   },
   connect: ({ sessionId, participantId, token, role, state, adventure, reconnecting = false }) => {
-    get().socket?.close();
-    const socket = new WebSocket(sessionWebSocketURL(sessionId, token));
+    const currentState = get();
+    currentState.socket?.close();
+    const resumedState = reconnecting ? (currentState.session ?? state) : state;
+    const resumedAdventure = reconnecting ? (currentState.adventure ?? adventure) : adventure;
+    const resumeRevision = reconnecting ? resumedState.revision : undefined;
+    const socket = new WebSocket(sessionWebSocketURL(sessionId, token, resumeRevision));
     const initialConnectionTelemetry = reconnecting
       ? reduceConnectionTelemetry(get().connectionTelemetry, { type: "connect" })
       : reduceConnectionTelemetry(createConnectionTelemetry(), { type: "connect" });
@@ -543,9 +553,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       participantId,
       token,
       role,
-      session: state,
-      adventure,
-      floorId: state.activeFloorId || adventure.floors[0]?.id || null,
+      session: resumedState,
+      adventure: resumedAdventure,
+      floorId: resumedState.activeFloorId || resumedAdventure.floors[0]?.id || null,
       editorPast: [],
       editorFuture: [],
       editorDirty: false,
@@ -590,6 +600,20 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   clearError: () => set({ error: null }),
 }));
+
+if (typeof window !== "undefined") {
+  window.__DDIVINATION_INTERRUPT_CONNECTION__ = () => {
+    const socket = useAppStore.getState().socket;
+    if (!socket) return;
+    // A synthetic abnormal close makes the reconnect test deterministic even
+    // when the browser/server finish a graceful close handshake at different
+    // times. connect() closes this superseded socket before opening its resume
+    // stream, so the hook cannot leave a second live connection behind.
+    socket.dispatchEvent(
+      new CloseEvent("close", { code: 4001, reason: "diagnostic reconnect" }),
+    );
+  };
+}
 
 function gridEditError(rejection: NonNullable<ReturnType<typeof applyGridEdit>["rejection"]>): string {
   switch (rejection) {

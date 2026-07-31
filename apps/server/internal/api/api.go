@@ -39,7 +39,7 @@ type LANEnabler interface {
 }
 
 type Server struct {
-	store      *store.Store
+	store      store.Persistence
 	hub        *session.Hub
 	lan        LANEnabler
 	logger     *slog.Logger
@@ -54,7 +54,7 @@ type Handlers struct {
 	LAN   http.Handler
 }
 
-func New(s *store.Store, hub *session.Hub, lan LANEnabler, logger *slog.Logger, webDir string, webFS fs.FS, assetsDir string) *Server {
+func New(s store.Persistence, hub *session.Hub, lan LANEnabler, logger *slog.Logger, webDir string, webFS fs.FS, assetsDir string) *Server {
 	server := &Server{
 		store: s, hub: hub, lan: lan, logger: logger, webDir: webDir, webFS: webFS,
 		assets:     asset.NewManager(assetsDir, s),
@@ -66,10 +66,16 @@ func New(s *store.Store, hub *session.Hub, lan LANEnabler, logger *slog.Logger, 
 	return server
 }
 
+// NewContractServer registers the complete HTTP contract without requiring a
+// live database. It is used only to render OpenAPI; handlers are not executed.
+func NewContractServer(logger *slog.Logger) *Server {
+	return &Server{logger: logger}
+}
+
 func (s *Server) Handlers() Handlers {
 	localMux := http.NewServeMux()
 	config := huma.DefaultConfig("DDivination API", "1.0.0-alpha.1")
-	config.Info.Description = "Local-first 3D VTT and deterministic 5E-compatible adventure generator."
+	config.Info.Description = "Online-first 3D VTT and deterministic 5E-compatible adventure generator."
 	localAPI := humago.New(localMux, config)
 	s.registerREST(localAPI)
 	localMux.HandleFunc("GET /api/v1/generation-runs/{id}/stream", s.streamGeneration)
@@ -543,6 +549,9 @@ func (s *Server) joinSession(ctx context.Context, input *joinSessionInput) (*joi
 	if errors.Is(err, session.ErrSessionNotFound) {
 		return nil, huma.NewError(http.StatusNotFound, "session not found")
 	}
+	if errors.Is(err, session.ErrSessionCorrupt) {
+		return nil, huma.NewError(http.StatusInternalServerError, "session recovery failed", err)
+	}
 	if err != nil {
 		return nil, huma.NewError(http.StatusUnauthorized, "could not join session", err)
 	}
@@ -586,6 +595,9 @@ func (s *Server) joinStatus(_ context.Context, input *joinStatusInput) (*joinSta
 	if errors.Is(err, session.ErrSessionNotFound) {
 		return nil, huma.NewError(http.StatusNotFound, "session not found")
 	}
+	if errors.Is(err, session.ErrSessionCorrupt) {
+		return nil, huma.NewError(http.StatusInternalServerError, "session recovery failed", err)
+	}
 	if err != nil {
 		return nil, huma.NewError(http.StatusForbidden, "could not inspect admission", err)
 	}
@@ -608,9 +620,22 @@ func (s *Server) rawJoinStatus(w http.ResponseWriter, r *http.Request) {
 func (s *Server) streamSession(w http.ResponseWriter, r *http.Request) {
 	sessionID := r.PathValue("id")
 	token := r.URL.Query().Get("token")
-	sub, snapshot, err := s.hub.Subscribe(sessionID, token)
+	var lastRevision *int64
+	if raw := strings.TrimSpace(r.URL.Query().Get("lastRevision")); raw != "" {
+		parsed, parseErr := strconv.ParseInt(raw, 10, 64)
+		if parseErr != nil || parsed < 0 {
+			writeProblem(w, http.StatusBadRequest, "Invalid replay revision", "lastRevision must be a non-negative integer")
+			return
+		}
+		lastRevision = &parsed
+	}
+	sub, initialMessages, err := s.hub.SubscribeFrom(sessionID, token, lastRevision)
 	if err != nil {
-		writeProblem(w, http.StatusUnauthorized, "WebSocket authorization failed", err.Error())
+		if errors.Is(err, session.ErrSessionCorrupt) {
+			writeProblem(w, http.StatusInternalServerError, "Session recovery failed", err.Error())
+		} else {
+			writeProblem(w, http.StatusUnauthorized, "WebSocket authorization failed", err.Error())
+		}
 		return
 	}
 	connection, err := websocket.Accept(w, r, &websocket.AcceptOptions{OriginPatterns: allowedOrigins(r)})
@@ -624,9 +649,13 @@ func (s *Server) streamSession(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithCancel(r.Context())
 	defer cancel()
+	heartbeat := time.NewTicker(20 * time.Second)
+	defer heartbeat.Stop()
 	outbound := make(chan any, 128)
 	readErrors := make(chan error, 1)
-	outbound <- snapshot
+	for _, message := range initialMessages {
+		outbound <- message
+	}
 
 	go func() {
 		for {
@@ -654,6 +683,13 @@ func (s *Server) streamSession(w http.ResponseWriter, r *http.Request) {
 		case <-sub.Revoked:
 			_ = connection.Close(websocket.StatusPolicyViolation, "session access revoked")
 			return
+		case <-heartbeat.C:
+			pingCtx, pingCancel := context.WithTimeout(ctx, 5*time.Second)
+			err := connection.Ping(pingCtx)
+			pingCancel()
+			if err != nil {
+				return
+			}
 		case event := <-sub.Events:
 			if err := wsjson.Write(ctx, connection, event); err != nil {
 				return
@@ -762,6 +798,9 @@ func (s *Server) rotateSessionCode(ctx context.Context, input *closeSessionInput
 	if errors.Is(err, session.ErrSessionNotFound) {
 		return nil, huma.NewError(http.StatusNotFound, "session not found")
 	}
+	if errors.Is(err, session.ErrSessionCorrupt) {
+		return nil, huma.NewError(http.StatusInternalServerError, "session recovery failed", err)
+	}
 	if err != nil {
 		return nil, huma.NewError(http.StatusForbidden, "could not rotate session code", err)
 	}
@@ -775,6 +814,8 @@ func (s *Server) closeSession(ctx context.Context, input *closeSessionInput) (*e
 	}
 	if err := s.hub.Close(ctx, input.ID, token); errors.Is(err, session.ErrSessionNotFound) {
 		return nil, huma.NewError(http.StatusNotFound, "session not found")
+	} else if errors.Is(err, session.ErrSessionCorrupt) {
+		return nil, huma.NewError(http.StatusInternalServerError, "session recovery failed", err)
 	} else if err != nil {
 		return nil, huma.NewError(http.StatusForbidden, "could not close session", err)
 	}

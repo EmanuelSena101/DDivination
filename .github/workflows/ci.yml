@@ -55,8 +55,54 @@ jobs:
       - run: go vet ./...
       - run: go build ./cmd/ddivination
 
+  postgres-integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: ddivination_test
+          POSTGRES_USER: ddivination
+          POSTGRES_PASSWORD: ddivination
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ddivination -d ddivination_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      TEST_DATABASE_URL: postgres://ddivination:ddivination@127.0.0.1:5432/ddivination_test?sslmode=disable
+    defaults:
+      run:
+        working-directory: apps/server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+          cache-dependency-path: apps/server/go.sum
+      - run: go test ./...
+      - run: go vet ./...
+
   e2e:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: ddivination_e2e
+          POSTGRES_USER: ddivination
+          POSTGRES_PASSWORD: ddivination
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ddivination -d ddivination_e2e"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      DATABASE_URL: postgres://ddivination:ddivination@127.0.0.1:5432/ddivination_e2e?sslmode=disable
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -73,7 +119,23 @@ jobs:
       - run: npm --workspace apps/web run test:e2e
 
   developer-workflow:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: ddivination_dev
+          POSTGRES_USER: ddivination
+          POSTGRES_PASSWORD: ddivination
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ddivination -d ddivination_dev"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      DATABASE_URL: postgres://ddivination:ddivination@127.0.0.1:5432/ddivination_dev?sslmode=disable
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

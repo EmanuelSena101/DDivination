@@ -1,10 +1,12 @@
 # BATCH-009 — Gerador de progressão
 
-Estado: `VALIDATING`
+Estado: `DONE`
 
 Issue: [#32](https://github.com/EmanuelSena101/DDivination/issues/32)
 
-Pull Request: a criar
+Pull Requests:
+[implementação #33](https://github.com/EmanuelSena101/DDivination/pull/33) e
+encerramento documental a criar
 
 ## Contexto
 
@@ -63,7 +65,7 @@ insolúveis.
 - [x] o boss está no clímax do último andar;
 - [x] a mesma seed, versão, especificação e relógio produzem o mesmo documento;
 - [x] a VTT apresenta a progressão nos dois idiomas;
-- [ ] testes, QA local e CI são aprovados.
+- [x] testes, QA local e CI são aprovados.
 
 ## Testes obrigatórios
 
@@ -134,19 +136,36 @@ insolúveis.
   progresso, editores, benchmark 64×64 e mesa GM/jogador.
 - A batch segue em `VALIDATING` até a aprovação dos gates do GitHub Actions.
 
+### 2026-07-31 — publicação e conclusão
+
+- Implementação publicada e integrada pelo PR #33.
+- Issue #32 encerrada automaticamente pelo merge.
+- Os sete gates do projeto foram aprovados: contrato, developer workflow, E2E,
+  web e Go em Windows, Ubuntu e macOS.
+- O E2E do CI concluiu em 5 minutos; os demais gates também foram aprovados.
+- A falha externa da Vercel não é gate do produto local-first.
+- Branch de encerramento documental criada após a integração da implementação.
+
 ## Resultado
 
-Em implementação.
+O gerador agora entrega uma progressão reproduzível e verificável da entrada ao
+clímax. Chaves e locks possuem referências reais, portais são pareados, segredos
+continuam opcionais e o backend rejeita qualquer documento cuja simulação não
+alcance o objetivo. O mestre recebe uma linha do tempo bilíngue por andar sem
+expor os IDs secretos aos jogadores.
 
 ## Pendências encontradas
 
-Preencher sem ampliar silenciosamente o escopo.
+- A interação ao vivo para abrir portas e consumir chaves continua fora do v1
+  essencial e poderá ser planejada junto às ferramentas finais da VTT.
+- Budgets de encontros, tesouros e catálogo SRD permanecem na Batch 10.
+- Regeneração parcial continua pendente para uma batch posterior.
 
 ## Documentação atualizada
 
-- [ ] documento desta batch;
-- [ ] `docs/STATUS.md`;
-- [ ] `docs/ROADMAP.md`;
-- [ ] `docs/ARCHITECTURE.md`;
-- [ ] README/manual, quando aplicável;
+- [x] documento desta batch;
+- [x] `docs/STATUS.md`;
+- [x] `docs/ROADMAP.md`;
+- [x] `docs/ARCHITECTURE.md`;
+- [x] README/manual, quando aplicável;
 - [x] ADR não necessário.

@@ -48,23 +48,22 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 ## Última batch concluída
 
-`BATCH-008 — Execuções de geração`
-
-A geração agora é assíncrona, observável e cancelável, com estágios persistidos,
-WebSocket local, fallback por polling, recuperação explícita após reinício e
-retomada do acompanhamento por URL. A validação incluiu suíte Go, contratos, 29
-testes Vitest, 7 cenários Playwright, budgets, QA visual e todos os sete jobs do
-CI.
-
-Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-008-generation-runs.md](batches/BATCH-008-generation-runs.md).
-
-## Batch em execução
-
 `BATCH-009 — Gerador de progressão`
 
-O gerador semântico agora possui progressão explícita entre salas e andares,
-locks, chaves, segredos, clímax e validação por simulação da solubilidade. A
-implementação está na fase de regressão completa antes da publicação da PR.
+O documento agora possui progressão semântica da entrada ao clímax, chaves e
+locks vinculados a portas e portais reais, segredos opcionais e validação por
+simulação de solubilidade. A validação incluiu 1.000 seeds, 30 testes Vitest, 7
+cenários Playwright, QA bilíngue e todos os sete jobs do CI.
+
+Consulte [ROADMAP.md](ROADMAP.md) e
+[BATCH-009-progression-generator.md](batches/BATCH-009-progression-generator.md).
+
+## Próxima batch
+
+`BATCH-010 — Catálogo e regras 5E`
+
+O próximo passo é ampliar o catálogo SRD 5.2.1 e aplicar budgets de encontros,
+tesouros, armadilhas, puzzles, descansos e recompensas sobre a progressão já
+validada. O escopo detalhado será fechado antes da implementação.
 
 O pipeline completo de GLB permanece reservado à BATCH-014.

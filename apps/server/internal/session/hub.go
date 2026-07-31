@@ -48,6 +48,9 @@ type Joined struct {
 	SessionID     string                   `json:"sessionId"`
 	ParticipantID string                   `json:"participantId"`
 	Token         string                   `json:"token"`
+	Status        string                   `json:"status" enum:"joined,pending,denied,expired"`
+	RequestID     string                   `json:"requestId,omitempty"`
+	ExpiresAt     *time.Time               `json:"expiresAt,omitempty"`
 	State         domain.SessionState      `json:"state"`
 	Adventure     domain.AdventureDocument `json:"adventure"`
 }
@@ -55,6 +58,8 @@ type Joined struct {
 type Subscriber struct {
 	Participant domain.Participant
 	Events      chan domain.SessionEvent
+	Revoked     chan struct{}
+	revokeOnce  sync.Once
 }
 
 type persistence interface {
@@ -62,18 +67,20 @@ type persistence interface {
 	SaveSessionSnapshot(context.Context, domain.SessionState) error
 	LoadSessionSnapshot(context.Context, string) (domain.SessionState, error)
 	SaveSessionCredential(context.Context, string, string, string) error
+	DeleteSessionCredential(context.Context, string, string) error
 	LoadSessionCredentials(context.Context, string) (map[string]string, error)
 	GetAdventure(context.Context, string) (domain.AdventureDocument, error)
 }
 
 type liveSession struct {
-	mu          sync.RWMutex
-	state       domain.SessionState
-	adventure   domain.AdventureDocument
-	code        string
-	codeExpires time.Time
-	byToken     map[string]string
-	subscribers map[*Subscriber]struct{}
+	mu              sync.RWMutex
+	state           domain.SessionState
+	adventure       domain.AdventureDocument
+	code            string
+	codeExpires     time.Time
+	byToken         map[string]string
+	admissionTokens map[string]string
+	subscribers     map[*Subscriber]struct{}
 }
 
 type Hub struct {
@@ -100,7 +107,7 @@ func (h *Hub) Create(ctx context.Context, adventure domain.AdventureDocument, gm
 		return Created{}, err
 	}
 	now := time.Now().UTC()
-	gm := domain.Participant{ID: "gm", Name: cleanName(gmName, "Game Master"), Role: "gm", Token: gmToken, JoinedAt: now}
+	gm := domain.Participant{ID: "gm", Name: cleanName(gmName, "Game Master"), Role: "gm", Token: gmToken, Connected: false, JoinedAt: now, LastSeenAt: now}
 	state := domain.SessionState{
 		ID:             sessionID,
 		AdventureID:    adventure.ID,
@@ -114,7 +121,13 @@ func (h *Hub) Create(ctx context.Context, adventure domain.AdventureDocument, gm
 		Initiative:     domain.InitiativeState{Entries: make([]domain.InitiativeEntry, 0), Round: 1},
 		Rolls:          make([]domain.DiceRoll, 0),
 		Open:           true,
-		CreatedAt:      now,
+		JoinOpen:       true,
+		Permissions: domain.SessionPermissions{
+			PlayerCanPing:     true,
+			PlayerCanRollDice: true,
+		},
+		Admissions: make(map[string]domain.AdmissionRequest),
+		CreatedAt:  now,
 	}
 	for _, floor := range adventure.Floors {
 		for _, entity := range floor.Entities {
@@ -141,12 +154,13 @@ func (h *Hub) Create(ctx context.Context, adventure domain.AdventureDocument, gm
 		state.TokenOwners["token-party"] = gm.ID
 	}
 	s := &liveSession{
-		state:       state,
-		adventure:   adventure,
-		code:        codeValue,
-		codeExpires: now.Add(15 * time.Minute),
-		byToken:     map[string]string{gmToken: gm.ID},
-		subscribers: make(map[*Subscriber]struct{}),
+		state:           state,
+		adventure:       adventure,
+		code:            codeValue,
+		codeExpires:     now.Add(15 * time.Minute),
+		byToken:         map[string]string{gmToken: gm.ID},
+		admissionTokens: make(map[string]string),
+		subscribers:     make(map[*Subscriber]struct{}),
 	}
 	h.mu.Lock()
 	h.sessions[sessionID] = s
@@ -177,6 +191,9 @@ func (h *Hub) Join(ctx context.Context, sessionID, codeValue, name, role string)
 	if !s.state.Open || time.Now().UTC().After(s.codeExpires) || !sameCode(s.code, codeValue) {
 		return Joined{}, ErrInvalidCode
 	}
+	if !s.state.JoinOpen {
+		return Joined{}, ErrInvalidCode
+	}
 	if role != "player" && role != "display" {
 		role = "player"
 	}
@@ -188,52 +205,77 @@ func (h *Hub) Join(ctx context.Context, sessionID, codeValue, name, role string)
 	if err != nil {
 		return Joined{}, err
 	}
+	now := time.Now().UTC()
 	participant := domain.Participant{
-		ID:       participantID,
-		Name:     cleanName(name, "Player"),
-		Role:     role,
-		Token:    token,
-		JoinedAt: time.Now().UTC(),
+		ID:         participantID,
+		Name:       cleanName(name, "Player"),
+		Role:       role,
+		Token:      token,
+		JoinedAt:   now,
+		LastSeenAt: now,
+	}
+	if s.state.ApprovalRequired {
+		expiresAt := now.Add(10 * time.Minute)
+		request := domain.AdmissionRequest{ID: participantID, Name: participant.Name, Role: role, Status: "pending", CreatedAt: now, ExpiresAt: expiresAt}
+		s.state.Admissions[participantID] = request
+		s.admissionTokens[token] = participantID
+		event, err := h.commitLocked(ctx, s, participantID, "admission.requested", map[string]any{"request": request})
+		if err != nil {
+			delete(s.state.Admissions, participantID)
+			delete(s.admissionTokens, token)
+			return Joined{}, err
+		}
+		h.broadcastLocked(s, event)
+		return Joined{SessionID: sessionID, ParticipantID: participantID, Token: token, Status: "pending", RequestID: participantID, ExpiresAt: &expiresAt}, nil
 	}
 	s.state.Participants[participant.ID] = participant
 	s.byToken[token] = participant.ID
 	if err := h.store.SaveSessionCredential(ctx, sessionID, participant.ID, token); err != nil {
 		return Joined{}, err
 	}
-	if role == "player" {
-		if owner, ok := s.state.TokenOwners["token-party"]; !ok || owner == "gm" {
-			s.state.TokenOwners["token-party"] = participant.ID
-		}
-	}
-	s.state.Revision++
-	event := domain.SessionEvent{
-		Revision:   s.state.Revision,
-		Type:       "participant.joined",
-		ActorID:    participant.ID,
-		OccurredAt: time.Now().UTC(),
-		Payload: map[string]any{
-			"participant": map[string]any{
-				"id":       participant.ID,
-				"name":     participant.Name,
-				"role":     participant.Role,
-				"joinedAt": participant.JoinedAt,
-			},
+	event, err := h.commitLocked(ctx, s, participant.ID, "participant.joined", map[string]any{
+		"participant": map[string]any{
+			"id":         participant.ID,
+			"name":       participant.Name,
+			"role":       participant.Role,
+			"connected":  participant.Connected,
+			"joinedAt":   participant.JoinedAt,
+			"lastSeenAt": participant.LastSeenAt,
 		},
-	}
-	if err := h.store.SaveSessionEvent(ctx, sessionID, event); err != nil {
+	})
+	if err != nil {
 		return Joined{}, err
 	}
-	if err := h.store.SaveSessionSnapshot(ctx, s.state); err != nil {
-		return Joined{}, err
-	}
-	for sub := range s.subscribers {
-		select {
-		case sub.Events <- event:
-		default:
-		}
-	}
+	h.broadcastLocked(s, event)
 	state, adventure := filteredSnapshot(s.state, s.adventure, participant)
-	return Joined{SessionID: sessionID, ParticipantID: participantID, Token: token, State: state, Adventure: adventure}, nil
+	return Joined{SessionID: sessionID, ParticipantID: participantID, Token: token, Status: "joined", State: state, Adventure: adventure}, nil
+}
+
+func (h *Hub) AdmissionStatus(sessionID, requestID, token string) (Joined, error) {
+	s, err := h.find(sessionID)
+	if err != nil {
+		return Joined{}, err
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.admissionTokens[token] != requestID {
+		return Joined{}, ErrUnauthorized
+	}
+	request, ok := s.state.Admissions[requestID]
+	if !ok {
+		return Joined{}, ErrUnauthorized
+	}
+	if request.Status == "pending" && time.Now().UTC().After(request.ExpiresAt) {
+		request.Status = "expired"
+		s.state.Admissions[requestID] = request
+	}
+	result := Joined{SessionID: sessionID, ParticipantID: requestID, Token: token, Status: request.Status, RequestID: requestID, ExpiresAt: &request.ExpiresAt}
+	if request.Status == "approved" {
+		participant := s.state.Participants[requestID]
+		result.Status = "joined"
+		result.State, result.Adventure = filteredSnapshot(s.state, s.adventure, participant)
+	}
+	return result, nil
 }
 
 func (h *Hub) Subscribe(sessionID, token string) (*Subscriber, Snapshot, error) {
@@ -247,7 +289,14 @@ func (h *Hub) Subscribe(sessionID, token string) (*Subscriber, Snapshot, error) 
 	if !ok {
 		return nil, Snapshot{}, ErrUnauthorized
 	}
-	sub := &Subscriber{Participant: participant, Events: make(chan domain.SessionEvent, 128)}
+	now := time.Now().UTC()
+	participant.Connected = true
+	participant.LastSeenAt = now
+	s.state.Participants[participant.ID] = participant
+	if event, commitErr := h.commitLocked(context.Background(), s, participant.ID, "participant.presence", map[string]any{"participantId": participant.ID, "connected": true, "lastSeenAt": participant.LastSeenAt}); commitErr == nil {
+		h.broadcastLocked(s, event)
+	}
+	sub := &Subscriber{Participant: participant, Events: make(chan domain.SessionEvent, 128), Revoked: make(chan struct{})}
 	s.subscribers[sub] = struct{}{}
 	state, adventure := filteredSnapshot(s.state, s.adventure, participant)
 	return sub, Snapshot{Type: "session.snapshot", State: state, Adventure: adventure}, nil
@@ -259,8 +308,26 @@ func (h *Hub) Unsubscribe(sessionID string, sub *Subscriber) {
 		return
 	}
 	s.mu.Lock()
+	if _, ok := s.subscribers[sub]; !ok {
+		s.mu.Unlock()
+		return
+	}
 	delete(s.subscribers, sub)
-	close(sub.Events)
+	if participant, ok := s.state.Participants[sub.Participant.ID]; ok {
+		for other := range s.subscribers {
+			if other.Participant.ID == participant.ID {
+				s.mu.Unlock()
+				return
+			}
+		}
+		participant.Connected = false
+		participant.LastSeenAt = time.Now().UTC()
+		s.state.Participants[participant.ID] = participant
+		event, commitErr := h.commitLocked(context.Background(), s, participant.ID, "participant.presence", map[string]any{"participantId": participant.ID, "connected": false, "lastSeenAt": participant.LastSeenAt})
+		if commitErr == nil {
+			h.broadcastLocked(s, event)
+		}
+	}
 	s.mu.Unlock()
 }
 
@@ -278,34 +345,206 @@ func (h *Hub) HandleCommand(ctx context.Context, sessionID, token string, comman
 	if command.ExpectedRevision != s.state.Revision {
 		return domain.SessionEvent{}, ErrRevision
 	}
-	payload, err := applyCommand(&s.state, s.adventure, participant, command)
+	participant.LastSeenAt = time.Now().UTC()
+	s.state.Participants[participant.ID] = participant
+	payload, revokedID, err := h.applyAdminCommandLocked(ctx, s, participant, command)
+	if errors.Is(err, errNotAdminCommand) {
+		payload, err = applyCommand(&s.state, s.adventure, participant, command)
+	}
 	if err != nil {
 		return domain.SessionEvent{}, err
 	}
-	s.state.Revision++
-	event := domain.SessionEvent{
-		Revision:   s.state.Revision,
-		Type:       eventType(command.Type),
-		ActorID:    participant.ID,
-		OccurredAt: time.Now().UTC(),
-		Payload:    payload,
+	event, err := h.commitLocked(ctx, s, participant.ID, eventType(command.Type), payload)
+	if err != nil {
+		return domain.SessionEvent{}, err
 	}
-	if err := h.store.SaveSessionEvent(ctx, sessionID, event); err != nil {
+	for sub := range s.subscribers {
+		if changed, ok := s.state.Participants[sub.Participant.ID]; ok {
+			sub.Participant = changed
+		}
+	}
+	h.broadcastLocked(s, event)
+	if revokedID != "" {
+		for sub := range s.subscribers {
+			if sub.Participant.ID == revokedID {
+				sub.revokeOnce.Do(func() { close(sub.Revoked) })
+			}
+		}
+	}
+	return event, nil
+}
+
+var errNotAdminCommand = errors.New("not an administrative command")
+
+func (h *Hub) applyAdminCommandLocked(ctx context.Context, s *liveSession, actor domain.Participant, command domain.SessionCommand) (map[string]any, string, error) {
+	switch command.Type {
+	case "participant.role.set", "participant.remove", "token.assign", "permissions.set", "admission.set", "admission.approve", "admission.deny":
+		if actor.Role != "gm" {
+			return nil, "", ErrUnauthorized
+		}
+	default:
+		return nil, "", errNotAdminCommand
+	}
+	switch command.Type {
+	case "participant.role.set":
+		id, _ := command.Payload["participantId"].(string)
+		role, _ := command.Payload["role"].(string)
+		target, ok := s.state.Participants[id]
+		if !ok || target.Role == "gm" || (role != "player" && role != "display") {
+			return nil, "", ErrInvalidCommand
+		}
+		target.Role = role
+		s.state.Participants[id] = target
+		if role == "display" {
+			for tokenID, ownerID := range s.state.TokenOwners {
+				if ownerID == id {
+					delete(s.state.TokenOwners, tokenID)
+				}
+			}
+		}
+		return map[string]any{"participantId": id, "role": role, "tokenOwners": s.state.TokenOwners}, "", nil
+	case "participant.remove":
+		id, _ := command.Payload["participantId"].(string)
+		target, ok := s.state.Participants[id]
+		if !ok || target.Role == "gm" {
+			return nil, "", ErrInvalidCommand
+		}
+		delete(s.state.Participants, id)
+		for tokenID, ownerID := range s.state.TokenOwners {
+			if ownerID == id {
+				delete(s.state.TokenOwners, tokenID)
+			}
+		}
+		for storedToken, participantID := range s.byToken {
+			if participantID == id {
+				delete(s.byToken, storedToken)
+			}
+		}
+		if err := h.store.DeleteSessionCredential(ctx, s.state.ID, id); err != nil {
+			return nil, "", err
+		}
+		return map[string]any{"participantId": id, "tokenOwners": s.state.TokenOwners}, id, nil
+	case "token.assign":
+		tokenID, _ := command.Payload["tokenId"].(string)
+		ownerID, _ := command.Payload["participantId"].(string)
+		if _, ok := s.state.TokenPositions[tokenID]; !ok {
+			return nil, "", ErrInvalidCommand
+		}
+		if ownerID == "" {
+			delete(s.state.TokenOwners, tokenID)
+		} else if owner, ok := s.state.Participants[ownerID]; !ok || owner.Role != "player" {
+			return nil, "", ErrInvalidCommand
+		} else {
+			s.state.TokenOwners[tokenID] = ownerID
+		}
+		return map[string]any{"tokenId": tokenID, "participantId": ownerID}, "", nil
+	case "permissions.set":
+		permissions := domain.SessionPermissions{}
+		raw, _ := json.Marshal(command.Payload["permissions"])
+		if err := json.Unmarshal(raw, &permissions); err != nil {
+			return nil, "", ErrInvalidCommand
+		}
+		s.state.Permissions = permissions
+		return map[string]any{"permissions": permissions}, "", nil
+	case "admission.set":
+		joinOpen, okOpen := command.Payload["joinOpen"].(bool)
+		approval, okApproval := command.Payload["approvalRequired"].(bool)
+		if !okOpen || !okApproval {
+			return nil, "", ErrInvalidCommand
+		}
+		s.state.JoinOpen, s.state.ApprovalRequired = joinOpen, approval
+		return map[string]any{"joinOpen": joinOpen, "approvalRequired": approval}, "", nil
+	case "admission.approve":
+		id, _ := command.Payload["requestId"].(string)
+		request, ok := s.state.Admissions[id]
+		if !ok || request.Status != "pending" || time.Now().UTC().After(request.ExpiresAt) {
+			return nil, "", ErrInvalidCommand
+		}
+		var pendingToken string
+		for token, requestID := range s.admissionTokens {
+			if requestID == id {
+				pendingToken = token
+				break
+			}
+		}
+		if pendingToken == "" {
+			return nil, "", ErrInvalidCommand
+		}
+		now := time.Now().UTC()
+		participant := domain.Participant{ID: id, Name: request.Name, Role: request.Role, JoinedAt: now, LastSeenAt: now}
+		s.state.Participants[id], s.byToken[pendingToken] = participant, id
+		request.Status = "approved"
+		s.state.Admissions[id] = request
+		if err := h.store.SaveSessionCredential(ctx, s.state.ID, id, pendingToken); err != nil {
+			return nil, "", err
+		}
+		return map[string]any{"requestId": id, "participant": participant}, "", nil
+	case "admission.deny":
+		id, _ := command.Payload["requestId"].(string)
+		request, ok := s.state.Admissions[id]
+		if !ok || request.Status != "pending" {
+			return nil, "", ErrInvalidCommand
+		}
+		request.Status = "denied"
+		s.state.Admissions[id] = request
+		return map[string]any{"requestId": id}, "", nil
+	}
+	return nil, "", ErrInvalidCommand
+}
+
+type CodeStatus struct {
+	Code             string    `json:"code"`
+	ExpiresAt        time.Time `json:"expiresAt"`
+	JoinOpen         bool      `json:"joinOpen"`
+	ApprovalRequired bool      `json:"approvalRequired"`
+}
+
+func (h *Hub) RotateCode(ctx context.Context, sessionID, token string) (CodeStatus, error) {
+	s, err := h.find(sessionID)
+	if err != nil {
+		return CodeStatus{}, err
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	participant, ok := participantByToken(s, token)
+	if !ok || participant.Role != "gm" {
+		return CodeStatus{}, ErrUnauthorized
+	}
+	code, err := randomDigits(6)
+	if err != nil {
+		return CodeStatus{}, err
+	}
+	s.code, s.codeExpires = code, time.Now().UTC().Add(15*time.Minute)
+	event, err := h.commitLocked(ctx, s, participant.ID, "session.code.rotated", map[string]any{"expiresAt": s.codeExpires})
+	if err != nil {
+		return CodeStatus{}, err
+	}
+	h.broadcastLocked(s, event)
+	return CodeStatus{Code: code, ExpiresAt: s.codeExpires, JoinOpen: s.state.JoinOpen, ApprovalRequired: s.state.ApprovalRequired}, nil
+}
+
+func (h *Hub) commitLocked(ctx context.Context, s *liveSession, actorID, eventType string, payload map[string]any) (domain.SessionEvent, error) {
+	s.state.Revision++
+	event := domain.SessionEvent{Revision: s.state.Revision, Type: eventType, ActorID: actorID, OccurredAt: time.Now().UTC(), Payload: payload}
+	if err := h.store.SaveSessionEvent(ctx, s.state.ID, event); err != nil {
+		s.state.Revision--
 		return domain.SessionEvent{}, err
 	}
 	if err := h.store.SaveSessionSnapshot(ctx, s.state); err != nil {
 		return domain.SessionEvent{}, err
 	}
+	return event, nil
+}
+
+func (h *Hub) broadcastLocked(s *liveSession, event domain.SessionEvent) {
 	for sub := range s.subscribers {
 		if canReceive(sub.Participant, event, s.adventure) {
 			select {
 			case sub.Events <- event:
 			default:
-				// Slow clients will reconnect and receive a fresh snapshot.
 			}
 		}
 	}
-	return event, nil
 }
 
 func (h *Hub) Close(ctx context.Context, sessionID, token string) error {
@@ -364,11 +603,21 @@ func (h *Hub) find(id string) (*liveSession, error) {
 		return nil, ErrSessionNotFound
 	}
 	restored := &liveSession{
-		state:       state,
-		adventure:   adventure,
-		codeExpires: time.Time{},
-		byToken:     credentials,
-		subscribers: make(map[*Subscriber]struct{}),
+		state:           state,
+		adventure:       adventure,
+		codeExpires:     time.Time{},
+		byToken:         credentials,
+		admissionTokens: make(map[string]string),
+		subscribers:     make(map[*Subscriber]struct{}),
+	}
+	if restored.state.Participants == nil {
+		restored.state.Participants = make(map[string]domain.Participant)
+	}
+	if restored.state.Admissions == nil {
+		restored.state.Admissions = make(map[string]domain.AdmissionRequest)
+	}
+	if !restored.state.JoinOpen && restored.state.Open && restored.state.Revision == 0 {
+		restored.state.JoinOpen = true
 	}
 	h.mu.Lock()
 	if existing := h.sessions[id]; existing != nil {
@@ -422,7 +671,7 @@ func applyCommand(state *domain.SessionState, adventure domain.AdventureDocument
 		return map[string]any{"tokenId": tokenID, "floorId": floorID, "x": x, "z": z}, nil
 
 	case "fog.reveal", "fog.hide":
-		if participant.Role != "gm" {
+		if participant.Role == "display" || (participant.Role != "gm" && !state.Permissions.PlayerCanRevealFog) {
 			return nil, ErrUnauthorized
 		}
 		floorID, _ := command.Payload["floorId"].(string)
@@ -448,7 +697,7 @@ func applyCommand(state *domain.SessionState, adventure domain.AdventureDocument
 		return map[string]any{"floorId": floorID}, nil
 
 	case "initiative.set":
-		if participant.Role != "gm" {
+		if participant.Role == "display" || (participant.Role != "gm" && !state.Permissions.PlayerCanManageInitiative) {
 			return nil, ErrUnauthorized
 		}
 		raw, err := json.Marshal(command.Payload["initiative"])
@@ -463,6 +712,9 @@ func applyCommand(state *domain.SessionState, adventure domain.AdventureDocument
 		return map[string]any{"initiative": initiative}, nil
 
 	case "dice.roll":
+		if participant.Role == "display" || (participant.Role != "gm" && !state.Permissions.PlayerCanRollDice) {
+			return nil, ErrUnauthorized
+		}
 		expression, _ := command.Payload["expression"].(string)
 		visibility, _ := command.Payload["visibility"].(string)
 		targetID, _ := command.Payload["targetId"].(string)
@@ -491,6 +743,9 @@ func applyCommand(state *domain.SessionState, adventure domain.AdventureDocument
 		return payload, nil
 
 	case "ping":
+		if participant.Role == "display" || (participant.Role != "gm" && !state.Permissions.PlayerCanPing) {
+			return nil, ErrUnauthorized
+		}
 		floorID, _ := command.Payload["floorId"].(string)
 		x, okX := intValue(command.Payload["x"])
 		z, okZ := intValue(command.Payload["z"])
@@ -514,6 +769,7 @@ func filteredSnapshot(state domain.SessionState, adventure domain.AdventureDocum
 		p.Token = ""
 		cleanState.Participants[id] = p
 	}
+	cleanState.Admissions = nil
 	cleanState.Rolls = filterRolls(cleanState.Rolls, participant)
 
 	encodedAdventure, _ := json.Marshal(adventure)
@@ -572,6 +828,9 @@ func filteredSnapshot(state domain.SessionState, adventure domain.AdventureDocum
 }
 
 func canReceive(participant domain.Participant, event domain.SessionEvent, adventure domain.AdventureDocument) bool {
+	if strings.HasPrefix(event.Type, "admission.") && event.Type != "admission.approved" {
+		return participant.Role == "gm"
+	}
 	if participant.Role != "gm" && event.Type == "token.moved" {
 		tokenID, _ := event.Payload["tokenId"].(string)
 		for _, floor := range adventure.Floors {
@@ -660,13 +919,20 @@ func rollDice(expression string) (domain.DiceRoll, error) {
 
 func eventType(commandType string) string {
 	return map[string]string{
-		"token.move":     "token.moved",
-		"fog.reveal":     "fog.changed",
-		"fog.hide":       "fog.changed",
-		"floor.set":      "floor.changed",
-		"initiative.set": "initiative.changed",
-		"dice.roll":      "dice.rolled",
-		"ping":           "map.pinged",
+		"token.move":           "token.moved",
+		"fog.reveal":           "fog.changed",
+		"fog.hide":             "fog.changed",
+		"floor.set":            "floor.changed",
+		"initiative.set":       "initiative.changed",
+		"dice.roll":            "dice.rolled",
+		"ping":                 "map.pinged",
+		"participant.role.set": "participant.role.changed",
+		"participant.remove":   "participant.removed",
+		"token.assign":         "token.assignment.changed",
+		"permissions.set":      "permissions.changed",
+		"admission.set":        "admission.settings.changed",
+		"admission.approve":    "admission.approved",
+		"admission.deny":       "admission.denied",
 	}[commandType]
 }
 

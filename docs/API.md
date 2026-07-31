@@ -34,6 +34,8 @@ interface é aberta na LAN com uma allowlist mínima.
 | GET | `/api/v1/adventures/{id}/print` | `printAdventure` | sim | não |
 | POST | `/api/v1/sessions` | `createSession` | sim | não |
 | POST | `/api/v1/sessions/{id}/join` | `joinSession` | sim | sim |
+| GET | `/api/v1/sessions/{id}/join/{requestId}` | `getJoinStatus` | sim | sim |
+| POST | `/api/v1/sessions/{id}/code` | `rotateSessionCode` | sim | não |
 | DELETE | `/api/v1/sessions/{id}` | `closeSession` | sim | não |
 | GET | `/api/v1/packages/{id}` | `exportPackage` | sim | não |
 | POST | `/api/v1/packages` | `importPackage` | sim | não |
@@ -43,7 +45,7 @@ interface é aberta na LAN com uma allowlist mínima.
 | GET | `/api/v1/generation-runs/{id}/stream` | WebSocket | sim | não |
 | GET | `/api/v1/sessions/{id}/stream` | WebSocket | sim | sim |
 
-Na LAN, qualquer rota fora de health, join e stream retorna `404`.
+Na LAN, qualquer rota fora de health, entrada, consulta de aprovação e stream retorna `404`.
 
 `GET /api/v1/catalog` devolve o catálogo incorporado identificado por
 `srd-5.2.1-ddivination-1`. Cada entrada informa ID estável, nome pt-BR/en-US,
@@ -135,6 +137,17 @@ O cliente envia comandos:
 
 O servidor transmite snapshots e eventos autoritativos. Permissões e conteúdo
 secreto são filtrados no servidor.
+
+Comandos administrativos são exclusivos do GM: `participant.role.set`,
+`participant.remove`, `token.assign`, `permissions.set`, `admission.set`,
+`admission.approve` e `admission.deny`. O papel `display` não pode enviar nenhum
+comando mutável. Jogadores dependem das permissões atuais para fog, ping, dados
+e iniciativa.
+
+Quando aprovação está habilitada, `join` devolve `status: "pending"`, um
+`requestId` e um token de espera. O cliente consulta a rota de status com esse
+token até receber `joined`, `denied` ou `expired`. O código pode ser rotacionado
+somente em loopback, usando o token Bearer do GM.
 
 ## Geração e verificação
 

@@ -68,6 +68,9 @@ function session(): SessionState {
     initiative: { entries: [], activeIndex: 0, round: 1 },
     rolls: [],
     open: true,
+    joinOpen: true,
+    approvalRequired: false,
+    permissions: { playerCanRevealFog: false, playerCanPing: true, playerCanRollDice: true, playerCanManageInitiative: false },
     createdAt: "2026-07-30T12:00:00Z",
   };
 }

@@ -628,6 +628,16 @@ button.secondary {
   min-height: 16px;
 }
 
+.admission-waiting {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid rgba(194, 154, 83, 0.35);
+  background: rgba(194, 154, 83, 0.08);
+}
+
+.admission-waiting small { color: var(--muted); }
+
 .vtt-layout {
   height: calc(100vh - 76px);
   display: grid;
@@ -724,6 +734,26 @@ button.secondary {
 .panel-section > header small {
   color: var(--gold);
 }
+
+.table-admin {
+  padding: 12px;
+  border: 1px solid rgba(194, 154, 83, 0.22);
+  background: rgba(194, 154, 83, 0.035);
+}
+
+.table-admin details { border-top: 1px solid var(--line); padding: 8px 0; }
+.table-admin summary { cursor: pointer; color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.table-admin .check-row { margin: 8px 0; font-size: 12px; }
+.admin-list { display: grid; gap: 5px; margin-top: 8px; }
+.admin-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px; background: rgba(255,255,255,.025); font-size: 11px; }
+.admin-row > span:first-child { min-width: 0; display: grid; gap: 2px; }
+.admin-row strong { overflow: hidden; text-overflow: ellipsis; }
+.admin-row small { color: var(--muted); }
+.admin-actions { display: flex; align-items: center; gap: 4px; }
+.admin-actions select, .admin-row select { min-height: 28px; padding: 4px; font-size: 11px; }
+.admin-actions button { min-width: 28px; min-height: 28px; padding: 3px; }
+.presence-online, .presence-offline { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: #5fd18a; }
+.presence-offline { background: #6f6b78; }
 
 .floor-list {
   display: grid;

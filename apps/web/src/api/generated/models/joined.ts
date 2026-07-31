@@ -6,14 +6,18 @@
  * OpenAPI spec version: 1.0.0-alpha.1
  */
 import type { AdventureDocument } from './adventureDocument';
+import type { JoinedStatus } from './joinedStatus';
 import type { SessionState } from './sessionState';
 
 export interface Joined {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   adventure: AdventureDocument;
+  expiresAt?: string;
   participantId: string;
+  requestId?: string;
   sessionId: string;
   state: SessionState;
+  status: JoinedStatus;
   token: string;
 }

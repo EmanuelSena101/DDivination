@@ -62,12 +62,18 @@ entram pela rede local somente depois que o mestre abre uma sessão.
 - O núcleo 3D é carregado ao abrir a VTT; Rapier é carregado somente na primeira
   rolagem de dados.
 - Conteúdo secreto é removido no servidor antes de chegar ao cliente.
+- A autoridade administrativa pertence ao GM criador. Papéis, permissões,
+  admissões e atribuições de token mudam somente por comandos validados pelo hub.
+- Remoção revoga a credencial persistida e fecha assinantes ativos; rotação do
+  código afeta somente novas admissões.
 - A instrumentação do VTT é opt-in, permanece no navegador e exporta somente
   um relatório sanitizado construído por allowlist.
 
 A superfície administrativa REST existe somente em loopback. A interface LAN
 usa uma allowlist independente com health, entrada e WebSocket de sessão.
 Consulte [API.md](API.md) para a matriz de rotas e os artefatos gerados.
+Consulte [TABLE_ADMINISTRATION.md](TABLE_ADMINISTRATION.md) para o modelo de
+papéis, admissão e permissões.
 Consulte [VTT_PERFORMANCE.md](VTT_PERFORMANCE.md) para os budgets e perfis da
 cena, [GRID_EDITOR.md](GRID_EDITOR.md) para as proteções editoriais e
 [VISUAL_PACK.md](VISUAL_PACK.md) para o pack base.

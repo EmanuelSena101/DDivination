@@ -46,6 +46,8 @@ var endpointContracts = []endpointContract{
 	{http.MethodGet, "/api/v1/adventures/{id}/print", "printAdventure", exposureLocal, "rest"},
 	{http.MethodPost, "/api/v1/sessions", "createSession", exposureLocal, "rest"},
 	{http.MethodPost, "/api/v1/sessions/{id}/join", "joinSession", exposureLAN, "rest"},
+	{http.MethodGet, "/api/v1/sessions/{id}/join/{requestId}", "getJoinStatus", exposureLAN, "rest"},
+	{http.MethodPost, "/api/v1/sessions/{id}/code", "rotateSessionCode", exposureLocal, "rest"},
 	{http.MethodDelete, "/api/v1/sessions/{id}", "closeSession", exposureLocal, "rest"},
 	{http.MethodGet, "/api/v1/sessions/{id}/stream", "streamSession", exposureLAN, "websocket"},
 	{http.MethodGet, "/api/v1/packages/{id}", "exportPackage", exposureLocal, "rest"},
@@ -151,6 +153,16 @@ func (s *Server) registerREST(api huma.API) {
 		[]string{"Sessions"}, http.StatusOK,
 		http.StatusBadRequest, http.StatusUnauthorized, http.StatusNotFound,
 	), s.joinSession)
+	huma.Register(api, apiOperation(
+		http.MethodGet, "/api/v1/sessions/{id}/join/{requestId}", "getJoinStatus", "Inspect a pending session admission request",
+		[]string{"Sessions"}, http.StatusOK,
+		http.StatusUnauthorized, http.StatusForbidden, http.StatusNotFound,
+	), s.joinStatus)
+	huma.Register(api, apiOperation(
+		http.MethodPost, "/api/v1/sessions/{id}/code", "rotateSessionCode", "Rotate the temporary LAN join code",
+		[]string{"Sessions"}, http.StatusOK,
+		http.StatusUnauthorized, http.StatusForbidden, http.StatusNotFound,
+	), s.rotateSessionCode)
 	huma.Register(api, apiOperation(
 		http.MethodDelete, "/api/v1/sessions/{id}", "closeSession", "Close a VTT session",
 		[]string{"Sessions"}, http.StatusNoContent,

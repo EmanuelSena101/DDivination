@@ -35,7 +35,7 @@ issue correspondente.
 | BATCH-008 | Execuções de geração | DONE |
 | BATCH-009 | Gerador de progressão | DONE |
 | BATCH-010 | Catálogo e regras 5E | DONE |
-| BATCH-011 | Administração da mesa | PLANNED |
+| BATCH-011 | Administração da mesa | DONE |
 | BATCH-012 | Durabilidade em tempo real | PLANNED |
 | BATCH-013 | Remake de UX e controles da VTT | PLANNED |
 | BATCH-014 | Fundação de dados e rulesets | PLANNED |

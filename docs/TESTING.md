@@ -96,6 +96,13 @@ Se o ambiente de desenvolvimento estiver aberto, encerre-o antes:
 .\scripts\stop.ps1
 ```
 
+## Administração da mesa
+
+Há testes unitários para a matriz de permissões, display somente leitura,
+aprovação, mudança de papel, atribuição e revogação de credenciais. O Playwright
+abre quatro contextos isolados — GM, dois jogadores e display — e cobre
+aprovação, permissões, token, rotação de código e expulsão.
+
 ## Instrumentação do VTT
 
 Vitest cobre os cálculos de frame time, percentil, janela limitada, contagens

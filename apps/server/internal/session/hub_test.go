@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"errors"
 	"path/filepath"
 	"testing"
 	"time"
@@ -154,5 +155,111 @@ func TestConfirmedSessionRestoresAfterServerRestart(t *testing.T) {
 	defer restoredHub.Unsubscribe(created.SessionID, subscription)
 	if snapshot.State.ID != created.SessionID || snapshot.Adventure.ID != doc.ID {
 		t.Fatal("restored session does not match the persisted snapshot")
+	}
+}
+
+func newAdministrativeTestHub(t *testing.T) (*Hub, Created) {
+	t.Helper()
+	database, err := store.Open(filepath.Join(t.TempDir(), "session.sqlite3"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = database.Close() })
+	doc, err := generator.Generate(domain.DefaultAdventureSpec(), 811, time.Now().UTC())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := database.SaveAdventure(context.Background(), doc, nil, "generated"); err != nil {
+		t.Fatal(err)
+	}
+	hub := NewHub(database)
+	created, err := hub.Create(context.Background(), doc, "GM")
+	if err != nil {
+		t.Fatal(err)
+	}
+	return hub, created
+}
+
+func TestDisplayIsStrictlyReadOnly(t *testing.T) {
+	hub, created := newAdministrativeTestHub(t)
+	joined, err := hub.Join(context.Background(), created.SessionID, created.Code, "Display", "display")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, commandType := range []string{"ping", "dice.roll", "token.move", "fog.reveal", "initiative.set"} {
+		command := domain.SessionCommand{ID: commandType, ExpectedRevision: joined.State.Revision, Type: commandType, Payload: map[string]any{}}
+		if _, err := hub.HandleCommand(context.Background(), created.SessionID, joined.Token, command); !errors.Is(err, ErrUnauthorized) {
+			t.Fatalf("display command %s: expected unauthorized, got %v", commandType, err)
+		}
+	}
+}
+
+func TestGMControlsPermissionsRolesTokensAndRemoval(t *testing.T) {
+	hub, created := newAdministrativeTestHub(t)
+	player, err := hub.Join(context.Background(), created.SessionID, created.Code, "Player", "player")
+	if err != nil {
+		t.Fatal(err)
+	}
+	revision := player.State.Revision
+	event, err := hub.HandleCommand(context.Background(), created.SessionID, created.Token, domain.SessionCommand{
+		ID: "permissions", ExpectedRevision: revision, Type: "permissions.set",
+		Payload: map[string]any{"permissions": domain.SessionPermissions{}},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := hub.HandleCommand(context.Background(), created.SessionID, player.Token, domain.SessionCommand{ID: "ping", ExpectedRevision: event.Revision, Type: "ping", Payload: map[string]any{"floorId": created.State.ActiveFloorID, "x": 1, "z": 1}}); !errors.Is(err, ErrUnauthorized) {
+		t.Fatalf("disabled player ping: expected unauthorized, got %v", err)
+	}
+	event, err = hub.HandleCommand(context.Background(), created.SessionID, created.Token, domain.SessionCommand{ID: "assign", ExpectedRevision: event.Revision, Type: "token.assign", Payload: map[string]any{"tokenId": "token-party", "participantId": player.ParticipantID}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	event, err = hub.HandleCommand(context.Background(), created.SessionID, created.Token, domain.SessionCommand{ID: "role", ExpectedRevision: event.Revision, Type: "participant.role.set", Payload: map[string]any{"participantId": player.ParticipantID, "role": "display"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, _ := hub.find(created.SessionID)
+	if _, assigned := s.state.TokenOwners["token-party"]; assigned {
+		t.Fatal("display retained token assignment")
+	}
+	sub, snapshot, err := hub.Subscribe(created.SessionID, player.Token)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer hub.Unsubscribe(created.SessionID, sub)
+	if _, err := hub.HandleCommand(context.Background(), created.SessionID, created.Token, domain.SessionCommand{ID: "remove", ExpectedRevision: snapshot.State.Revision, Type: "participant.remove", Payload: map[string]any{"participantId": player.ParticipantID}}); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-sub.Revoked:
+	case <-time.After(time.Second):
+		t.Fatal("removed participant connection was not revoked")
+	}
+	if _, _, err := hub.Subscribe(created.SessionID, player.Token); !errors.Is(err, ErrUnauthorized) {
+		t.Fatalf("removed credential remained valid: %v", err)
+	}
+}
+
+func TestOptionalAdmissionApprovalFlow(t *testing.T) {
+	hub, created := newAdministrativeTestHub(t)
+	event, err := hub.HandleCommand(context.Background(), created.SessionID, created.Token, domain.SessionCommand{ID: "settings", ExpectedRevision: 0, Type: "admission.set", Payload: map[string]any{"joinOpen": true, "approvalRequired": true}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	pending, err := hub.Join(context.Background(), created.SessionID, created.Code, "Waiting", "player")
+	if err != nil || pending.Status != "pending" {
+		t.Fatalf("expected pending join, got %#v, %v", pending, err)
+	}
+	if _, _, err := hub.Subscribe(created.SessionID, pending.Token); !errors.Is(err, ErrUnauthorized) {
+		t.Fatal("pending participant subscribed before approval")
+	}
+	event, err = hub.HandleCommand(context.Background(), created.SessionID, created.Token, domain.SessionCommand{ID: "approve", ExpectedRevision: event.Revision + 1, Type: "admission.approve", Payload: map[string]any{"requestId": pending.RequestID}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	status, err := hub.AdmissionStatus(created.SessionID, pending.RequestID, pending.Token)
+	if err != nil || status.Status != "joined" || status.State.Revision != event.Revision {
+		t.Fatalf("approved status mismatch: %#v, %v", status, err)
 	}
 }

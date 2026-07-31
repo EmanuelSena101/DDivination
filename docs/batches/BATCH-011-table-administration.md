@@ -1,12 +1,14 @@
 # BATCH-011 — Administração da mesa
 
-Estado: `PLANNED`
+Estado: `DONE`
 
 Issue: [#40](https://github.com/EmanuelSena101/DDivination/issues/40)
 
 Planejamento: [Pull Request #53](https://github.com/EmanuelSena101/DDivination/pull/53)
 
-Pull Request: a criar quando a implementação começar
+Branch: `codex/batch-011-table-administration`
+
+Pull Request: [#54](https://github.com/EmanuelSena101/DDivination/pull/54)
 
 ## Contexto
 
@@ -45,17 +47,21 @@ papéis, tokens e acesso à mesa sem expor controles indevidos aos jogadores.
 - esconder um botão não substitui autorização;
 - códigos LAN são temporários e tokens continuam efêmeros;
 - o papel `display` é somente leitura e não recebe segredos do GM.
+- aprovação de entrada é opcional e vem desligada por padrão;
+- não haverá co-GM nesta batch: o GM proprietário continua sendo a única autoridade administrativa;
+- permissões padrão mantêm ping e dados para jogadores, mas fog e iniciativa ficam restritos ao GM;
+- remover um participante revoga sua credencial e encerra sua conexão ativa.
 
 ## Critérios de aceitação
 
-- [ ] GM atribui e revoga tokens sem reiniciar a sessão;
-- [ ] jogador controla apenas tokens e ferramentas permitidos;
-- [ ] participante removido perde acesso imediatamente;
-- [ ] rotação do código invalida apenas novas entradas com o código anterior;
-- [ ] display nunca envia comandos mutáveis;
-- [ ] eventos administrativos aparecem para os destinatários corretos;
-- [ ] controles da UI são específicos por papel;
-- [ ] tentativas REST/WebSocket não autorizadas são rejeitadas e testadas.
+- [x] GM atribui e revoga tokens sem reiniciar a sessão;
+- [x] jogador controla apenas tokens e ferramentas permitidos;
+- [x] participante removido perde acesso imediatamente;
+- [x] rotação do código invalida apenas novas entradas com o código anterior;
+- [x] display nunca envia comandos mutáveis;
+- [x] eventos administrativos aparecem para os destinatários corretos;
+- [x] controles da UI são específicos por papel;
+- [x] tentativas REST/WebSocket não autorizadas são rejeitadas e testadas.
 
 ## Testes obrigatórios
 
@@ -75,19 +81,57 @@ papéis, tokens e acesso à mesa sem expor controles indevidos aos jogadores.
 - payload secreto vazar em eventos administrativos. Mitigação: projeções por
   destinatário no servidor.
 
+## Diário de implementação
+
+### 2026-07-31 — início e auditoria
+
+- branch de implementação criada a partir da `main` aprovada;
+- issue #40 atualizada com o início do trabalho;
+- contratos de sessão, hub WebSocket, persistência e controles da VTT auditados;
+- detectado que `display` ainda conseguia enviar `ping` e `dice.roll`;
+- definida aprovação opt-in e descartado co-GM no escopo da Batch 11;
+- escolhida administração ao vivo por comandos WebSocket autoritativos, com rotação de
+  código por REST local autenticado.
+
+### 2026-07-31 — implementação
+
+- estado de sessão ampliado com presença, última atividade, permissões, admissões
+  e abertura para novas entradas;
+- painel bilíngue do GM entregue para papéis, participantes, tokens e acesso;
+- fluxo opt-in de aprovação entregue com tela de espera e polling autenticado;
+- rotação do código adicionada à API REST local e ao contrato OpenAPI;
+- remoção passou a apagar credencial e fechar imediatamente o WebSocket;
+- `display` passou a ser somente leitura também no servidor;
+- controles de fog, ping, dados e iniciativa passaram a respeitar as permissões
+  no backend e na interface.
+
+### 2026-07-31 — validação
+
+- testes Go, `go vet`, build e contrato OpenAPI aprovados;
+- TypeScript strict, 32 testes Vitest, build e budgets aprovados;
+- 8 cenários Playwright aprovados, incluindo GM, dois jogadores e display;
+- QA visual do painel em pt-BR aprovada sem erros de console;
+- avisos preexistentes de depreciação do Three.js permanecem registrados para
+  manutenção futura e não foram introduzidos por esta batch.
+
 ## Resultado
 
-Planejamento registrado. Implementação permanece futura.
+O GM agora administra a mesa ao vivo sem comandos técnicos. A autoridade segue
+no servidor, jogadores recebem somente as ferramentas permitidas e displays são
+estritamente somente leitura. Entrada, aprovação, código e expulsão têm estados
+explícitos e auditáveis por eventos.
 
-## Pendências encontradas
+## Pendências transferidas
 
-- definir se aprovação de entrada será opt-in ou default no início da batch;
-- fechar a política de co-GM sem criar contas permanentes.
+- replay e recuperação operacional após reinício permanecem na Batch 12;
+- reorganização responsiva do painel e dos controles permanece na Batch 13;
+- co-GM e contas online continuam fora do v1.
 
 ## Documentação atualizada
 
 - [x] documento desta batch;
 - [x] roadmap e índice;
 - [x] issue no GitHub;
-- [ ] API e manual de sessão durante a implementação;
-- [ ] ADR, se houver co-GM ou mudança de modelo de autoridade.
+- [x] API e manual de administração da sessão;
+- [x] arquitetura, testes e README;
+- [x] ADR dispensado: não houve co-GM nem mudança da autoridade definida.

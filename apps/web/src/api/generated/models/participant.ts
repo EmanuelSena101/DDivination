@@ -8,8 +8,10 @@
 import type { ParticipantRole } from './participantRole';
 
 export interface Participant {
+  connected: boolean;
   id: string;
   joinedAt: string;
+  lastSeenAt: string;
   name: string;
   role: ParticipantRole;
 }

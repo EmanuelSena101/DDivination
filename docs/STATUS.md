@@ -56,26 +56,23 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 ## Última batch concluída
 
-`BATCH-010 — Catálogo e regras 5E`
+`BATCH-011 — Administração da mesa`
 
-O gerador agora usa um catálogo SRD 5.2.1 versionado, budgets oficiais de XP e
-conteúdo semântico bilíngue de encontros, tesouros, puzzles, armadilhas e
-descansos. O mestre recebe essas informações na VTT e nas exportações, enquanto
-o servidor as remove da visão do jogador. A validação incluiu 1.000 seeds, 320
-combinações adicionais, 31 testes Vitest, 7 cenários Playwright, QA bilíngue e
-todos os sete gates do projeto no CI.
+O GM agora administra acesso, aprovações, participantes, papéis, presença,
+tokens e permissões pela interface. O servidor aplica a matriz de autorização,
+revoga participantes imediatamente e mantém `display` somente leitura. A
+validação incluiu 32 testes Vitest, 8 cenários Playwright e todos os gates locais.
 
 Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-010-catalog-rules.md](batches/BATCH-010-catalog-rules.md).
+[BATCH-011-table-administration.md](batches/BATCH-011-table-administration.md).
 
 ## Próxima batch
 
-`BATCH-011 — Administração da mesa`
+`BATCH-012 — Durabilidade em tempo real`
 
-A Batch 11 permanece `PLANNED` e deverá consolidar a administração da sessão:
-participantes, papéis, atribuição de tokens e controles operacionais do mestre.
-Seu escopo e critérios estão registrados no
-[diário da Batch 11](batches/BATCH-011-table-administration.md) e na issue #40.
+A próxima batch consolidará replay, snapshots periódicos, reconexão por revisão
+e recuperação de sessões abertas após reinício. Seu escopo está no
+[diário da Batch 12](batches/BATCH-012-realtime-durability.md).
 
 ## Roadmap ampliado após auditoria do legado
 

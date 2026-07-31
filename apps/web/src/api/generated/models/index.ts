@@ -6,6 +6,9 @@
  * OpenAPI spec version: 1.0.0-alpha.1
  */
 
+export * from './admissionRequest';
+export * from './admissionRequestRole';
+export * from './admissionRequestStatus';
 export * from './adventureDocument';
 export * from './adventureNarrative';
 export * from './adventureSnapshotSummary';
@@ -20,6 +23,7 @@ export * from './attribution';
 export * from './catalog';
 export * from './catalogItem';
 export * from './catalogItemKind';
+export * from './codeStatus';
 export * from './contentCounts';
 export * from './created';
 export * from './createSessionInputBody';
@@ -45,6 +49,7 @@ export * from './importAssetBody';
 export * from './initiativeEntry';
 export * from './initiativeState';
 export * from './joined';
+export * from './joinedStatus';
 export * from './joinRequest';
 export * from './joinRequestRole';
 export * from './listAdventureCheckpointsParams';
@@ -66,7 +71,9 @@ export * from './result';
 export * from './room';
 export * from './sceneEntity';
 export * from './sceneEntityKind';
+export * from './sessionPermissions';
 export * from './sessionState';
+export * from './sessionStateAdmissions';
 export * from './sessionStateParticipants';
 export * from './sessionStateRevealedCells';
 export * from './sessionStateTokenFloors';

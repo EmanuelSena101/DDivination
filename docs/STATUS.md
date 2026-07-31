@@ -69,11 +69,11 @@ incluindo 8 cenários Playwright, foram aprovados.
 Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-012-realtime-durability.md](batches/BATCH-012-realtime-durability.md).
 
-## Próxima batch
+## Batch em andamento
 
 `BATCH-013 — Remake de UX e controles da VTT`
 
-O próximo trabalho reorganiza gestos, seleção, câmera, ferramentas e feedback
+O trabalho atual reorganiza gestos, seleção, câmera, ferramentas e feedback
 visual da VTT, eliminando a ambiguidade entre mover a câmera e agir no mapa.
 Consulte o [diário da Batch 13](batches/BATCH-013-vtt-ux-controls.md).
 

@@ -1,12 +1,14 @@
 # BATCH-013 — Remake de UX e controles da VTT
 
-Estado: `PLANNED`
+Estado: `IN_PROGRESS`
 
 Issue: [#35](https://github.com/EmanuelSena101/DDivination/issues/35)
 
 Planejamento: [Pull Request #36](https://github.com/EmanuelSena101/DDivination/pull/36)
 
-Pull Request: a criar quando a implementação começar
+Branch: `codex/batch-013-vtt-ux-controls`
+
+Pull Request: a criar após publicar o checkpoint inicial
 
 ## Contexto
 
@@ -146,7 +148,8 @@ responsividade e superfícies específicas para mestre, jogador e display.
 
 ## Resultado
 
-Planejamento registrado. Implementação permanece futura.
+Implementação iniciada em 2026-07-31. O primeiro checkpoint audita e unifica os
+gestos de câmera e as ações do mapa antes das mudanças de hierarquia visual.
 
 ## Pendências encontradas
 

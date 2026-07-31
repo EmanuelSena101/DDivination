@@ -197,6 +197,15 @@ function adventure(): AdventureDocument {
     },
     floors: [createSceneBenchmarkFloor({ size: 64, tokenCount: 0, propCount: 0 })],
     encounters: [],
+    progression: {
+      entryRoomId: "",
+      objectiveRoomId: "",
+      climaxRoomId: "",
+      steps: [],
+      locks: [],
+      secretRoomIds: [],
+      solvable: false,
+    },
     analysis: {
       totalRooms: 1,
       totalFloors: 1,

@@ -772,6 +772,108 @@ button.secondary {
   font-size: 9px;
 }
 
+.progression-panel > header small.solvable {
+  color: #65c491;
+}
+
+.progression-panel > header small.unsolvable {
+  color: #db5967;
+}
+
+.progression-summary {
+  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+}
+
+.progression-summary span {
+  padding: 7px 8px;
+  color: #716e7c;
+  font-size: 8px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.progression-summary strong {
+  margin-right: 5px;
+  color: var(--gold);
+  font: 600 12px "Cinzel", serif;
+}
+
+.progression-list {
+  max-height: 270px;
+  margin: 0;
+  padding: 0 3px 0 0;
+  display: grid;
+  gap: 4px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.progression-list li {
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 25px 1fr;
+  gap: 7px;
+  border-left: 2px solid #4f4a5d;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.progression-list li.progression-key {
+  border-left-color: var(--gold);
+}
+
+.progression-list li.progression-transition,
+.progression-list li.progression-climax {
+  border-left-color: #7657f7;
+}
+
+.progression-order {
+  color: #777283;
+  font: 600 9px "Cinzel", serif;
+}
+
+.progression-list strong,
+.progression-list small {
+  display: block;
+}
+
+.progression-list strong {
+  font-size: 10px;
+}
+
+.progression-list small {
+  margin-top: 2px;
+  color: #8b829d;
+  font-size: 8px;
+  text-transform: uppercase;
+}
+
+.progression-list p {
+  margin: 5px 0 0;
+  color: #777381;
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.progression-tags {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.progression-tags span {
+  padding: 3px 5px;
+  color: #c5b77d;
+  font-size: 8px;
+  border: 1px solid rgba(196, 154, 88, 0.24);
+  border-radius: 2px;
+  background: rgba(196, 154, 88, 0.06);
+}
+
 .invariant-list {
   margin: 0;
   padding: 0;

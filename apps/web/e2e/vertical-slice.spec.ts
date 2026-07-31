@@ -5,6 +5,9 @@ test("GM and player share an authoritative 3D dice roll", async ({ browser, page
   await page.goto("/");
   await page.getByRole("button", { name: "✦ Divinar dungeon" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Serpent Cult");
+  await expect(page.getByTestId("progression-panel")).toBeVisible();
+  await expect(page.getByTestId("progression-panel")).toContainText("Solúvel");
+  await expect(page.getByTestId("progression-panel")).toContainText("Chave do limiar");
 
   await page.getByTestId("toggle-vtt-diagnostics").click();
   await expect(page.getByTestId("vtt-diagnostics-panel")).toBeVisible();
@@ -32,6 +35,7 @@ test("GM and player share an authoritative 3D dice roll", async ({ browser, page
   await player.getByLabel("Seu nome", { exact: true }).fill("Lia");
   await player.getByRole("button", { name: "Entrar" }).click();
   await expect(player.getByText("LIVE", { exact: true })).toBeVisible();
+  await expect(player.getByTestId("progression-panel")).toHaveCount(0);
 
   await player.getByRole("button", { name: "Rolar" }).click();
   await expect(player.locator(".last-roll")).toBeVisible();

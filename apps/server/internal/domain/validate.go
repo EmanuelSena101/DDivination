@@ -39,9 +39,12 @@ func ValidateAdventure(document AdventureDocument) error {
 	}
 
 	floors := make(map[string]FloorMap, len(document.Floors))
-	rooms := make(map[string]string)
-	entities := make(map[string]struct{})
-	portals := make(map[string]struct{})
+	roomFloors := make(map[string]string)
+	rooms := make(map[string]Room)
+	entities := make(map[string]SceneEntity)
+	portals := make(map[string]Portal)
+	walls := make(map[string]WallEdge)
+	wallFloors := make(map[string]string)
 	indices := make(map[int]struct{})
 	for _, floor := range document.Floors {
 		if strings.TrimSpace(floor.ID) == "" {
@@ -95,13 +98,23 @@ func ValidateAdventure(document AdventureDocument) error {
 				return invalidAdventure("duplicate wall %s on floor %q", key, floor.ID)
 			}
 			edges[key] = struct{}{}
+			if wall.ID != "" {
+				if _, duplicate := walls[wall.ID]; duplicate {
+					return invalidAdventure("duplicate wall id %q", wall.ID)
+				}
+				walls[wall.ID] = wall
+				wallFloors[wall.ID] = floor.ID
+			}
+			if wall.RequiredKeyID != "" && (wall.ID == "" || wall.Kind != "door" || !wall.Locked) {
+				return invalidAdventure("keyed wall on floor %q must be an identified locked door", floor.ID)
+			}
 		}
 
 		for _, room := range floor.Rooms {
 			if strings.TrimSpace(room.ID) == "" {
 				return invalidAdventure("room id is required on floor %q", floor.ID)
 			}
-			if _, duplicate := rooms[room.ID]; duplicate {
+			if _, duplicate := roomFloors[room.ID]; duplicate {
 				return invalidAdventure("duplicate room id %q", room.ID)
 			}
 			if _, ok := tiles[room.Center]; !ok {
@@ -110,7 +123,11 @@ func ValidateAdventure(document AdventureDocument) error {
 			if err := validateLocalized("room "+room.ID+" name", room.Name); err != nil {
 				return err
 			}
-			rooms[room.ID] = floor.ID
+			if err := validateLocalized("room "+room.ID+" description", room.Description); err != nil {
+				return err
+			}
+			roomFloors[room.ID] = floor.ID
+			rooms[room.ID] = room
 		}
 		for _, entity := range floor.Entities {
 			if strings.TrimSpace(entity.ID) == "" {
@@ -128,7 +145,10 @@ func ValidateAdventure(document AdventureDocument) error {
 			if err := validateLocalized("entity "+entity.ID+" name", entity.Name); err != nil {
 				return err
 			}
-			entities[entity.ID] = struct{}{}
+			if entity.RoomID != "" && roomFloors[entity.RoomID] != floor.ID {
+				return invalidAdventure("entity %q references an invalid room", entity.ID)
+			}
+			entities[entity.ID] = entity
 		}
 		for _, portal := range floor.Portals {
 			if strings.TrimSpace(portal.ID) == "" {
@@ -143,7 +163,7 @@ func ValidateAdventure(document AdventureDocument) error {
 			if _, ok := tiles[portal.From]; !ok {
 				return invalidAdventure("portal %q source has no tile", portal.ID)
 			}
-			portals[portal.ID] = struct{}{}
+			portals[portal.ID] = portal
 		}
 		if err := validateWalkableRooms(floor, tiles); err != nil {
 			return err
@@ -169,20 +189,43 @@ func ValidateAdventure(document AdventureDocument) error {
 	if err := validateFloorConnectivity(document.Floors[0].ID, floors, floorLinks); err != nil {
 		return err
 	}
+	if err := validatePortalPairs(portals); err != nil {
+		return err
+	}
 	for _, encounter := range document.Encounters {
-		if actualFloor, ok := rooms[encounter.RoomID]; !ok || actualFloor != encounter.FloorID {
+		if actualFloor, ok := roomFloors[encounter.RoomID]; !ok || actualFloor != encounter.FloorID {
 			return invalidAdventure("encounter %q references an invalid room", encounter.ID)
 		}
 	}
 	if document.Analysis.TotalFloors != len(document.Floors) {
 		return invalidAdventure("analysis totalFloors does not match document")
 	}
-	if document.Analysis.TotalRooms != len(rooms) {
+	if document.Analysis.TotalRooms != len(roomFloors) {
 		return invalidAdventure("analysis totalRooms does not match document")
 	}
 	for _, roomID := range append(append([]string{}, document.Analysis.CriticalPath...), document.Analysis.DeadEnds...) {
-		if _, ok := rooms[roomID]; !ok {
+		if _, ok := roomFloors[roomID]; !ok {
 			return invalidAdventure("analysis references unknown room %q", roomID)
+		}
+	}
+	if err := validateProgression(document, roomFloors, rooms, entities, portals, walls, wallFloors); err != nil {
+		return err
+	}
+	return nil
+}
+
+func validatePortalPairs(portals map[string]Portal) error {
+	for _, portal := range portals {
+		paired := false
+		for _, candidate := range portals {
+			if candidate.FromFloorID == portal.ToFloorID && candidate.ToFloorID == portal.FromFloorID &&
+				candidate.From == portal.To && candidate.To == portal.From {
+				paired = true
+				break
+			}
+		}
+		if !paired {
+			return invalidAdventure("portal %q has no coherent return pair", portal.ID)
 		}
 	}
 	return nil

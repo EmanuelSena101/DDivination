@@ -45,6 +45,7 @@ func GenerateContext(
 	rng := NewRNG(seed)
 	adventureID := fmt.Sprintf("adv-%016x", seed)
 	floors := make([]domain.FloorMap, 0, spec.FloorCount)
+	floorPaths := make([][]string, 0, spec.FloorCount)
 	criticalPath := make([]string, 0)
 	deadEnds := make([]string, 0)
 	encounters := make([]domain.Encounter, 0)
@@ -55,6 +56,7 @@ func GenerateContext(
 			return domain.AdventureDocument{}, err
 		}
 		floor, path, secretID, encounter := generateFloor(spec, rng, adventureID, floorIndex)
+		floorPaths = append(floorPaths, path)
 		criticalPath = append(criticalPath, path...)
 		if secretID != "" {
 			deadEnds = append(deadEnds, secretID)
@@ -111,6 +113,7 @@ func GenerateContext(
 	if err := ctx.Err(); err != nil {
 		return domain.AdventureDocument{}, err
 	}
+	progression, floors := buildProgression(floors, floorPaths)
 	name := generatedName(spec, rng)
 	doc := domain.AdventureDocument{
 		ID:               adventureID,
@@ -139,8 +142,9 @@ func GenerateContext(
 				ENUS: fmt.Sprintf("A %s environment shaped by %s.", spec.Biome, spec.Theme),
 			},
 		},
-		Floors:     floors,
-		Encounters: encounters,
+		Floors:      floors,
+		Encounters:  encounters,
+		Progression: progression,
 		Analysis: domain.DungeonAnalysis{
 			TotalRooms:          countRooms(floors),
 			TotalFloors:         len(floors),
@@ -149,15 +153,21 @@ func GenerateContext(
 			EstimatedDifficulty: spec.Difficulty,
 			Invariants: []string{
 				"entrance-reaches-objective",
+				"keys-precede-locks",
+				"progression-is-solvable",
 				"portals-are-paired",
 				"secrets-are-optional",
+				"dead-ends-have-purpose",
 				"critical-path-is-walkable",
-				"boss-is-on-final-floor",
+				"climax-is-on-final-floor",
 			},
 		},
 		Attributions: []domain.Attribution{srdAttribution()},
 		CreatedAt:    now.UTC(),
 		UpdatedAt:    now.UTC(),
+	}
+	if err := domain.ValidateAdventure(doc); err != nil {
+		return domain.AdventureDocument{}, fmt.Errorf("generated adventure failed semantic validation: %w", err)
 	}
 	return doc, nil
 }
@@ -396,7 +406,7 @@ func addDecorations(floor *domain.FloorMap, rng *RNG) {
 		asset := rng.Pick([]string{"prop-crate", "prop-column", "prop-brazier"})
 		name := domain.LocalizedText{PTBR: "Objeto de cenário", ENUS: "Scenery prop"}
 		if room.Secret {
-			kind = "key"
+			kind = "prop"
 			asset = "prop-chest"
 			name = domain.LocalizedText{PTBR: "Tesouro oculto", ENUS: "Hidden treasure"}
 		}

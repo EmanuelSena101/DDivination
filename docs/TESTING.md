@@ -78,6 +78,12 @@ cancelamento cooperativo do gerador. No navegador, o E2E combina uma aventura
 realmente persistida com um stream controlado para verificar progresso,
 WebSocket, polling, reload e abertura final da VTT sem flakiness temporal.
 
+O gerador de progressão é exercitado sobre 1.000 seeds, variando de um a cinco
+andares e os três estilos estruturais. A validação negativa cobre chave obtida
+depois do lock, alvo inexistente e sala secreta inserida no caminho obrigatório.
+O E2E confirma o painel bilíngue de progressão na visão do mestre e sua ausência
+na visão do jogador.
+
 Se o ambiente de desenvolvimento estiver aberto, encerre-o antes:
 
 ```powershell

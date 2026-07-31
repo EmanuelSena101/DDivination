@@ -69,6 +69,12 @@ O servidor valida o documento semântico antes de persistir. IDs duplicados,
 referências inválidas, posições sem tile, andares desconectados e salas
 obrigatórias inalcançáveis recebem `422 Unprocessable Entity`.
 
+A validação também reconstrói a progressão ordenada. Chaves devem ser entidades
+reais adquiridas antes de seus locks; locks devem apontar para uma porta ou
+portal compatível; segredos não podem fazer parte do caminho obrigatório; e o
+clímax deve encerrar a progressão no último andar. O campo `solvable` registra o
+resultado, mas não substitui essa simulação no servidor.
+
 Cada `PUT` aprovado incrementa a versão e cria um snapshot imutável. O endpoint
 de checkpoints também permite criar um marco manual sem alterar a versão.
 Restaurar um checkpoint exige `If-Match` e grava seu conteúdo como uma nova

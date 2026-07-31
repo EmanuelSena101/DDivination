@@ -9,6 +9,7 @@ import type { AdventureNarrative } from './adventureNarrative';
 import type { AdventureSpec } from './adventureSpec';
 import type { Attribution } from './attribution';
 import type { DungeonAnalysis } from './dungeonAnalysis';
+import type { DungeonProgression } from './dungeonProgression';
 import type { Encounter } from './encounter';
 import type { FloorMap } from './floorMap';
 import type { LocalizedText } from './localizedText';
@@ -28,6 +29,7 @@ export interface AdventureDocument {
   id: string;
   name: LocalizedText;
   narrative: AdventureNarrative;
+  progression: DungeonProgression;
   schemaVersion: string;
   /** @minimum 0 */
   seed: number;

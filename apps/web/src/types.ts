@@ -33,10 +33,12 @@ export interface Tile extends GridPosition {
 }
 
 export interface WallEdge extends GridPosition {
+  id?: string;
   direction: "north" | "east" | "south" | "west";
   kind: "wall" | "door" | "secret-door";
   open: boolean;
   locked: boolean;
+  requiredKeyId?: string;
 }
 
 export interface Portal {
@@ -107,6 +109,7 @@ export interface AdventureDocument {
     difficulty: string;
     totalXp: number;
   }>;
+  progression: DungeonProgression;
   analysis: {
     totalRooms: number;
     totalFloors: number;
@@ -124,6 +127,36 @@ export interface AdventureDocument {
   }>;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ProgressionStep {
+  order: number;
+  floorId: string;
+  roomId: string;
+  kind: "entrance" | "exploration" | "key" | "transition" | "climax";
+  beat: LocalizedText;
+  grantsKeyIds: string[];
+  requiresKeyIds: string[];
+}
+
+export interface ProgressionLock {
+  id: string;
+  kind: "door" | "portal";
+  targetId: string;
+  floorId: string;
+  fromRoomId: string;
+  toRoomId: string;
+  keyId: string;
+}
+
+export interface DungeonProgression {
+  entryRoomId: string;
+  objectiveRoomId: string;
+  climaxRoomId: string;
+  steps: ProgressionStep[];
+  locks: ProgressionLock[];
+  secretRoomIds: string[];
+  solvable: boolean;
 }
 
 export interface AdventureSnapshotSummary {

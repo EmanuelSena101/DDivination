@@ -60,6 +60,15 @@ function document(name: string, version: number): AdventureDocument {
     },
     floors: [],
     encounters: [],
+    progression: {
+      entryRoomId: "",
+      objectiveRoomId: "",
+      climaxRoomId: "",
+      steps: [],
+      locks: [],
+      secretRoomIds: [],
+      solvable: false,
+    },
     analysis: {
       totalRooms: 0,
       totalFloors: 0,

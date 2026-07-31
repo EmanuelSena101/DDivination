@@ -18,8 +18,10 @@ $webDist = Join-Path $repoRoot "apps\web\dist"
 $backendProcess = $null
 $webProcess = $null
 $runtimeFileCreated = $false
+$databaseManaged = $false
 $previousDataDir = [Environment]::GetEnvironmentVariable("DDIVINATION_DATA_DIR", "Process")
 $previousWebDir = [Environment]::GetEnvironmentVariable("DDIVINATION_WEB_DIR", "Process")
+$previousDatabaseURL = [Environment]::GetEnvironmentVariable("DATABASE_URL", "Process")
 
 Push-Location $repoRoot
 try {
@@ -30,6 +32,15 @@ try {
     }
     Assert-DDivinationPortAvailable -Port 8080
     Assert-DDivinationPortAvailable -Port 5173
+
+    if ([string]::IsNullOrWhiteSpace($env:DATABASE_URL)) {
+        & (Join-Path $repoRoot "scripts\database.ps1") -Action Up
+        if ($LASTEXITCODE -ne 0) {
+            throw "Nao foi possivel iniciar o PostgreSQL local."
+        }
+        $env:DATABASE_URL = "postgres://ddivination:ddivination@127.0.0.1:54329/ddivination?sslmode=disable"
+        $databaseManaged = $true
+    }
 
     if (-not (Test-Path -LiteralPath (Join-Path $repoRoot "node_modules"))) {
         if ($SkipInstall) {
@@ -67,27 +78,33 @@ try {
 
     $env:DDIVINATION_DATA_DIR = $resolvedDataDir
     $env:DDIVINATION_WEB_DIR = $webDist
-    $backendProcess = Start-Process `
-        -FilePath $backendBinary `
-        -WorkingDirectory $repoRoot `
-        -RedirectStandardOutput $backendLog `
-        -RedirectStandardError $backendErrorLog `
-        -WindowStyle Hidden `
-        -PassThru
-
-    $webProcess = Start-Process `
-        -FilePath $nodeTools.Npm `
-        -ArgumentList @("run", "dev:web") `
-        -WorkingDirectory $repoRoot `
-        -RedirectStandardOutput $webLog `
-        -RedirectStandardError $webErrorLog `
-        -WindowStyle Hidden `
-        -PassThru
+    $backendStart = @{
+        FilePath = $backendBinary
+        WorkingDirectory = $repoRoot
+        RedirectStandardOutput = $backendLog
+        RedirectStandardError = $backendErrorLog
+        PassThru = $true
+    }
+    $webStart = @{
+        FilePath = $nodeTools.Npm
+        ArgumentList = @("run", "dev:web")
+        WorkingDirectory = $repoRoot
+        RedirectStandardOutput = $webLog
+        RedirectStandardError = $webErrorLog
+        PassThru = $true
+    }
+    if ($env:OS -eq "Windows_NT") {
+        $backendStart.WindowStyle = "Hidden"
+        $webStart.WindowStyle = "Hidden"
+    }
+    $backendProcess = Start-Process @backendStart
+    $webProcess = Start-Process @webStart
 
     $runtimeRecord = [ordered]@{
         repoRoot = $repoRoot
         dataDir = $resolvedDataDir
         startedAtUtc = [DateTime]::UtcNow.ToString("o")
+        databaseManaged = $databaseManaged
         backend = [ordered]@{
             id = $backendProcess.Id
             startedAtUtc = $backendProcess.StartTime.ToUniversalTime().ToString("o")
@@ -111,6 +128,7 @@ try {
     Write-Host "Frontend: http://127.0.0.1:5173"
     Write-Host "Backend:  http://127.0.0.1:8080"
     Write-Host "Dados:    $resolvedDataDir"
+    Write-Host "Banco:    PostgreSQL"
     Write-Host "Logs:     $runtimeDir"
     Write-Host ""
     Write-Host "Para encerrar: .\scripts\stop.ps1"
@@ -124,6 +142,9 @@ try {
     if ($runtimeFileCreated -and (Test-Path -LiteralPath $runtimeFile)) {
         Remove-Item -LiteralPath $runtimeFile -Force
     }
+    if ($databaseManaged) {
+        & (Join-Path $repoRoot "scripts\database.ps1") -Action Down 2>$null
+    }
     Write-Error $_
 } finally {
     if ($null -eq $previousDataDir) {
@@ -135,6 +156,11 @@ try {
         Remove-Item Env:DDIVINATION_WEB_DIR -ErrorAction SilentlyContinue
     } else {
         $env:DDIVINATION_WEB_DIR = $previousWebDir
+    }
+    if ($null -eq $previousDatabaseURL) {
+        Remove-Item Env:DATABASE_URL -ErrorAction SilentlyContinue
+    } else {
+        $env:DATABASE_URL = $previousDatabaseURL
     }
     Pop-Location
 }

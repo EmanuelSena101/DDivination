@@ -15,21 +15,13 @@ import (
 	"github.com/EmanuelSena101/DDivination/apps/server/internal/domain"
 	"github.com/EmanuelSena101/DDivination/apps/server/internal/generator"
 	"github.com/EmanuelSena101/DDivination/apps/server/internal/session"
-	"github.com/EmanuelSena101/DDivination/apps/server/internal/store"
+	"github.com/EmanuelSena101/DDivination/apps/server/internal/testdb"
 )
 
 func newContractTestServer(t *testing.T) (*Server, Handlers) {
 	t.Helper()
 	root := t.TempDir()
-	database, err := store.Open(filepath.Join(root, "test.sqlite3"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() {
-		if err := database.Close(); err != nil {
-			t.Errorf("close database: %v", err)
-		}
-	})
+	database := testdb.Open(t)
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	server := New(database, session.NewHub(database), nil, logger, "", nil, filepath.Join(root, "assets"))
 	return server, server.Handlers()

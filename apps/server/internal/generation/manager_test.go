@@ -4,13 +4,13 @@ import (
 	"context"
 	"io"
 	"log/slog"
-	"path/filepath"
 	"slices"
 	"testing"
 	"time"
 
 	"github.com/EmanuelSena101/DDivination/apps/server/internal/domain"
 	"github.com/EmanuelSena101/DDivination/apps/server/internal/store"
+	"github.com/EmanuelSena101/DDivination/apps/server/internal/testdb"
 )
 
 func TestManagerCompletesWithMonotonicPersistedStages(t *testing.T) {
@@ -137,16 +137,7 @@ func TestManagerRecoversInterruptedRuns(t *testing.T) {
 
 func openTestStore(t *testing.T) *store.Store {
 	t.Helper()
-	database, err := store.Open(filepath.Join(t.TempDir(), "generation.sqlite3"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() {
-		if err := database.Close(); err != nil {
-			t.Errorf("close store: %v", err)
-		}
-	})
-	return database
+	return testdb.Open(t)
 }
 
 func testLogger() *slog.Logger {

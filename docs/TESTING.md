@@ -6,6 +6,7 @@
 - Node.js 24+;
 - npm 11+;
 - Go 1.26+ no `PATH` ou no runtime portátil em `.tools/`.
+- Docker Desktop com Compose, ou `DATABASE_URL` apontando para PostgreSQL 17+.
 
 ## Iniciar
 
@@ -17,6 +18,7 @@ Na raiz do repositório:
 
 O script:
 
+- inicia e aguarda o PostgreSQL local quando `DATABASE_URL` não está definida;
 - valida Node, npm, Go e as portas 8080/5173;
 - instala dependências quando `node_modules` não existe;
 - compila um snapshot do frontend para os clientes LAN;
@@ -43,7 +45,29 @@ Use outro diretório de dados quando necessário:
 ```
 
 O script encerra somente os PIDs registrados por `dev.ps1`, validando o horário
-de criação para evitar atingir um PID reutilizado. Logs são preservados.
+de criação para evitar atingir um PID reutilizado. Logs e dados são preservados;
+o container PostgreSQL iniciado automaticamente também é parado.
+
+## PostgreSQL local
+
+```powershell
+.\scripts\database.ps1 -Action Up
+.\scripts\database.ps1 -Action Status
+.\scripts\database.ps1 -Action Down
+.\scripts\database.ps1 -Action Reset
+```
+
+`Down` preserva o volume. `Reset` remove somente o volume Compose deste projeto,
+recria o banco e deve ser usado quando fixtures locais puderem ser descartadas.
+O endereço padrão é:
+
+```text
+postgres://ddivination:ddivination@127.0.0.1:54329/ddivination?sslmode=disable
+```
+
+Para um PostgreSQL próprio, defina `DATABASE_URL`; os scripts não iniciarão nem
+pararão Docker. `TEST_DATABASE_URL` pode apontar para outra base nos testes. Cada
+teste Go cria um schema aleatório e o remove ao terminar.
 
 ## Testar
 
@@ -59,7 +83,8 @@ Sem Playwright:
 .\scripts\test.ps1 -SkipE2E
 ```
 
-O script executa testes, vet e build Go; verifica drift do OpenAPI e do cliente
+O script inicia PostgreSQL quando necessário, executa testes, vet e build Go;
+verifica drift do OpenAPI e do cliente
 Orval; executa TypeScript strict, Vitest, build Vite, budgets de bundle e, por
 padrão, Playwright.
 
@@ -68,9 +93,9 @@ Os arquivos são executados em série: abrir uma mesa altera intencionalmente a
 interface de rede do único servidor local do teste.
 
 Os cenários editoriais cobrem grid, conteúdo, autosave, reload, checkpoints e
-um conflito otimista provocado por um segundo cliente HTTP. A suíte usa um
-diretório SQLite isolado e mantém um único worker para preservar a ordem das
-operações autoritativas.
+um conflito otimista provocado por um segundo cliente HTTP. A suíte usa schemas
+PostgreSQL isolados e mantém um único worker Playwright para preservar a ordem
+das operações autoritativas.
 
 O fluxo de geração cobre a resposta assíncrona, progresso monotônico,
 persistência final, cancelamento idempotente, recuperação após reinício e
@@ -102,6 +127,18 @@ Há testes unitários para a matriz de permissões, display somente leitura,
 aprovação, mudança de papel, atribuição e revogação de credenciais. O Playwright
 abre quatro contextos isolados — GM, dois jogadores e display — e cobre
 aprovação, permissões, token, rotação de código e expulsão.
+
+## Durabilidade da sessão
+
+Os testes PostgreSQL cobrem 1.000 eventos, snapshots, compactação, idempotência,
+falha antes e repetição depois do commit, duas mesas concorrentes, retenção de
+mesas encerradas e migrations reaplicadas em outro pool. Testes do hub recriam a
+instância para confirmar restauração de fog, tokens, iniciativa, rolagens,
+credenciais e código de entrada. O Playwright interrompe o WebSocket, reconecta
+por revisão e confirma que a rolagem visível permanece a mesma.
+
+No GitHub Actions, `postgres-integration` usa PostgreSQL 17 efêmero. Os jobs
+`e2e` e `developer-workflow` também executam contra PostgreSQL real.
 
 ## Instrumentação do VTT
 
@@ -151,5 +188,7 @@ O `go.work` da raiz inclui `apps/server`. Com Go disponível no `PATH`, comandos
 como este funcionam sem trocar de diretório:
 
 ```powershell
+npm run db:up
+$env:DATABASE_URL = "postgres://ddivination:ddivination@127.0.0.1:54329/ddivination?sslmode=disable"
 go run ./apps/server/cmd/ddivination
 ```

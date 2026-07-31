@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS session_credentials (
     session_id TEXT NOT NULL,
     participant_id TEXT NOT NULL,
     token_hash TEXT NOT NULL UNIQUE,
-    created_at TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
     PRIMARY KEY(session_id, participant_id)
 );
 

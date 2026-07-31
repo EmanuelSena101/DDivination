@@ -58,7 +58,7 @@ cena 3D. A remoção exige confirmação.
 ## Salvamento e checkpoints
 
 Depois de 1,5 segundo sem novas alterações, o frontend salva automaticamente no
-SQLite. **Salvar agora** ignora a espera. Se uma alteração surgir enquanto a
+PostgreSQL. **Salvar agora** ignora a espera. Se uma alteração surgir enquanto a
 requisição está em andamento, ela permanece no rascunho e dispara outro
 autosave; a resposta antiga nunca apaga trabalho novo.
 

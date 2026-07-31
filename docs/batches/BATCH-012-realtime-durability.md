@@ -1,12 +1,14 @@
 # BATCH-012 — Durabilidade em tempo real e migração para PostgreSQL
 
-Estado: `PLANNED`
+Estado: `DONE`
 
 Issue: [#41](https://github.com/EmanuelSena101/DDivination/issues/41)
 
 Planejamento: [Pull Request #53](https://github.com/EmanuelSena101/DDivination/pull/53)
 
-Pull Request: a criar quando a implementação começar
+Branch: `codex/batch-012-postgresql-durability`
+
+Pull Request: [#56](https://github.com/EmanuelSena101/DDivination/pull/56)
 
 ## Contexto
 
@@ -94,22 +96,22 @@ dois bancos operacionais.
 
 ## Critérios de aceitação
 
-- [ ] aplicação completa inicia e passa nos testes usando somente PostgreSQL;
-- [ ] nenhuma store operacional depende de SQLite;
-- [ ] banco local pode ser criado, migrado, inspecionado e parado pelo fluxo
+- [x] aplicação completa inicia e passa nos testes usando somente PostgreSQL;
+- [x] nenhuma store operacional depende de SQLite;
+- [x] banco local pode ser criado, migrado, inspecionado e parado pelo fluxo
   documentado do projeto;
-- [ ] reiniciar o servidor restaura sessão, fog, tokens, iniciativa e rolagens;
-- [ ] reconectar com revisão recente recebe apenas eventos pendentes;
-- [ ] reconectar muito atrás recebe snapshot consistente;
-- [ ] repetir comando confirmado não duplica o efeito;
-- [ ] snapshot a cada 100 eventos é produzido e validado;
-- [ ] jogador não recebe segredos por replay ou snapshot;
-- [ ] queda durante confirmação não perde nem duplica evento;
-- [ ] compactação mantém capacidade de recuperação suportada;
-- [ ] migrations executam em PostgreSQL limpo e atualizam a fixture da versão
+- [x] reiniciar o servidor restaura sessão, fog, tokens, iniciativa e rolagens;
+- [x] reconectar com revisão recente recebe apenas eventos pendentes;
+- [x] reconectar muito atrás recebe snapshot consistente;
+- [x] repetir comando confirmado não duplica o efeito;
+- [x] snapshot a cada 100 eventos é produzido e validado;
+- [x] jogador não recebe segredos por replay ou snapshot;
+- [x] queda durante confirmação não perde nem duplica evento;
+- [x] compactação mantém capacidade de recuperação suportada;
+- [x] migrations executam em PostgreSQL limpo e atualizam a fixture da versão
   anterior coberta pela batch;
-- [ ] CI valida migrations, integração e isolamento entre ao menos duas sessões;
-- [ ] o código não contém credenciais, URL ou identificadores reais do Supabase.
+- [x] CI valida migrations, integração e isolamento entre ao menos duas sessões;
+- [x] o código não contém credenciais, URL ou identificadores reais do Supabase.
 
 ## Testes obrigatórios
 
@@ -135,13 +137,46 @@ dois bancos operacionais.
 
 ## Resultado
 
-Planejamento registrado. Implementação permanece futura.
+Os cinco checkpoints internos foram implementados:
+
+- **12A:** interfaces de persistência independentes de provedor, `DATABASE_URL`,
+  pgx, PostgreSQL 17 por Compose e jobs dedicados no CI;
+- **12B:** adventures, snapshots editoriais, gerações, assets, credenciais e
+  sessões migrados para JSONB, `TIMESTAMPTZ` e placeholders PostgreSQL;
+- **12C:** commit serializável une evento, idempotência, revisão, estado corrente,
+  acesso e snapshot antes do broadcast;
+- **12D:** restauração após reinício, replay por `lastRevision`, snapshot de
+  fallback, projeção de segredos, heartbeat e estados de reconexão;
+- **12E:** dependências SQLite removidas, scripts unificados e documentação
+  operacional criada.
+
+O log produz snapshot na revisão zero, a cada 100 eventos e no encerramento.
+Mantém 500 eventos recentes por padrão; mesas encerradas expiram após 24 horas,
+com ambas as janelas configuráveis. Comandos continuam idempotentes depois da
+compactação porque `session_commands` é separado de `session_events`.
+
+A validação local contra PostgreSQL real aprovou toda a suíte Go, inclusive
+1.000 eventos, dois commits concorrentes em mesas independentes, falha anterior
+ao commit, retry posterior ao commit, reinício do hub e retenção. O Playwright
+interrompeu o WebSocket de um jogador, retomou pela revisão confirmada e manteve
+a mesma rolagem autoritativa; os oito cenários E2E e os 32 testes Vitest passaram.
+O smoke test também aprovou start, health, frontend incorporado, Vite e stop com
+PostgreSQL gerenciado pelos scripts. Após corrigir o código de saída residual do
+`stop.ps1` no Linux e estabilizar comandos administrativos concorrentes, todos
+os jobs próprios da PR #56 passaram, incluindo 8/8 cenários Playwright.
 
 ## Pendências encontradas
 
-- definir a janela padrão de retenção de sessões encerradas; o mecanismo será
-  configurável e não bloqueará esta batch;
-- definir UX para sessão recuperável versus sessão encerrada.
+- Auth, RLS, Realtime, Storage, secrets e deploy continuam exclusivamente na
+  Batch 22;
+- o preview externo da Vercel continuará falhando até existir a configuração de
+  deploy da Batch 22; ele não é um gate operacional desta batch local/CI;
+- não há fixture PostgreSQL de produção anterior para importar. O teste de
+  upgrade desta batch reaplica migrations em um segundo pool sobre uma fixture
+  já persistida e valida checksum/idempotência;
+- o restart de processo é validado na integração Go recriando o hub; o E2E de
+  navegador valida a interrupção e retomada do WebSocket sem assumir controle
+  externo do processo criado pelo Playwright.
 
 ## Documentação atualizada
 
@@ -149,6 +184,6 @@ Planejamento registrado. Implementação permanece futura.
 - [x] roadmap e índice;
 - [x] issue no GitHub;
 - [x] ADR da transição online-first/PostgreSQL;
-- [ ] protocolo de recuperação durante a implementação;
-- [ ] guia operacional do PostgreSQL local durante a implementação;
-- [ ] ADR complementar apenas se o formato final do log divergir do ADR-003.
+- [x] protocolo de recuperação em `docs/SESSION_DURABILITY.md`;
+- [x] guia operacional do PostgreSQL local no README e em `docs/TESTING.md`;
+- [x] ADR complementar dispensado: o formato final permanece dentro do ADR-003.

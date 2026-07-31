@@ -37,12 +37,21 @@ function Stop-RecordedProcess {
     }
 
     Write-Host "Encerrando $Name (PID $processId)..."
-    & taskkill.exe /PID $processId /T /F 2>$null | Out-Null
+    Stop-DDivinationProcessTree -Process $process
 }
 
 Stop-RecordedProcess -Name "frontend" -Entry $record.web
 Stop-RecordedProcess -Name "backend" -Entry $record.backend
 Remove-Item -LiteralPath $runtimeFile -Force
 
+if ($record.PSObject.Properties.Name -contains "databaseManaged" -and $record.databaseManaged) {
+    & (Join-Path $repoRoot "scripts\database.ps1") -Action Down
+}
+
 Write-Host "DDivination encerrado." -ForegroundColor Green
 Write-Host "Os logs foram preservados em $runtimeDir."
+
+# Native process-tree helpers may leave a non-zero LASTEXITCODE behind even
+# when every managed process was stopped successfully. GitHub Actions uses
+# that residual value as the PowerShell step result on Linux.
+$global:LASTEXITCODE = 0

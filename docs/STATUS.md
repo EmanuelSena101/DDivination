@@ -10,7 +10,7 @@ na tag `legacy-python-mvp`.
 O rewrite possui uma fundação executável e um vertical slice funcional:
 
 - servidor Go 1.26 com API Huma/OpenAPI;
-- persistência SQLite em WAL e migrations incorporadas;
+- persistência PostgreSQL com migrations incorporadas e checksum;
 - geração procedural determinística e bilíngue;
 - execuções de geração assíncronas, observáveis e canceláveis;
 - mapas semânticos com múltiplos andares;
@@ -18,6 +18,8 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 - sessões LAN com papéis `gm`, `player` e `display`;
 - movimento autoritativo, fog manual, ping, medição e iniciativa;
 - dados 3D com resultado autoritativo e histórico;
+- log transacional de sessão, idempotência, snapshots, replay e recuperação após
+  reinício;
 - importação validada de PNG, WebP e GLB;
 - pacotes `.ddivination` e exportações Markdown, HTML e PNG;
 - adapter opcional de IA com fallback procedural;
@@ -56,25 +58,24 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 ## Última batch concluída
 
-`BATCH-011 — Administração da mesa`
+`BATCH-012 — Durabilidade em tempo real e migração para PostgreSQL`
 
-O GM agora administra acesso, aprovações, participantes, papéis, presença,
-tokens e permissões pela interface. O servidor aplica a matriz de autorização,
-revoga participantes imediatamente e mantém `display` somente leitura. A
-validação incluiu 32 testes Vitest, 8 cenários Playwright e todos os gates locais.
+Toda a persistência operacional agora usa PostgreSQL. Mesas possuem log
+transacional, idempotência, snapshots, replay, retenção configurável e
+recuperação após reinício. O cliente reconecta por revisão, preserva comandos
+pendentes e recebe confirmação autoritativa; todos os jobs próprios da PR #56,
+incluindo 8 cenários Playwright, foram aprovados.
 
 Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-011-table-administration.md](batches/BATCH-011-table-administration.md).
+[BATCH-012-realtime-durability.md](batches/BATCH-012-realtime-durability.md).
 
 ## Próxima batch
 
-`BATCH-012 — Durabilidade em tempo real e migração para PostgreSQL`
+`BATCH-013 — Remake de UX e controles da VTT`
 
-A próxima batch migrará a persistência operacional de SQLite para PostgreSQL e
-consolidará replay, snapshots periódicos, reconexão por revisão e recuperação de
-sessões abertas após reinício. Ela prepara contratos compatíveis com Supabase,
-mas continuará local/CI e não criará infraestrutura cloud. Seu escopo está no
-[diário da Batch 12](batches/BATCH-012-realtime-durability.md).
+O próximo trabalho reorganiza gestos, seleção, câmera, ferramentas e feedback
+visual da VTT, eliminando a ambiguidade entre mover a câmera e agir no mapa.
+Consulte o [diário da Batch 13](batches/BATCH-013-vtt-ux-controls.md).
 
 ## Roadmap ampliado após auditoria do legado
 
@@ -90,8 +91,7 @@ combate manual e automação permanecem expansões pós-v1 nas Batches 23 e 24.
 
 ## Direção de arquitetura aprovada
 
-O requisito de operação offline-first foi removido. O estado atual continua
-executável com Go, SQLite e LAN enquanto a transição é construída, mas o destino
-do v1 é online-first: PostgreSQL a partir da Batch 12 e Vercel + Supabase na
+O requisito de operação offline-first foi removido. O estado atual executa com
+Go, PostgreSQL e LAN; o destino do v1 é online-first com Vercel + Supabase na
 Batch 22. A decisão e seus limites estão no
 [ADR-003](decisions/ADR-003-online-first-postgresql.md).

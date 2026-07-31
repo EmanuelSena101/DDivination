@@ -152,7 +152,11 @@ export function printURL(adventureId: string): string {
   return `/api/v1/adventures/${encodeURIComponent(adventureId)}/print`;
 }
 
-export function sessionWebSocketURL(sessionId: string, token: string): string {
-  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  return `${protocol}//${window.location.host}/api/v1/sessions/${encodeURIComponent(sessionId)}/stream?token=${encodeURIComponent(token)}`;
+export function sessionWebSocketURL(sessionId: string, token: string, lastRevision?: number): string {
+	const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+	const query = new URLSearchParams({ token });
+	if (lastRevision !== undefined && Number.isInteger(lastRevision) && lastRevision >= 0) {
+		query.set("lastRevision", String(lastRevision));
+	}
+	return `${protocol}//${window.location.host}/api/v1/sessions/${encodeURIComponent(sessionId)}/stream?${query.toString()}`;
 }

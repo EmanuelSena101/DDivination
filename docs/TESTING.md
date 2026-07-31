@@ -84,6 +84,12 @@ depois do lock, alvo inexistente e sala secreta inserida no caminho obrigatório
 O E2E confirma o painel bilíngue de progressão na visão do mestre e sua ausência
 na visão do jogador.
 
+A camada de regras acrescenta 320 combinações determinísticas cobrindo níveis
+1–20, grupos de 1–8 personagens, quatro dificuldades, quatro qualidades de
+tesouro e 1–5 andares. Testes negativos alteram referência de criatura, budget,
+tier de armadilha e atribuição. O E2E confirma o painel de conteúdo somente para
+o mestre; o snapshot do jogador não contém notas nem métricas editoriais.
+
 Se o ambiente de desenvolvimento estiver aberto, encerre-o antes:
 
 ```powershell

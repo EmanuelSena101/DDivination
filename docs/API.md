@@ -45,6 +45,11 @@ interface é aberta na LAN com uma allowlist mínima.
 
 Na LAN, qualquer rota fora de health, join e stream retorna `404`.
 
+`GET /api/v1/catalog` devolve o catálogo incorporado identificado por
+`srd-5.2.1-ddivination-1`. Cada entrada informa ID estável, nome pt-BR/en-US,
+tipo, CR/XP ou faixa de nível, origem e licença. Stat blocks completos não fazem
+parte desse contrato.
+
 ## Erros REST
 
 Falhas REST usam `application/problem+json` e seguem Problem Details:
@@ -74,6 +79,12 @@ reais adquiridas antes de seus locks; locks devem apontar para uma porta ou
 portal compatível; segredos não podem fazer parte do caminho obrigatório; e o
 clímax deve encerrar a progressão no último andar. O campo `solvable` registra o
 resultado, mas não substitui essa simulação no servidor.
+
+Documentos com `rulesVersion` também validam cada criatura contra o catálogo,
+recalculam o orçamento de XP para nível, tamanho e dificuldade do grupo,
+rejeitam encontros acima do teto e conferem os agregados de conteúdo. Puzzles,
+tesouros, armadilhas e descansos precisam apontar para salas reais e possuir os
+dois idiomas. Documentos anteriores sem `rulesVersion` seguem compatíveis.
 
 Cada `PUT` aprovado incrementa a versão e cria um snapshot imutável. O endpoint
 de checkpoints também permite criar um marco manual sem alterar a versão.

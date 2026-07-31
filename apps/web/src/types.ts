@@ -90,6 +90,7 @@ export interface AdventureDocument {
   id: string;
   schemaVersion: string;
   generatorVersion: string;
+  rulesVersion?: string;
   version: number;
   seed: number;
   name: LocalizedText;
@@ -102,13 +103,11 @@ export interface AdventureDocument {
     atmosphere: LocalizedText;
   };
   floors: FloorMap[];
-  encounters: Array<{
-    id: string;
-    floorId: string;
-    roomId: string;
-    difficulty: string;
-    totalXp: number;
-  }>;
+  encounters: Encounter[];
+  treasures: Treasure[];
+  puzzles: Puzzle[];
+  traps: Trap[];
+  restPoints: RestPoint[];
   progression: DungeonProgression;
   analysis: {
     totalRooms: number;
@@ -116,6 +115,10 @@ export interface AdventureDocument {
     criticalPath: string[];
     deadEnds: string[];
     estimatedDifficulty: string;
+    encounterBudgetXp: number;
+    encounterTotalXp: number;
+    treasureValueGp: number;
+    contentCounts: ContentCounts;
     invariants: string[];
   };
   attributions: Array<{
@@ -127,6 +130,85 @@ export interface AdventureDocument {
   }>;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface EncounterCreature {
+  index: string;
+  name: LocalizedText;
+  count: number;
+  cr: number;
+  xp: number;
+}
+
+export interface Encounter {
+  id: string;
+  floorId: string;
+  roomId: string;
+  difficulty: "easy" | "medium" | "hard" | "deadly";
+  creatures: EncounterCreature[];
+  budgetXp: number;
+  budgetTier: "low" | "moderate" | "high";
+  totalXp: number;
+}
+
+export interface Treasure {
+  id: string;
+  floorId: string;
+  roomId: string;
+  name: LocalizedText;
+  description: LocalizedText;
+  quality: "poor" | "standard" | "rich" | "legendary";
+  valueGp: number;
+  contents: LocalizedText[];
+  source: string;
+}
+
+export interface Puzzle {
+  id: string;
+  floorId: string;
+  roomId: string;
+  name: LocalizedText;
+  prompt: LocalizedText;
+  solution: LocalizedText;
+  hint: LocalizedText;
+  checkDc: number;
+  source: string;
+}
+
+export interface Trap {
+  id: string;
+  floorId: string;
+  roomId: string;
+  catalogIndex: string;
+  name: LocalizedText;
+  severity: "nuisance" | "deadly";
+  levelTier: "1-4" | "5-10" | "11-16" | "17-20";
+  trigger: LocalizedText;
+  detectionDc: number;
+  disableDc: number;
+  saveDc: number;
+  damage: LocalizedText;
+  source: string;
+  license: string;
+  hidden: boolean;
+}
+
+export interface RestPoint {
+  id: string;
+  floorId: string;
+  roomId: string;
+  kind: "short";
+  name: LocalizedText;
+  description: LocalizedText;
+  source: string;
+}
+
+export interface ContentCounts {
+  encounters: number;
+  treasures: number;
+  puzzles: number;
+  traps: number;
+  restPoints: number;
 }
 
 export interface ProgressionStep {

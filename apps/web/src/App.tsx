@@ -29,6 +29,7 @@ import {
 } from "./components/EditorPersistenceBar";
 import { GridEditorPanel } from "./components/GridEditorPanel";
 import { ProgressionPanel } from "./components/ProgressionPanel";
+import { AdventureContentPanel } from "./components/AdventureContentPanel";
 import { VTTDiagnosticsPanel } from "./components/VTTDiagnosticsPanel";
 import type { GridEditorTool } from "./gridEditor";
 import { isGenerationTerminal, reconcileGenerationRun } from "./generationRun";
@@ -745,7 +746,10 @@ function VTT() {
         </div>
 
         {role === "gm" && (
-          <ProgressionPanel adventure={adventure} floorId={floor.id} language={language} />
+          <>
+            <ProgressionPanel adventure={adventure} floorId={floor.id} language={language} />
+            <AdventureContentPanel adventure={adventure} floorId={floor.id} language={language} />
+          </>
         )}
 
         <section className="panel-section">

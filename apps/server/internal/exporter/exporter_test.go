@@ -22,7 +22,9 @@ func TestPrintableExportsContainBothLanguagesAndAttribution(t *testing.T) {
 	for _, content := range []string{markdown, string(html)} {
 		if !strings.Contains(content, doc.Name.PTBR) ||
 			!strings.Contains(content, doc.Name.ENUS) ||
-			!strings.Contains(content, "CC-BY-4.0") {
+			!strings.Contains(content, "CC-BY-4.0") ||
+			!strings.Contains(content, doc.Puzzles[0].Name.PTBR) ||
+			!strings.Contains(content, doc.Traps[0].Name.ENUS) {
 			t.Fatal("export is missing bilingual content or attribution")
 		}
 	}

@@ -357,9 +357,20 @@ remotos sem confirmação. Acompanhe o [roadmap](docs/ROADMAP.md).
 
 ## SRD e atribuição
 
-O catálogo inicial e as aventuras incluem material do
-[System Reference Document 5.2.1](https://www.dndbeyond.com/srd), de Wizards of
-the Coast LLC, licenciado sob CC-BY-4.0.
+> This work includes material from the System Reference Document 5.2.1
+> (“SRD 5.2.1”) by Wizards of the Coast LLC, available at
+> https://www.dndbeyond.com/srd. The SRD 5.2.1 is licensed under the Creative
+> Commons Attribution 4.0 International License, available at
+> https://creativecommons.org/licenses/by/4.0/legalcode.
+
+O gerador usa os budgets oficiais de XP por personagem e referencia somente
+metadados selecionados de criaturas e armadilhas; fichas completas e combate
+automatizado não fazem parte do projeto.
+
+As dificuldades são apresentadas como fácil, média, difícil e mortal. Para o
+cálculo, elas usam respectivamente as faixas `low`, `moderate`, `high` e `high`
+do SRD; “mortal” é reservado ao clímax. Tesouros e puzzles são templates
+originais do DDivination e aparecem com origem separada.
 
 DDivination não é um produto oficial de D&D. O pack visual inicial contém
 primitivas procedurais originais; consulte

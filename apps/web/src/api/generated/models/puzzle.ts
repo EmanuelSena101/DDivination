@@ -5,17 +5,20 @@
  * Local-first 3D VTT and deterministic 5E-compatible adventure generator.
  * OpenAPI spec version: 1.0.0-alpha.1
  */
-import type { CatalogItemKind } from './catalogItemKind';
 import type { LocalizedText } from './localizedText';
 
-export interface CatalogItem {
-  cr?: number;
-  index: string;
-  kind: CatalogItemKind;
-  license: string;
-  maxLevel?: number;
-  minLevel?: number;
+export interface Puzzle {
+  /**
+     * @minimum 5
+     * @maximum 30
+     */
+  checkDc: number;
+  floorId: string;
+  hint: LocalizedText;
+  id: string;
   name: LocalizedText;
+  prompt: LocalizedText;
+  roomId: string;
+  solution: LocalizedText;
   source: string;
-  xp?: number;
 }

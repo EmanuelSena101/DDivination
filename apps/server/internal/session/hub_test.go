@@ -120,6 +120,12 @@ func TestPlayerSnapshotDoesNotRevealSecretMetadata(t *testing.T) {
 	if len(visible.Progression.SecretRoomIDs) != 0 {
 		t.Fatal("secret progression identifiers leaked to the player")
 	}
+	if len(visible.Encounters) != 0 || len(visible.Treasures) != 0 || len(visible.Puzzles) != 0 || len(visible.Traps) != 0 || len(visible.RestPoints) != 0 {
+		t.Fatal("GM-only adventure content leaked to the player")
+	}
+	if visible.Analysis.ContentCounts != (domain.ContentCounts{}) || visible.Analysis.EncounterBudgetXP != 0 || visible.Analysis.TreasureValueGP != 0 {
+		t.Fatal("GM-only content analysis leaked to the player")
+	}
 }
 
 func TestConfirmedSessionRestoresAfterServerRestart(t *testing.T) {

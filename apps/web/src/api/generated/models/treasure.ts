@@ -5,17 +5,19 @@
  * Local-first 3D VTT and deterministic 5E-compatible adventure generator.
  * OpenAPI spec version: 1.0.0-alpha.1
  */
-import type { CatalogItemKind } from './catalogItemKind';
 import type { LocalizedText } from './localizedText';
+import type { TreasureQuality } from './treasureQuality';
 
-export interface CatalogItem {
-  cr?: number;
-  index: string;
-  kind: CatalogItemKind;
-  license: string;
-  maxLevel?: number;
-  minLevel?: number;
+export interface Treasure {
+  /** @nullable */
+  contents: LocalizedText[] | null;
+  description: LocalizedText;
+  floorId: string;
+  id: string;
   name: LocalizedText;
+  quality: TreasureQuality;
+  roomId: string;
   source: string;
-  xp?: number;
+  /** @minimum 1 */
+  valueGp: number;
 }

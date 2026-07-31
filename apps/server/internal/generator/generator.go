@@ -48,21 +48,17 @@ func GenerateContext(
 	floorPaths := make([][]string, 0, spec.FloorCount)
 	criticalPath := make([]string, 0)
 	deadEnds := make([]string, 0)
-	encounters := make([]domain.Encounter, 0)
 
 	var previousPortal *domain.Portal
 	for floorIndex := 0; floorIndex < spec.FloorCount; floorIndex++ {
 		if err := ctx.Err(); err != nil {
 			return domain.AdventureDocument{}, err
 		}
-		floor, path, secretID, encounter := generateFloor(spec, rng, adventureID, floorIndex)
+		floor, path, secretID := generateFloor(spec, rng, adventureID, floorIndex)
 		floorPaths = append(floorPaths, path)
 		criticalPath = append(criticalPath, path...)
 		if secretID != "" {
 			deadEnds = append(deadEnds, secretID)
-		}
-		if encounter != nil {
-			encounters = append(encounters, *encounter)
 		}
 
 		if previousPortal != nil {
@@ -114,11 +110,17 @@ func GenerateContext(
 		return domain.AdventureDocument{}, err
 	}
 	progression, floors := buildProgression(floors, floorPaths)
+	encounters, treasures, puzzles, traps, restPoints := buildAdventureContent(spec, rng, &floors, progression)
 	name := generatedName(spec, rng)
+	contentCounts := domain.ContentCounts{
+		Encounters: len(encounters), Treasures: len(treasures), Puzzles: len(puzzles),
+		Traps: len(traps), RestPoints: len(restPoints),
+	}
 	doc := domain.AdventureDocument{
 		ID:               adventureID,
 		SchemaVersion:    domain.SchemaVersion,
 		GeneratorVersion: domain.GeneratorVersion,
+		RulesVersion:     domain.RulesVersion,
 		Version:          1,
 		Seed:             seed,
 		Name:             name,
@@ -144,6 +146,10 @@ func GenerateContext(
 		},
 		Floors:      floors,
 		Encounters:  encounters,
+		Treasures:   treasures,
+		Puzzles:     puzzles,
+		Traps:       traps,
+		RestPoints:  restPoints,
 		Progression: progression,
 		Analysis: domain.DungeonAnalysis{
 			TotalRooms:          countRooms(floors),
@@ -151,6 +157,10 @@ func GenerateContext(
 			CriticalPath:        criticalPath,
 			DeadEnds:            deadEnds,
 			EstimatedDifficulty: spec.Difficulty,
+			EncounterBudgetXP:   sumEncounterBudgets(encounters),
+			EncounterTotalXP:    sumEncounterXP(encounters),
+			TreasureValueGP:     sumTreasureValue(treasures),
+			ContentCounts:       contentCounts,
 			Invariants: []string{
 				"entrance-reaches-objective",
 				"keys-precede-locks",
@@ -160,6 +170,9 @@ func GenerateContext(
 				"dead-ends-have-purpose",
 				"critical-path-is-walkable",
 				"climax-is-on-final-floor",
+				"encounters-fit-srd-budgets",
+				"catalog-references-are-valid",
+				"adventure-content-is-bilingual",
 			},
 		},
 		Attributions: []domain.Attribution{srdAttribution()},
@@ -225,7 +238,7 @@ func validate(spec domain.AdventureSpec) error {
 	return nil
 }
 
-func generateFloor(spec domain.AdventureSpec, rng *RNG, adventureID string, floorIndex int) (domain.FloorMap, []string, string, *domain.Encounter) {
+func generateFloor(spec domain.AdventureSpec, rng *RNG, adventureID string, floorIndex int) (domain.FloorMap, []string, string) {
 	requiredRooms := clamp(4+spec.DurationHours/2, 4, 8)
 	totalRooms := requiredRooms + 1 // one optional secret branch
 	columns := 3
@@ -295,7 +308,6 @@ func generateFloor(spec domain.AdventureSpec, rng *RNG, adventureID string, floo
 		})
 	}
 
-	var encounter *domain.Encounter
 	if floorIndex == spec.FloorCount-1 {
 		bossRoom := floor.Rooms[requiredRooms-1]
 		floor.Entities = append(floor.Entities, domain.SceneEntity{
@@ -307,11 +319,9 @@ func generateFloor(spec domain.AdventureSpec, rng *RNG, adventureID string, floo
 			AssetID:        "mini-boss",
 			BlocksMovement: true,
 		})
-		e := bossEncounter(spec, floor.ID, bossRoom.ID)
-		encounter = &e
 	}
 
-	return floor, pathIDs, floor.Rooms[secretIndex].ID, encounter
+	return floor, pathIDs, floor.Rooms[secretIndex].ID
 }
 
 func carveRect(cells map[domain.GridPosition]domain.Tile, r rect, roomID string) {
@@ -422,25 +432,6 @@ func addDecorations(floor *domain.FloorMap, rng *RNG) {
 	}
 }
 
-func bossEncounter(spec domain.AdventureSpec, floorID, roomID string) domain.Encounter {
-	cr := float64(clamp(spec.PartyLevel+1, 1, 20))
-	xp := 200 * spec.PartyLevel * spec.PartySize
-	return domain.Encounter{
-		ID:         "encounter-final",
-		FloorID:    floorID,
-		RoomID:     roomID,
-		Difficulty: "deadly",
-		Creatures: []domain.EncounterCreature{{
-			Index: "generated-antagonist",
-			Name:  domain.LocalizedText{PTBR: title(spec.Antagonist), ENUS: title(spec.Antagonist)},
-			Count: 1,
-			CR:    cr,
-			XP:    xp,
-		}},
-		TotalXP: xp,
-	}
-}
-
 func generatedName(spec domain.AdventureSpec, rng *RNG) domain.LocalizedText {
 	if spec.Name != nil {
 		return *spec.Name
@@ -516,13 +507,7 @@ func markTile(tiles []domain.Tile, pos domain.GridPosition, kind string) []domai
 }
 
 func srdAttribution() domain.Attribution {
-	return domain.Attribution{
-		Title:   "System Reference Document 5.2.1",
-		Creator: "Wizards of the Coast LLC",
-		Source:  "https://www.dndbeyond.com/srd",
-		License: "CC-BY-4.0",
-		Notice:  "This work includes material from the System Reference Document 5.2.1 by Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd and licensed under CC-BY-4.0.",
-	}
+	return domain.SRDAttribution()
 }
 
 func oneOf(value string, allowed ...string) bool {

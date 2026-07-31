@@ -780,6 +780,60 @@ button.secondary {
   color: #db5967;
 }
 
+.content-budget-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+  margin: 0.65rem 0;
+}
+
+.content-budget-summary span {
+  color: var(--muted);
+  font-size: 0.64rem;
+  text-align: center;
+}
+
+.content-budget-summary strong {
+  color: var(--gold);
+  display: block;
+  font-family: "Cinzel", serif;
+  font-size: 0.82rem;
+}
+
+.adventure-content-list {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.adventure-content-list details {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(205, 180, 121, 0.1);
+  border-radius: 0.45rem;
+  padding: 0.5rem 0.55rem;
+}
+
+.adventure-content-list summary {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 0.55rem;
+  list-style: none;
+}
+
+.adventure-content-list summary::-webkit-details-marker { display: none; }
+
+.adventure-content-list summary i {
+  color: var(--gold);
+  font-style: normal;
+  width: 1rem;
+}
+
+.adventure-content-list summary span { display: grid; flex: 1; }
+.adventure-content-list summary strong { font-size: 0.72rem; }
+.adventure-content-list summary small,
+.adventure-content-list details > small { color: var(--muted); font-size: 0.6rem; }
+.adventure-content-list details p { color: var(--text-soft); font-size: 0.68rem; line-height: 1.45; margin: 0.5rem 0 0.25rem; }
+
 .progression-summary {
   margin-bottom: 8px;
   display: grid;

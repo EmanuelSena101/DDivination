@@ -211,6 +211,11 @@ func ValidateAdventure(document AdventureDocument) error {
 	if err := validateProgression(document, roomFloors, rooms, entities, portals, walls, wallFloors); err != nil {
 		return err
 	}
+	if document.RulesVersion != "" {
+		if err := validateRulesContent(document, roomFloors, rooms); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

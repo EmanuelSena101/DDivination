@@ -44,7 +44,7 @@ test("generation progress survives reload and opens the persisted adventure", as
     stage: "queued",
     progress: 0,
     seed: 8808,
-    generatorVersion: "go-v1-alpha.2",
+    generatorVersion: "go-v1-alpha.3",
     spec,
     diagnostics: ["procedural-mode", "offline-ready"],
     stages: [{ name: "queued", progress: 0, occurredAt: timestamp }],

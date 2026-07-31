@@ -5,9 +5,12 @@
  * Local-first 3D VTT and deterministic 5E-compatible adventure generator.
  * OpenAPI spec version: 1.0.0-alpha.1
  */
+import type { EncounterBudgetTier } from './encounterBudgetTier';
 import type { EncounterCreature } from './encounterCreature';
 
 export interface Encounter {
+  budgetTier: EncounterBudgetTier;
+  budgetXp: number;
   /** @nullable */
   creatures: EncounterCreature[] | null;
   difficulty: string;

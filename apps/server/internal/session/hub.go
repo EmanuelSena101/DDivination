@@ -551,6 +551,15 @@ func filteredSnapshot(state domain.SessionState, adventure domain.AdventureDocum
 		cleanAdventure.Analysis.TotalRooms += len(floor.Rooms)
 	}
 	cleanAdventure.Analysis.DeadEnds = nil
+	cleanAdventure.Encounters = nil
+	cleanAdventure.Treasures = nil
+	cleanAdventure.Puzzles = nil
+	cleanAdventure.Traps = nil
+	cleanAdventure.RestPoints = nil
+	cleanAdventure.Analysis.EncounterBudgetXP = 0
+	cleanAdventure.Analysis.EncounterTotalXP = 0
+	cleanAdventure.Analysis.TreasureValueGP = 0
+	cleanAdventure.Analysis.ContentCounts = domain.ContentCounts{}
 	cleanAdventure.Progression.SecretRoomIDs = nil
 	visibleInvariants := cleanAdventure.Analysis.Invariants[:0]
 	for _, invariant := range cleanAdventure.Analysis.Invariants {

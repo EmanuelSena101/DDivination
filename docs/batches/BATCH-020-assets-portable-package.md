@@ -16,8 +16,8 @@ carregam toda a biblioteca binária e os packs de regras necessários.
 
 ## Objetivo
 
-Finalizar o pipeline de assets e tornar aventuras realmente portáteis entre
-instalações offline, preservando hashes, licenças e dependências.
+Finalizar o pipeline de assets e tornar aventuras portáteis entre ambientes,
+contas ou sessões compatíveis, preservando hashes, licenças e dependências.
 
 ## Escopo
 
@@ -48,7 +48,7 @@ instalações offline, preservando hashes, licenças e dependências.
 
 ## Critérios de aceitação
 
-- [ ] aventura exportada abre offline em instalação limpa compatível;
+- [ ] aventura exportada abre em ambiente limpo compatível;
 - [ ] assets customizados usados mantêm bytes e hashes;
 - [ ] dependência ausente produz orientação clara e não corrompe importação;
 - [ ] GLB externo, inválido ou excessivo é rejeitado;

@@ -2,9 +2,17 @@
 
 ## Visão
 
-DDivination é uma aplicação web local-first. Um servidor Go mantém o estado
-autoritativo, persiste os documentos e hospeda o frontend. Clientes de jogador
-entram pela rede local somente depois que o mestre abre uma sessão.
+Até a Batch 11, DDivination está implementado como aplicação web local-first. Um
+servidor Go mantém o estado autoritativo, persiste os documentos e hospeda o
+frontend. Clientes de jogador entram pela rede local somente depois que o
+mestre abre uma sessão.
+
+O destino aprovado para o v1 é online-first. A Batch 12 substituirá SQLite por
+PostgreSQL e criará as fronteiras de persistência; a Batch 22 publicará o
+frontend na Vercel e integrará Supabase PostgreSQL, Auth, Realtime e Storage.
+Durante a transição, esta documentação distingue o que já existe do que está
+planejado. Consulte o
+[ADR-003](decisions/ADR-003-online-first-postgresql.md).
 
 ## Componentes
 
@@ -19,7 +27,8 @@ entram pela rede local somente depois que o mestre abre uma sessão.
 - REST gerencia recursos persistentes e é integralmente contratado com Huma.
 - WebSocket transporta comandos/eventos de sessão e snapshots de progresso da
   geração.
-- SQLite é a fonte local de persistência.
+- SQLite é a fonte de persistência implementada até a Batch 11; PostgreSQL a
+  substituirá na Batch 12.
 - O servidor é autoritativo para permissões, movimento, fog e dados.
 - O frontend deriva meshes a partir do documento semântico.
 - A progressão também faz parte do documento semântico: etapas ordenadas ligam
@@ -46,8 +55,9 @@ entram pela rede local somente depois que o mestre abre uma sessão.
   recentes preservam o conteúdo local e são rebaseadas sobre a versão salva.
 - Conflitos pausam o autosave e exigem uma escolha explícita; não existe merge
   silencioso campo a campo.
-- Gerações são enfileiradas por um coordenador local. O SQLite guarda o estado
-  durável; memória guarda somente funções de cancelamento e assinantes ativos.
+- Gerações são enfileiradas por um coordenador local. No estado atual, SQLite
+  guarda o estado durável; memória guarda somente funções de cancelamento e
+  assinantes ativos. As stores migrarão para PostgreSQL na Batch 12.
 - O pipeline publica estágios monotônicos entre validação, construção dos
   andares, enriquecimento opcional, validação semântica e persistência.
 - Cancelamento usa `context.Context` e é verificado entre andares e antes da
@@ -91,7 +101,7 @@ Sessões usam revisões monotônicas, eventos persistidos e snapshots. Assets s�
 endereçados por SHA-256. Execuções de geração persistem o snapshot completo de
 seu estado e histórico a cada transição relevante.
 
-## Segurança local
+## Segurança do runtime local atual
 
 - O servidor inicia somente em loopback.
 - A interface LAN é ativada ao abrir uma sessão.
@@ -99,3 +109,7 @@ seu estado e histórico a cada transição relevante.
 - Tokens são armazenados somente como hashes.
 - Importações validam tamanho, formato, hashes e caminhos.
 - Chaves de IA não entram no SQLite, logs ou pacotes.
+
+Auth, RLS, políticas de Storage, secrets e isolamento entre mesas no ambiente
+cloud pertencem à Batch 22. Até lá, nenhuma credencial real de Supabase faz parte
+do repositório ou do fluxo de desenvolvimento.

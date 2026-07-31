@@ -33,7 +33,7 @@ release v1.
 | [BATCH-009](BATCH-009-progression-generator.md) | Gerador de progressão | DONE |
 | [BATCH-010](BATCH-010-catalog-rules.md) | Catálogo e regras 5E | DONE |
 | [BATCH-011](BATCH-011-table-administration.md) | Administração da mesa | DONE |
-| [BATCH-012](BATCH-012-realtime-durability.md) | Durabilidade em tempo real | PLANNED |
+| [BATCH-012](BATCH-012-realtime-durability.md) | Durabilidade em tempo real e migração PostgreSQL | PLANNED |
 | [BATCH-013](BATCH-013-vtt-ux-controls.md) | Remake de UX e controles da VTT | PLANNED |
 | [BATCH-014](BATCH-014-ruleset-data-foundation.md) | Fundação de dados e rulesets | PLANNED |
 | [BATCH-015](BATCH-015-legacy-catalog-parity.md) | Paridade do catálogo legado 2014 | PLANNED |
@@ -43,7 +43,7 @@ release v1.
 | [BATCH-019](BATCH-019-partial-regeneration.md) | Regeneração parcial | PLANNED |
 | [BATCH-020](BATCH-020-assets-portable-package.md) | Assets e pacote portátil | PLANNED |
 | [BATCH-021](BATCH-021-optional-ai.md) | IA opcional | PLANNED |
-| [BATCH-022](BATCH-022-v1-release.md) | Release v1 | PLANNED |
+| [BATCH-022](BATCH-022-v1-release.md) | Deploy cloud e release v1 | PLANNED |
 | [BATCH-023](BATCH-023-character-sheets-manual-combat.md) | Fichas e combate manual (pós-v1) | PLANNED |
 | [BATCH-024](BATCH-024-combat-automation.md) | Automação de combate (pós-v1) | PLANNED |
 

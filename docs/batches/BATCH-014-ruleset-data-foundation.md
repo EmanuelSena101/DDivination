@@ -16,7 +16,7 @@ ou separação segura entre a D&D 5e API 2014 e o SRD 5.2.1 de 2024.
 
 ## Objetivo
 
-Criar a infraestrutura offline-first de packs de regras e providers que será a
+Criar a infraestrutura versionada de packs de regras e providers que será a
 fonte única para geração, validação, compêndio, exportação e futuras fichas.
 
 ## Escopo
@@ -25,7 +25,7 @@ fonte única para geração, validação, compêndio, exportação e futuras fic
   atribuição, hash e compatibilidade;
 - modelos normalizados para criatura, item, equipamento, magia, condição, regra,
   classe/feature e referências entre recursos;
-- tabelas SQLite, busca full-text e queries tipadas;
+- tabelas PostgreSQL, busca full-text e queries tipadas;
 - interface Go `CatalogProvider` para pack incorporado, arquivo e HTTP;
 - importação transacional, validação, rollback e atualização por hash;
 - estado de instalação, progresso, diagnóstico e cancelamento;
@@ -33,7 +33,8 @@ fonte única para geração, validação, compêndio, exportação e futuras fic
 - seleção explícita de `rulesetPackId` no `AdventureSpec` e no snapshot;
 - API paginada de packs, recursos, detalhes e busca;
 - atribuições acumuladas em aventura, exportações e `.ddivination`;
-- cache local e geração funcional sem internet.
+- cache versionado e geração independente da disponibilidade do provider de
+  origem depois que o pack estiver instalado.
 
 ## Fora do escopo
 
@@ -49,7 +50,8 @@ fonte única para geração, validação, compêndio, exportação e futuras fic
 - o domínio depende de modelos normalizados, não do JSON de um provider;
 - packs instalados são imutáveis; atualização cria nova versão;
 - conteúdo customizado vive em pack separado e sobreposição é explícita;
-- a aplicação sempre inclui um pack starter válido para funcionar offline;
+- a aplicação sempre inclui um pack starter válido e não consulta APIs externas
+  durante cada geração;
 - a arquitetura será registrada em ADR antes da implementação.
 
 ## Critérios de aceitação
@@ -57,7 +59,7 @@ fonte única para geração, validação, compêndio, exportação e futuras fic
 - [ ] pack válido importa atomicamente e fica pesquisável;
 - [ ] pack inválido não altera o catálogo instalado;
 - [ ] mesma aventura mantém referência exata ao pack usado;
-- [ ] geração funciona com rede indisponível;
+- [ ] geração funciona quando o provider de origem está indisponível;
 - [ ] 2014 e 2024 aparecem como rulesets distintos;
 - [ ] troca/remoção de pack respeita aventuras que ainda o referenciam;
 - [ ] atribuições corretas acompanham exportação e pacote;
@@ -66,13 +68,13 @@ fonte única para geração, validação, compêndio, exportação e futuras fic
 
 ## Testes obrigatórios
 
-- migrations e integração SQLite temporária;
+- migrations e integração PostgreSQL temporária;
 - importação, rollback, atualização, hash e compatibilidade;
 - fuzzing de manifesto e payloads;
 - property tests de referências e versionamento;
 - contrato OpenAPI/Orval;
 - benchmark de ingestão e busca com 10.000 fixtures;
-- testes totalmente offline;
+- testes sem dependência de providers externos;
 - regressão completa e GitHub Actions.
 
 ## Riscos
@@ -90,8 +92,8 @@ Planejamento registrado. Implementação permanece futura.
 
 ## Pendências encontradas
 
-- definir formato físico final do pack (`SQLite`, JSON compactado ou híbrido);
-- escolher estratégia FTS compatível com `modernc.org/sqlite`;
+- definir divisão final entre colunas normalizadas, `JSONB` e payload compactado;
+- escolher índices e configuração da busca textual do PostgreSQL;
 - fechar política de remoção de versões ainda referenciadas.
 
 ## Documentação atualizada

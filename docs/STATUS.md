@@ -58,26 +58,24 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 ## Última batch concluída
 
-`BATCH-011 — Administração da mesa`
-
-O GM agora administra acesso, aprovações, participantes, papéis, presença,
-tokens e permissões pela interface. O servidor aplica a matriz de autorização,
-revoga participantes imediatamente e mantém `display` somente leitura. A
-validação incluiu 32 testes Vitest, 8 cenários Playwright e todos os gates locais.
-
-Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-011-table-administration.md](batches/BATCH-011-table-administration.md).
-
-## Batch em validação
-
 `BATCH-012 — Durabilidade em tempo real e migração para PostgreSQL`
 
-A implementação substituiu toda a persistência operacional por PostgreSQL e
-consolidou replay, snapshots periódicos, reconexão por revisão, heartbeat,
-retenção e recuperação de sessões abertas após reinício. Contratos permanecem
-independentes do Supabase; infraestrutura cloud continua na Batch 22. A batch
-aguarda PR e CI remoto para mudar de `VALIDATING` para `DONE`. Consulte o
-[diário da Batch 12](batches/BATCH-012-realtime-durability.md).
+Toda a persistência operacional agora usa PostgreSQL. Mesas possuem log
+transacional, idempotência, snapshots, replay, retenção configurável e
+recuperação após reinício. O cliente reconecta por revisão, preserva comandos
+pendentes e recebe confirmação autoritativa; todos os jobs próprios da PR #56,
+incluindo 8 cenários Playwright, foram aprovados.
+
+Consulte [ROADMAP.md](ROADMAP.md) e
+[BATCH-012-realtime-durability.md](batches/BATCH-012-realtime-durability.md).
+
+## Próxima batch
+
+`BATCH-013 — Remake de UX e controles da VTT`
+
+O próximo trabalho reorganiza gestos, seleção, câmera, ferramentas e feedback
+visual da VTT, eliminando a ambiguidade entre mover a câmera e agir no mapa.
+Consulte o [diário da Batch 13](batches/BATCH-013-vtt-ux-controls.md).
 
 ## Roadmap ampliado após auditoria do legado
 

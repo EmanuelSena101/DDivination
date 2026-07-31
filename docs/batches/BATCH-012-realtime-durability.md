@@ -1,6 +1,6 @@
 # BATCH-012 — Durabilidade em tempo real e migração para PostgreSQL
 
-Estado: `VALIDATING`
+Estado: `DONE`
 
 Issue: [#41](https://github.com/EmanuelSena101/DDivination/issues/41)
 
@@ -110,7 +110,7 @@ dois bancos operacionais.
 - [x] compactação mantém capacidade de recuperação suportada;
 - [x] migrations executam em PostgreSQL limpo e atualizam a fixture da versão
   anterior coberta pela batch;
-- [ ] CI valida migrations, integração e isolamento entre ao menos duas sessões;
+- [x] CI valida migrations, integração e isolamento entre ao menos duas sessões;
 - [x] o código não contém credenciais, URL ou identificadores reais do Supabase.
 
 ## Testes obrigatórios
@@ -161,12 +161,16 @@ ao commit, retry posterior ao commit, reinício do hub e retenção. O Playwrigh
 interrompeu o WebSocket de um jogador, retomou pela revisão confirmada e manteve
 a mesma rolagem autoritativa; os oito cenários E2E e os 32 testes Vitest passaram.
 O smoke test também aprovou start, health, frontend incorporado, Vite e stop com
-PostgreSQL gerenciado pelos scripts. A conclusão aguarda apenas o CI da PR #56.
+PostgreSQL gerenciado pelos scripts. Após corrigir o código de saída residual do
+`stop.ps1` no Linux e estabilizar comandos administrativos concorrentes, todos
+os jobs próprios da PR #56 passaram, incluindo 8/8 cenários Playwright.
 
 ## Pendências encontradas
 
 - Auth, RLS, Realtime, Storage, secrets e deploy continuam exclusivamente na
   Batch 22;
+- o preview externo da Vercel continuará falhando até existir a configuração de
+  deploy da Batch 22; ele não é um gate operacional desta batch local/CI;
 - não há fixture PostgreSQL de produção anterior para importar. O teste de
   upgrade desta batch reaplica migrations em um segundo pool sobre uma fixture
   já persistida e valida checksum/idempotência;

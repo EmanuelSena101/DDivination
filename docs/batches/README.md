@@ -33,7 +33,7 @@ release v1.
 | [BATCH-009](BATCH-009-progression-generator.md) | Gerador de progressão | DONE |
 | [BATCH-010](BATCH-010-catalog-rules.md) | Catálogo e regras 5E | DONE |
 | [BATCH-011](BATCH-011-table-administration.md) | Administração da mesa | DONE |
-| [BATCH-012](BATCH-012-realtime-durability.md) | Durabilidade em tempo real e migração PostgreSQL | VALIDATING |
+| [BATCH-012](BATCH-012-realtime-durability.md) | Durabilidade em tempo real e migração PostgreSQL | DONE |
 | [BATCH-013](BATCH-013-vtt-ux-controls.md) | Remake de UX e controles da VTT | PLANNED |
 | [BATCH-014](BATCH-014-ruleset-data-foundation.md) | Fundação de dados e rulesets | PLANNED |
 | [BATCH-015](BATCH-015-legacy-catalog-parity.md) | Paridade do catálogo legado 2014 | PLANNED |

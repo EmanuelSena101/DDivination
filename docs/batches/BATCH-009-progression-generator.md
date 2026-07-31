@@ -6,7 +6,7 @@ Issue: [#32](https://github.com/EmanuelSena101/DDivination/issues/32)
 
 Pull Requests:
 [implementação #33](https://github.com/EmanuelSena101/DDivination/pull/33) e
-encerramento documental a criar
+[encerramento #34](https://github.com/EmanuelSena101/DDivination/pull/34)
 
 ## Contexto
 
@@ -145,6 +145,7 @@ insolúveis.
 - O E2E do CI concluiu em 5 minutos; os demais gates também foram aprovados.
 - A falha externa da Vercel não é gate do produto local-first.
 - Branch de encerramento documental criada após a integração da implementação.
+- Pull Request #34 registra o encerramento definitivo da batch.
 
 ## Resultado
 

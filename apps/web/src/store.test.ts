@@ -17,6 +17,9 @@ function state(): SessionState {
     initiative: { entries: [], activeIndex: 0, round: 1 },
     rolls: [],
     open: true,
+    joinOpen: true,
+    approvalRequired: false,
+    permissions: { playerCanRevealFog: false, playerCanPing: true, playerCanRollDice: true, playerCanManageInitiative: false },
     createdAt: "2026-07-28T12:00:00Z",
   };
 }
@@ -59,6 +62,17 @@ describe("session event projection", () => {
       event("fog.changed", { floorId: "floor-1", x: 4, z: 7, revealed: false }),
     );
     expect(hidden.revealedCells["floor-1"]).toEqual([]);
+  });
+
+  it("projects administrative permissions, roles and token assignments", () => {
+    const joined = applySessionEvent(state(), event("participant.joined", { participant: { id: "p1", name: "Ana", role: "player", connected: true, joinedAt: "2026-07-28T12:00:00Z", lastSeenAt: "2026-07-28T12:00:00Z" } }));
+    const assigned = applySessionEvent(joined, event("token.assignment.changed", { tokenId: "party", participantId: "p1" }));
+    const displayed = applySessionEvent(assigned, event("participant.role.changed", { participantId: "p1", role: "display", tokenOwners: {} }));
+    const restricted = applySessionEvent(displayed, event("permissions.changed", { permissions: { playerCanRevealFog: false, playerCanPing: false, playerCanRollDice: false, playerCanManageInitiative: false } }));
+    expect(restricted.participants.p1.role).toBe("display");
+    expect(restricted.tokenOwners.party).toBeUndefined();
+    expect(restricted.permissions.playerCanPing).toBe(false);
+    expect(joined.tokenOwners.party).toBeUndefined();
   });
 });
 

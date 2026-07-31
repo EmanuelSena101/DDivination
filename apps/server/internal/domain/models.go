@@ -327,11 +327,29 @@ type AssetRef struct {
 }
 
 type Participant struct {
-	ID       string    `json:"id"`
-	Name     string    `json:"name"`
-	Role     string    `json:"role" enum:"gm,player,display"`
-	Token    string    `json:"-"`
-	JoinedAt time.Time `json:"joinedAt"`
+	ID         string    `json:"id"`
+	Name       string    `json:"name"`
+	Role       string    `json:"role" enum:"gm,player,display"`
+	Token      string    `json:"-"`
+	Connected  bool      `json:"connected"`
+	JoinedAt   time.Time `json:"joinedAt"`
+	LastSeenAt time.Time `json:"lastSeenAt"`
+}
+
+type SessionPermissions struct {
+	PlayerCanRevealFog        bool `json:"playerCanRevealFog"`
+	PlayerCanPing             bool `json:"playerCanPing"`
+	PlayerCanRollDice         bool `json:"playerCanRollDice"`
+	PlayerCanManageInitiative bool `json:"playerCanManageInitiative"`
+}
+
+type AdmissionRequest struct {
+	ID        string    `json:"id"`
+	Name      string    `json:"name"`
+	Role      string    `json:"role" enum:"player,display"`
+	Status    string    `json:"status" enum:"pending,approved,denied,expired"`
+	CreatedAt time.Time `json:"createdAt"`
+	ExpiresAt time.Time `json:"expiresAt"`
 }
 
 type InitiativeEntry struct {
@@ -359,19 +377,23 @@ type DiceRoll struct {
 }
 
 type SessionState struct {
-	ID             string                    `json:"id"`
-	AdventureID    string                    `json:"adventureId"`
-	Revision       int64                     `json:"revision"`
-	ActiveFloorID  string                    `json:"activeFloorId"`
-	Participants   map[string]Participant    `json:"participants"`
-	TokenPositions map[string]GridPosition   `json:"tokenPositions"`
-	TokenFloors    map[string]string         `json:"tokenFloors"`
-	TokenOwners    map[string]string         `json:"tokenOwners"`
-	RevealedCells  map[string][]GridPosition `json:"revealedCells"`
-	Initiative     InitiativeState           `json:"initiative"`
-	Rolls          []DiceRoll                `json:"rolls"`
-	Open           bool                      `json:"open"`
-	CreatedAt      time.Time                 `json:"createdAt"`
+	ID               string                      `json:"id"`
+	AdventureID      string                      `json:"adventureId"`
+	Revision         int64                       `json:"revision"`
+	ActiveFloorID    string                      `json:"activeFloorId"`
+	Participants     map[string]Participant      `json:"participants"`
+	TokenPositions   map[string]GridPosition     `json:"tokenPositions"`
+	TokenFloors      map[string]string           `json:"tokenFloors"`
+	TokenOwners      map[string]string           `json:"tokenOwners"`
+	RevealedCells    map[string][]GridPosition   `json:"revealedCells"`
+	Initiative       InitiativeState             `json:"initiative"`
+	Rolls            []DiceRoll                  `json:"rolls"`
+	Open             bool                        `json:"open"`
+	JoinOpen         bool                        `json:"joinOpen"`
+	ApprovalRequired bool                        `json:"approvalRequired"`
+	Permissions      SessionPermissions          `json:"permissions"`
+	Admissions       map[string]AdmissionRequest `json:"admissions,omitempty"`
+	CreatedAt        time.Time                   `json:"createdAt"`
 }
 
 type SessionCommand struct {

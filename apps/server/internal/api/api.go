@@ -79,6 +79,7 @@ func (s *Server) Handlers() Handlers {
 	lanMux := http.NewServeMux()
 	lanMux.HandleFunc("GET /api/v1/health", s.rawHealth)
 	lanMux.HandleFunc("POST /api/v1/sessions/{id}/join", s.rawJoinSession)
+	lanMux.HandleFunc("GET /api/v1/sessions/{id}/join/{requestId}", s.rawJoinStatus)
 	lanMux.HandleFunc("GET /api/v1/sessions/{id}/stream", s.streamSession)
 	lanMux.Handle("/", s.staticHandler())
 	return Handlers{Local: securityHeaders(localMux), LAN: securityHeaders(lanMux)}
@@ -568,6 +569,42 @@ func (s *Server) rawJoinSession(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, output.Body)
 }
 
+type joinStatusInput struct {
+	ID            string `path:"id"`
+	RequestID     string `path:"requestId"`
+	Authorization string `header:"Authorization"`
+}
+
+type joinStatusOutput struct{ Body session.Joined }
+
+func (s *Server) joinStatus(_ context.Context, input *joinStatusInput) (*joinStatusOutput, error) {
+	token := bearerToken(input.Authorization)
+	if token == "" {
+		return nil, huma.NewError(http.StatusUnauthorized, "missing admission token")
+	}
+	joined, err := s.hub.AdmissionStatus(input.ID, input.RequestID, token)
+	if errors.Is(err, session.ErrSessionNotFound) {
+		return nil, huma.NewError(http.StatusNotFound, "session not found")
+	}
+	if err != nil {
+		return nil, huma.NewError(http.StatusForbidden, "could not inspect admission", err)
+	}
+	return &joinStatusOutput{Body: joined}, nil
+}
+
+func (s *Server) rawJoinStatus(w http.ResponseWriter, r *http.Request) {
+	output, err := s.joinStatus(r.Context(), &joinStatusInput{ID: r.PathValue("id"), RequestID: r.PathValue("requestId"), Authorization: r.Header.Get("Authorization")})
+	if err != nil {
+		status := http.StatusForbidden
+		if statusError, ok := err.(huma.StatusError); ok {
+			status = statusError.GetStatus()
+		}
+		writeProblem(w, status, "Could not inspect admission", err.Error())
+		return
+	}
+	writeJSON(w, http.StatusOK, output.Body)
+}
+
 func (s *Server) streamSession(w http.ResponseWriter, r *http.Request) {
 	sessionID := r.PathValue("id")
 	token := r.URL.Query().Get("token")
@@ -613,6 +650,9 @@ func (s *Server) streamSession(w http.ResponseWriter, r *http.Request) {
 		case <-ctx.Done():
 			return
 		case <-readErrors:
+			return
+		case <-sub.Revoked:
+			_ = connection.Close(websocket.StatusPolicyViolation, "session access revoked")
 			return
 		case event := <-sub.Events:
 			if err := wsjson.Write(ctx, connection, event); err != nil {
@@ -711,8 +751,25 @@ type closeSessionInput struct {
 	Authorization string `header:"Authorization"`
 }
 
+type rotateSessionCodeOutput struct{ Body session.CodeStatus }
+
+func (s *Server) rotateSessionCode(ctx context.Context, input *closeSessionInput) (*rotateSessionCodeOutput, error) {
+	token := bearerToken(input.Authorization)
+	if token == "" {
+		return nil, huma.NewError(http.StatusUnauthorized, "missing session token")
+	}
+	status, err := s.hub.RotateCode(ctx, input.ID, token)
+	if errors.Is(err, session.ErrSessionNotFound) {
+		return nil, huma.NewError(http.StatusNotFound, "session not found")
+	}
+	if err != nil {
+		return nil, huma.NewError(http.StatusForbidden, "could not rotate session code", err)
+	}
+	return &rotateSessionCodeOutput{Body: status}, nil
+}
+
 func (s *Server) closeSession(ctx context.Context, input *closeSessionInput) (*emptyOutput, error) {
-	token := strings.TrimSpace(strings.TrimPrefix(input.Authorization, "Bearer "))
+	token := bearerToken(input.Authorization)
 	if token == "" {
 		return nil, huma.NewError(http.StatusUnauthorized, "missing session token")
 	}
@@ -723,6 +780,8 @@ func (s *Server) closeSession(ctx context.Context, input *closeSessionInput) (*e
 	}
 	return &emptyOutput{}, nil
 }
+
+func bearerToken(value string) string { return strings.TrimSpace(strings.TrimPrefix(value, "Bearer ")) }
 
 type listAssetsOutput struct {
 	Body []domain.AssetRef

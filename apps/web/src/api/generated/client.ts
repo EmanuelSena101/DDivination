@@ -12,6 +12,7 @@ import type {
   AiEnrichRequest,
   AssetRef,
   Catalog,
+  CodeStatus,
   CreateSessionInputBody,
   CreateSessionResponse,
   ErrorModel,
@@ -1409,6 +1410,76 @@ export const closeSession = async (id: string, options?: RequestInit): Promise<c
 
 
 
+export type rotateSessionCodeResponse200 = {
+  data: CodeStatus
+  status: 200
+}
+
+export type rotateSessionCodeResponse401 = {
+  data: ErrorModel
+  status: 401
+}
+
+export type rotateSessionCodeResponse403 = {
+  data: ErrorModel
+  status: 403
+}
+
+export type rotateSessionCodeResponse404 = {
+  data: ErrorModel
+  status: 404
+}
+
+export type rotateSessionCodeResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type rotateSessionCodeResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type rotateSessionCodeResponseSuccess = (rotateSessionCodeResponse200) & {
+  headers: Headers;
+};
+export type rotateSessionCodeResponseError = (rotateSessionCodeResponse401 | rotateSessionCodeResponse403 | rotateSessionCodeResponse404 | rotateSessionCodeResponse422 | rotateSessionCodeResponse500) & {
+  headers: Headers;
+};
+
+export type rotateSessionCodeResponse = (rotateSessionCodeResponseSuccess | rotateSessionCodeResponseError)
+
+export const getRotateSessionCodeUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/sessions/${id}/code`
+}
+
+/**
+ * @summary Rotate the temporary LAN join code
+ */
+export const rotateSessionCode = async (id: string, options?: RequestInit): Promise<rotateSessionCodeResponse> => {
+
+  const res = await fetch(getRotateSessionCodeUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: rotateSessionCodeResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as rotateSessionCodeResponse
+}
+
+
+
 export type joinSessionResponse200 = {
   data: Joined
   status: 200
@@ -1476,4 +1547,76 @@ export const joinSession = async (id: string,
 
   const data: joinSessionResponse['data'] = body ? JSON.parse(body) : {}
   return { data, status: res.status, headers: res.headers } as joinSessionResponse
+}
+
+
+
+export type getJoinStatusResponse200 = {
+  data: Joined
+  status: 200
+}
+
+export type getJoinStatusResponse401 = {
+  data: ErrorModel
+  status: 401
+}
+
+export type getJoinStatusResponse403 = {
+  data: ErrorModel
+  status: 403
+}
+
+export type getJoinStatusResponse404 = {
+  data: ErrorModel
+  status: 404
+}
+
+export type getJoinStatusResponse422 = {
+  data: ErrorModel
+  status: 422
+}
+
+export type getJoinStatusResponse500 = {
+  data: ErrorModel
+  status: 500
+}
+
+export type getJoinStatusResponseSuccess = (getJoinStatusResponse200) & {
+  headers: Headers;
+};
+export type getJoinStatusResponseError = (getJoinStatusResponse401 | getJoinStatusResponse403 | getJoinStatusResponse404 | getJoinStatusResponse422 | getJoinStatusResponse500) & {
+  headers: Headers;
+};
+
+export type getJoinStatusResponse = (getJoinStatusResponseSuccess | getJoinStatusResponseError)
+
+export const getGetJoinStatusUrl = (id: string,
+    requestId: string,) => {
+
+
+
+
+  return `/api/v1/sessions/${id}/join/${requestId}`
+}
+
+/**
+ * @summary Inspect a pending session admission request
+ */
+export const getJoinStatus = async (id: string,
+    requestId: string, options?: RequestInit): Promise<getJoinStatusResponse> => {
+
+  const res = await fetch(getGetJoinStatusUrl(id,requestId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getJoinStatusResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getJoinStatusResponse
 }

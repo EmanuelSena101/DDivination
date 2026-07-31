@@ -463,6 +463,11 @@ func (s *Store) LoadSessionCredentials(ctx context.Context, sessionID string) (m
 	return result, rows.Err()
 }
 
+func (s *Store) DeleteSessionCredential(ctx context.Context, sessionID, participantID string) error {
+	_, err := s.db.ExecContext(ctx, `DELETE FROM session_credentials WHERE session_id = ? AND participant_id = ?`, sessionID, participantID)
+	return err
+}
+
 func (s *Store) SaveAsset(ctx context.Context, ref domain.AssetRef, relativePath string) error {
 	metadata, err := json.Marshal(ref)
 	if err != nil {

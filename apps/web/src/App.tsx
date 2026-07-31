@@ -12,6 +12,7 @@ import {
   getAdventure,
   getGenerationRun,
   generationRunStreamURL,
+  getJoinStatus,
   joinSession,
   listGenerationRuns,
   listAdventureCheckpoints,
@@ -31,6 +32,7 @@ import { GridEditorPanel } from "./components/GridEditorPanel";
 import { ProgressionPanel } from "./components/ProgressionPanel";
 import { AdventureContentPanel } from "./components/AdventureContentPanel";
 import { VTTDiagnosticsPanel } from "./components/VTTDiagnosticsPanel";
+import { TableAdministrationPanel } from "./components/TableAdministrationPanel";
 import type { GridEditorTool } from "./gridEditor";
 import { isGenerationTerminal, reconcileGenerationRun } from "./generationRun";
 import { useAppStore } from "./store";
@@ -44,6 +46,7 @@ import {
   DEFAULT_SPEC,
   type AdventureSpec,
   type GenerationRun,
+  type JoinedSession,
   type Language,
 } from "./types";
 
@@ -405,9 +408,11 @@ function JoinScreen({ sessionId, code }: { sessionId: string; code: string }) {
   const connect = useAppStore((state) => state.connect);
   const [name, setName] = useState("");
   const [display, setDisplay] = useState(false);
+  const [pending, setPending] = useState<JoinedSession | null>(null);
   const mutation = useMutation({
     mutationFn: () => joinSession(sessionId, code, name, display ? "display" : "player"),
-    onSuccess: (joined) =>
+    onSuccess: (joined) => {
+      if (joined.status === "pending") { setPending(joined); return; }
       connect({
         sessionId: joined.sessionId,
         participantId: joined.participantId,
@@ -415,8 +420,20 @@ function JoinScreen({ sessionId, code }: { sessionId: string; code: string }) {
         role: display ? "display" : "player",
         state: joined.state,
         adventure: joined.adventure,
-      }),
+      });
+    },
   });
+  const admission = useQuery({
+    queryKey: ["session-admission", sessionId, pending?.requestId],
+    queryFn: () => getJoinStatus(sessionId, pending!.requestId!, pending!.token),
+    enabled: Boolean(pending?.requestId),
+    refetchInterval: (query) => query.state.data?.status === "joined" || query.state.data?.status === "denied" || query.state.data?.status === "expired" ? false : 1000,
+  });
+  useEffect(() => {
+    const joined = admission.data;
+    if (!joined || joined.status !== "joined") return;
+    connect({ sessionId: joined.sessionId, participantId: joined.participantId, token: joined.token, role: display ? "display" : "player", state: joined.state, adventure: joined.adventure });
+  }, [admission.data, connect, display]);
   return (
     <main className="join-layout">
       <section className="join-card">
@@ -425,7 +442,10 @@ function JoinScreen({ sessionId, code }: { sessionId: string; code: string }) {
         <p>
           {t("sessionCode")}: <strong>{code}</strong>
         </p>
-        <label>
+        {pending ? <div className="admission-waiting">
+          <strong>{admission.data?.status === "denied" ? t("admissionDenied") : admission.data?.status === "expired" ? t("admissionExpired") : t("waitingApproval")}</strong>
+          <small>{t("waitingApprovalHint")}</small>
+        </div> : <><label>
           {t("playerName")}
           <input autoFocus value={name} maxLength={60} onChange={(event) => setName(event.target.value)} />
         </label>
@@ -437,6 +457,7 @@ function JoinScreen({ sessionId, code }: { sessionId: string; code: string }) {
         <button className="primary action" disabled={!name.trim() || mutation.isPending} onClick={() => mutation.mutate()}>
           {mutation.isPending ? t("loading") : t("join")}
         </button>
+        </>}
       </section>
     </main>
   );
@@ -713,6 +734,10 @@ function VTT() {
     window.history.replaceState({}, "", "/");
     clearAdventure();
   };
+  const canRevealFog = role === "gm" || (role === "player" && Boolean(session?.permissions.playerCanRevealFog));
+  const canPing = role === "gm" || (role === "player" && Boolean(session?.permissions.playerCanPing));
+  const canRollDice = role === "gm" || (role === "player" && Boolean(session?.permissions.playerCanRollDice));
+  const canManageInitiative = role === "gm" || (role === "player" && Boolean(session?.permissions.playerCanManageInitiative));
 
   return (
     <main className="vtt-layout">
@@ -752,6 +777,16 @@ function VTT() {
           </>
         )}
 
+        {role === "gm" && session && sessionId && sessionToken && (
+          <TableAdministrationPanel
+            session={session}
+            sessionId={sessionId}
+            token={sessionToken}
+            send={send}
+            onCodeRotated={(code) => setShare({ code, url: `${window.location.origin}/?session=${encodeURIComponent(sessionId)}&code=${encodeURIComponent(code)}` })}
+          />
+        )}
+
         <section className="panel-section">
           <header>
             <span>{t("floors")}</span>
@@ -785,7 +820,7 @@ function VTT() {
                   </li>
                 ))}
               </ol>
-            ) : role === "gm" ? (
+            ) : canManageInitiative ? (
               <div className="initiative-setup">
                 {initiativeTokens.map((entity) => (
                   <label key={entity.id}>
@@ -804,7 +839,7 @@ function VTT() {
                 ))}
               </div>
             ) : null}
-            {role === "gm" && (
+            {canManageInitiative && (
               <button className="secondary compact-action" onClick={(session.initiative.entries || []).length ? nextInitiative : startInitiative}>
                 {(session.initiative.entries || []).length ? t("nextTurn") : t("startInitiative")}
               </button>
@@ -842,12 +877,12 @@ function VTT() {
               {editorOpen ? "◈" : "✎"}{" "}
               <span>{editorOpen ? t("editorExit") : t("editorToggle")}</span>
             </button>
-            <button className={fogBrush ? "active" : ""} disabled={role !== "gm" || !session} onClick={() => setFogBrush(!fogBrush)}>
+            <button className={fogBrush ? "active" : ""} disabled={!canRevealFog || !session} onClick={() => setFogBrush(!fogBrush)}>
               ◐ <span>{t("revealFog")}</span>
             </button>
             <button
               className={pingMode ? "active" : ""}
-              disabled={!session}
+              disabled={!session || !canPing}
               onClick={() => {
                 setPingMode(!pingMode);
                 setMeasureMode(false);
@@ -901,7 +936,7 @@ function VTT() {
                 × <span>{t("closeTable")}</span>
               </button>
             )}
-            <a className="tool-link" href={packageURL(adventure.id)}>
+            {role === "gm" && <><a className="tool-link" href={packageURL(adventure.id)}>
               ⇩ <span>{t("exportPackage")}</span>
             </a>
             <a className="tool-link" href={markdownURL(adventure.id)}>
@@ -910,6 +945,7 @@ function VTT() {
             <a className="tool-link" href={printURL(adventure.id)} target="_blank" rel="noreferrer">
               ⎙ <span>{t("print")}</span>
             </a>
+            </>}
             <button onClick={downloadScreenshot}>
               ▣ <span>{t("screenshot")}</span>
             </button>
@@ -1034,7 +1070,7 @@ function VTT() {
             <option value="public">{t("public")}</option>
             <option value="gm">{t("gm")}</option>
           </select>
-          <button className="primary" disabled={!session || !connected} onClick={roll}>
+          <button className="primary" disabled={!session || !connected || !canRollDice} onClick={roll}>
             {t("roll")}
           </button>
           {session?.rolls.slice(-1).map((item) => (

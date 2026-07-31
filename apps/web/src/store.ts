@@ -24,6 +24,7 @@ import type {
   DiceRoll,
   GridPosition,
   Language,
+  Participant,
   SceneEntity,
   SessionCommand,
   SessionEvent,
@@ -96,7 +97,13 @@ export function applySessionEvent(state: SessionState, event: SessionEvent): Ses
     tokenFloors: { ...state.tokenFloors },
     revealedCells: { ...state.revealedCells },
     rolls: [...state.rolls],
+    participants: { ...state.participants },
+    tokenOwners: { ...state.tokenOwners },
+    admissions: { ...(state.admissions || {}) },
   };
+  if (next.participants[event.actorId]) {
+    next.participants[event.actorId] = { ...next.participants[event.actorId], lastSeenAt: event.occurredAt };
+  }
   switch (event.type) {
     case "token.moved": {
       const tokenId = String(event.payload.tokenId);
@@ -126,6 +133,54 @@ export function applySessionEvent(state: SessionState, event: SessionEvent): Ses
     case "participant.joined": {
       const participant = event.payload.participant as SessionState["participants"][string];
       next.participants = { ...state.participants, [participant.id]: participant };
+      break;
+    }
+    case "participant.presence": {
+      const participantId = String(event.payload.participantId);
+      const participant = next.participants[participantId];
+      if (participant) next.participants[participantId] = { ...participant, connected: Boolean(event.payload.connected), lastSeenAt: String(event.payload.lastSeenAt) };
+      break;
+    }
+    case "participant.role.changed": {
+      const participantId = String(event.payload.participantId);
+      const participant = next.participants[participantId];
+      if (participant) next.participants[participantId] = { ...participant, role: event.payload.role as Participant["role"] };
+      if (event.payload.tokenOwners) next.tokenOwners = { ...(event.payload.tokenOwners as SessionState["tokenOwners"]) };
+      break;
+    }
+    case "participant.removed":
+      delete next.participants[String(event.payload.participantId)];
+      if (event.payload.tokenOwners) next.tokenOwners = { ...(event.payload.tokenOwners as SessionState["tokenOwners"]) };
+      break;
+    case "token.assignment.changed": {
+      const tokenId = String(event.payload.tokenId);
+      const ownerId = String(event.payload.participantId || "");
+      if (ownerId) next.tokenOwners[tokenId] = ownerId;
+      else delete next.tokenOwners[tokenId];
+      break;
+    }
+    case "permissions.changed":
+      next.permissions = event.payload.permissions as SessionState["permissions"];
+      break;
+    case "admission.settings.changed":
+      next.joinOpen = Boolean(event.payload.joinOpen);
+      next.approvalRequired = Boolean(event.payload.approvalRequired);
+      break;
+    case "admission.requested": {
+      const request = event.payload.request as NonNullable<SessionState["admissions"]>[string];
+      next.admissions![request.id] = request;
+      break;
+    }
+    case "admission.approved": {
+      const requestId = String(event.payload.requestId);
+      if (next.admissions?.[requestId]) next.admissions[requestId] = { ...next.admissions[requestId], status: "approved" };
+      const participant = event.payload.participant as SessionState["participants"][string];
+      next.participants[participant.id] = participant;
+      break;
+    }
+    case "admission.denied": {
+      const requestId = String(event.payload.requestId);
+      if (next.admissions?.[requestId]) next.admissions[requestId] = { ...next.admissions[requestId], status: "denied" };
       break;
     }
     case "dice.rolled":
@@ -365,8 +420,12 @@ export const useAppStore = create<AppState>((set, get) => ({
         error: null,
         connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, { type: "open" }),
       }));
-    socket.onclose = () => {
+    socket.onclose = (event) => {
       if (get().socket !== socket) return;
+      if (event.code === 1008) {
+        set({ socket: null, connected: false, session: null, sessionId: null, token: null, error: "Session access was revoked" });
+        return;
+      }
       set((current) => ({
         connected: false,
         connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, {
@@ -458,8 +517,12 @@ export const useAppStore = create<AppState>((set, get) => ({
       set((current) => {
         if (!current.session) return current;
         const sessionState = applySessionEvent(current.session, event);
+        const ownRole = event.type === "participant.role.changed" && String(event.payload.participantId) === current.participantId
+          ? (event.payload.role as AppState["role"])
+          : current.role;
         return {
           session: sessionState,
+          role: ownRole,
           floorId: event.type === "floor.changed" ? sessionState.activeFloorId : current.floorId,
           latestRoll: event.type === "dice.rolled" ? (event.payload as unknown as DiceRoll) : current.latestRoll,
           latestPing:

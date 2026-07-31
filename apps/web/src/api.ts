@@ -5,6 +5,7 @@ import type {
   CreatedSession,
   GenerationRun,
   JoinedSession,
+  SessionCodeStatus,
 } from "./types";
 
 export class APIError extends Error {
@@ -112,6 +113,19 @@ export function joinSession(sessionId: string, code: string, name: string, role:
   return request(`/api/v1/sessions/${encodeURIComponent(sessionId)}/join`, {
     method: "POST",
     body: JSON.stringify({ code, name, role }),
+  });
+}
+
+export function getJoinStatus(sessionId: string, requestId: string, token: string): Promise<JoinedSession> {
+  return request(`/api/v1/sessions/${encodeURIComponent(sessionId)}/join/${encodeURIComponent(requestId)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function rotateSessionCode(sessionId: string, token: string): Promise<SessionCodeStatus> {
+  return request(`/api/v1/sessions/${encodeURIComponent(sessionId)}/code`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
   });
 }
 

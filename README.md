@@ -148,7 +148,7 @@ paredes, entidades e portais; meshes e buffers gráficos não entram no banco.
 | **Medir** | Mede distâncias no grid; cada célula representa 5 pés. |
 | **Diagnóstico** | Mostra FPS, P95, draw calls, triângulos e sincronização. |
 | **Abrir mesa** | Inicia uma sessão para jogadores na rede local. |
-| **Fog** | Revela ou oculta células manualmente; disponível ao mestre. |
+| **Fog** | Revela ou oculta células; o GM pode delegar a jogadores. |
 | **Ping** | Marca uma posição para os participantes conectados. |
 | **Dados** | Rola uma expressão como `1d20`, com resultado do servidor. |
 | **Exportar** | Gera pacote, Markdown, página imprimível ou screenshot. |
@@ -168,8 +168,14 @@ paredes, entidades e portais; meshes e buffers gráficos não entram no banco.
 2. O DDivination mostra um QR code, um código temporário e um endereço LAN.
 3. Compartilhe o QR code ou endereço com quem estiver na mesma rede.
 4. O jogador informa um nome e entra como **player** ou **display**.
-5. O mestre pode movimentar qualquer token. O primeiro jogador recebe o token
-   do grupo automaticamente; jogadores controlam somente tokens atribuídos.
+5. No painel **Administração da mesa**, o mestre atribui tokens, define
+   permissões e pode exigir aprovação antes da entrada.
+6. O mestre movimenta qualquer token; jogadores controlam somente os tokens
+   explicitamente atribuídos e displays são somente leitura.
+
+O painel também permite fechar novas entradas, gerar outro código, alterar
+`player`/`display`, acompanhar presença e remover participantes. Veja o
+[guia de administração](docs/TABLE_ADMINISTRATION.md).
 
 O backend continua autoritativo para movimento, fog e dados. Conteúdo secreto é
 filtrado no servidor antes de ser enviado ao cliente.

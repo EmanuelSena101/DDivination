@@ -7,6 +7,8 @@
  */
 import type { DiceRoll } from './diceRoll';
 import type { InitiativeState } from './initiativeState';
+import type { SessionPermissions } from './sessionPermissions';
+import type { SessionStateAdmissions } from './sessionStateAdmissions';
 import type { SessionStateParticipants } from './sessionStateParticipants';
 import type { SessionStateRevealedCells } from './sessionStateRevealedCells';
 import type { SessionStateTokenFloors } from './sessionStateTokenFloors';
@@ -15,12 +17,16 @@ import type { SessionStateTokenPositions } from './sessionStateTokenPositions';
 
 export interface SessionState {
   activeFloorId: string;
+  admissions?: SessionStateAdmissions;
   adventureId: string;
+  approvalRequired: boolean;
   createdAt: string;
   id: string;
   initiative: InitiativeState;
+  joinOpen: boolean;
   open: boolean;
   participants: SessionStateParticipants;
+  permissions: SessionPermissions;
   revealedCells: SessionStateRevealedCells;
   revision: number;
   /** @nullable */

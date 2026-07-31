@@ -276,7 +276,25 @@ export interface Participant {
   id: string;
   name: string;
   role: "gm" | "player" | "display";
+  connected: boolean;
   joinedAt: string;
+  lastSeenAt: string;
+}
+
+export interface SessionPermissions {
+  playerCanRevealFog: boolean;
+  playerCanPing: boolean;
+  playerCanRollDice: boolean;
+  playerCanManageInitiative: boolean;
+}
+
+export interface AdmissionRequest {
+  id: string;
+  name: string;
+  role: "player" | "display";
+  status: "pending" | "approved" | "denied" | "expired";
+  createdAt: string;
+  expiresAt: string;
 }
 
 export interface DiceRoll {
@@ -308,6 +326,10 @@ export interface SessionState {
   };
   rolls: DiceRoll[];
   open: boolean;
+  joinOpen: boolean;
+  approvalRequired: boolean;
+  permissions: SessionPermissions;
+  admissions?: Record<string, AdmissionRequest>;
   createdAt: string;
 }
 
@@ -327,8 +349,18 @@ export interface JoinedSession {
   sessionId: string;
   participantId: string;
   token: string;
+  status: "joined" | "pending" | "denied" | "expired";
+  requestId?: string;
+  expiresAt?: string;
   state: SessionState;
   adventure: AdventureDocument;
+}
+
+export interface SessionCodeStatus {
+  code: string;
+  expiresAt: string;
+  joinOpen: boolean;
+  approvalRequired: boolean;
 }
 
 export interface SessionEvent {

@@ -4,6 +4,8 @@ Estado: `PLANNED`
 
 Issue: [#35](https://github.com/EmanuelSena101/DDivination/issues/35)
 
+Planejamento: [Pull Request #36](https://github.com/EmanuelSena101/DDivination/pull/36)
+
 Pull Request: a criar quando a implementação começar
 
 ## Contexto

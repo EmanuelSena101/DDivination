@@ -12,7 +12,7 @@ const run = (overrides: Partial<GenerationRun> = {}): GenerationRun => ({
   stage: "building-floor-1-of-2",
   progress: 30,
   seed: 42,
-  generatorVersion: "go-v1-alpha.1",
+  generatorVersion: "go-v1-alpha.2",
   spec: {
     partySize: 4,
     partyLevel: 5,

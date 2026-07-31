@@ -117,6 +117,9 @@ func TestPlayerSnapshotDoesNotRevealSecretMetadata(t *testing.T) {
 	if len(visible.Analysis.DeadEnds) != 0 {
 		t.Fatal("secret dead-end identifiers leaked to the player")
 	}
+	if len(visible.Progression.SecretRoomIDs) != 0 {
+		t.Fatal("secret progression identifiers leaked to the player")
+	}
 }
 
 func TestConfirmedSessionRestoresAfterServerRestart(t *testing.T) {

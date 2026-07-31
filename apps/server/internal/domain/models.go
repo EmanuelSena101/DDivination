@@ -4,7 +4,7 @@ import "time"
 
 const (
 	SchemaVersion    = "1.0.0"
-	GeneratorVersion = "go-v1-alpha.1"
+	GeneratorVersion = "go-v1-alpha.2"
 )
 
 type LocalizedText struct {
@@ -58,12 +58,14 @@ type Tile struct {
 }
 
 type WallEdge struct {
-	X         int    `json:"x"`
-	Z         int    `json:"z"`
-	Direction string `json:"direction" enum:"north,east,south,west"`
-	Kind      string `json:"kind" enum:"wall,door,secret-door"`
-	Open      bool   `json:"open"`
-	Locked    bool   `json:"locked"`
+	ID            string `json:"id,omitempty"`
+	X             int    `json:"x"`
+	Z             int    `json:"z"`
+	Direction     string `json:"direction" enum:"north,east,south,west"`
+	Kind          string `json:"kind" enum:"wall,door,secret-door"`
+	Open          bool   `json:"open"`
+	Locked        bool   `json:"locked"`
+	RequiredKeyID string `json:"requiredKeyId,omitempty"`
 }
 
 type Portal struct {
@@ -137,6 +139,36 @@ type DungeonAnalysis struct {
 	Invariants          []string `json:"invariants"`
 }
 
+type ProgressionStep struct {
+	Order          int           `json:"order" minimum:"1"`
+	FloorID        string        `json:"floorId"`
+	RoomID         string        `json:"roomId"`
+	Kind           string        `json:"kind" enum:"entrance,exploration,key,transition,climax"`
+	Beat           LocalizedText `json:"beat"`
+	GrantsKeyIDs   []string      `json:"grantsKeyIds"`
+	RequiresKeyIDs []string      `json:"requiresKeyIds"`
+}
+
+type ProgressionLock struct {
+	ID         string `json:"id"`
+	Kind       string `json:"kind" enum:"door,portal"`
+	TargetID   string `json:"targetId"`
+	FloorID    string `json:"floorId"`
+	FromRoomID string `json:"fromRoomId"`
+	ToRoomID   string `json:"toRoomId"`
+	KeyID      string `json:"keyId"`
+}
+
+type DungeonProgression struct {
+	EntryRoomID     string            `json:"entryRoomId"`
+	ObjectiveRoomID string            `json:"objectiveRoomId"`
+	ClimaxRoomID    string            `json:"climaxRoomId"`
+	Steps           []ProgressionStep `json:"steps"`
+	Locks           []ProgressionLock `json:"locks"`
+	SecretRoomIDs   []string          `json:"secretRoomIds"`
+	Solvable        bool              `json:"solvable"`
+}
+
 type AdventureNarrative struct {
 	Hook       LocalizedText `json:"hook"`
 	Objective  LocalizedText `json:"objective"`
@@ -156,6 +188,7 @@ type AdventureDocument struct {
 	Narrative        AdventureNarrative `json:"narrative"`
 	Floors           []FloorMap         `json:"floors"`
 	Encounters       []Encounter        `json:"encounters"`
+	Progression      DungeonProgression `json:"progression"`
 	Analysis         DungeonAnalysis    `json:"analysis"`
 	Attributions     []Attribution      `json:"attributions"`
 	CreatedAt        time.Time          `json:"createdAt"`

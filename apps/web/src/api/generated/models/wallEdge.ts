@@ -10,9 +10,11 @@ import type { WallEdgeKind } from './wallEdgeKind';
 
 export interface WallEdge {
   direction: WallEdgeDirection;
+  id?: string;
   kind: WallEdgeKind;
   locked: boolean;
   open: boolean;
+  requiredKeyId?: string;
   x: number;
   z: number;
 }

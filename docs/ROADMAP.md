@@ -33,7 +33,7 @@ issue correspondente.
 | BATCH-006 | Editor de entidades e conteúdo | DONE |
 | BATCH-007 | Persistência editorial | DONE |
 | BATCH-008 | Execuções de geração | DONE |
-| BATCH-009 | Gerador de progressão | PLANNED |
+| BATCH-009 | Gerador de progressão | VALIDATING |
 | BATCH-010 | Catálogo e regras 5E | PLANNED |
 | BATCH-011 | Administração da mesa | PLANNED |
 | BATCH-012 | Durabilidade em tempo real | PLANNED |

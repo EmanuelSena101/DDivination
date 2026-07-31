@@ -47,16 +47,25 @@ func TestGenerateIsDeterministic(t *testing.T) {
 
 func TestGeneratedDungeonInvariants(t *testing.T) {
 	now := time.Date(2026, 7, 28, 12, 0, 0, 0, time.UTC)
-	for seed := uint64(0); seed < 250; seed++ {
+	styles := []string{"linear", "branching", "labyrinthine"}
+	for seed := uint64(0); seed < 1000; seed++ {
 		spec := domain.DefaultAdventureSpec()
 		spec.FloorCount = 1 + int(seed%5)
 		spec.DurationHours = 2 + int(seed%7)
+		spec.StructureStyle = styles[seed%uint64(len(styles))]
 		doc, err := Generate(spec, seed, now)
 		if err != nil {
 			t.Fatalf("seed %d: %v", seed, err)
 		}
 		if len(doc.Floors) != spec.FloorCount {
 			t.Fatalf("seed %d: got %d floors", seed, len(doc.Floors))
+		}
+		if !doc.Progression.Solvable || len(doc.Progression.Locks) != spec.FloorCount {
+			t.Fatalf("seed %d: invalid progression summary", seed)
+		}
+		if doc.Progression.Steps[0].RoomID != doc.Progression.EntryRoomID ||
+			doc.Progression.Steps[len(doc.Progression.Steps)-1].RoomID != doc.Progression.ClimaxRoomID {
+			t.Fatalf("seed %d: progression endpoints mismatch", seed)
 		}
 		for floorIndex, floor := range doc.Floors {
 			walkable := make(map[domain.GridPosition]bool, len(floor.Tiles))

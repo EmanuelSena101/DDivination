@@ -43,6 +43,8 @@
 ## O que já funciona
 
 - geração procedural bilíngue e reproduzível por `seed + generatorVersion`;
+- progressão semântica validada da entrada ao clímax, com chaves, locks e
+  segredos opcionais;
 - execuções assíncronas com progresso, histórico, cancelamento e retomada após
   recarregar a página;
 - dungeons com vários andares, salas, corredores, paredes e portais;

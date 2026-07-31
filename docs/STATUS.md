@@ -1,6 +1,6 @@
 # Estado do DDivination
 
-Última atualização: 2026-07-30
+Última atualização: 2026-07-31
 
 ## Estado atual
 
@@ -59,12 +59,12 @@ CI.
 Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-008-generation-runs.md](batches/BATCH-008-generation-runs.md).
 
-## Próxima batch
+## Batch em execução
 
 `BATCH-009 — Gerador de progressão`
 
-O próximo passo é aprofundar o gerador semântico com progressão entre salas e
-andares, locks, chaves, segredos, clímax e invariantes de solubilidade. O escopo
-detalhado será fechado antes da implementação.
+O gerador semântico agora possui progressão explícita entre salas e andares,
+locks, chaves, segredos, clímax e validação por simulação da solubilidade. A
+implementação está na fase de regressão completa antes da publicação da PR.
 
 O pipeline completo de GLB permanece reservado à BATCH-014.

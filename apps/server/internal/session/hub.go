@@ -551,6 +551,7 @@ func filteredSnapshot(state domain.SessionState, adventure domain.AdventureDocum
 		cleanAdventure.Analysis.TotalRooms += len(floor.Rooms)
 	}
 	cleanAdventure.Analysis.DeadEnds = nil
+	cleanAdventure.Progression.SecretRoomIDs = nil
 	visibleInvariants := cleanAdventure.Analysis.Invariants[:0]
 	for _, invariant := range cleanAdventure.Analysis.Invariants {
 		if invariant != "secrets-are-optional" {

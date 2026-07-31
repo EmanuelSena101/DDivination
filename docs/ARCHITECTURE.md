@@ -22,6 +22,12 @@ entram pela rede local somente depois que o mestre abre uma sessão.
 - SQLite é a fonte local de persistência.
 - O servidor é autoritativo para permissões, movimento, fog e dados.
 - O frontend deriva meshes a partir do documento semântico.
+- A progressão também faz parte do documento semântico: etapas ordenadas ligam
+  entrada, exploração, transições e clímax; locks referenciam portas ou portais
+  e chaves referenciam entidades reais.
+- O validador simula a aquisição de chaves antes de cada lock, confere pares de
+  portais, mantém segredos fora do caminho obrigatório e exige o boss no clímax
+  do último andar. Documentos inválidos não são gerados nem persistidos.
 - O editor altera uma cópia imutável local do documento semântico. Grid,
   conteúdo bilíngue e entidades compartilham o mesmo histórico limitado de
   undo/redo.
@@ -61,7 +67,8 @@ cena, [GRID_EDITOR.md](GRID_EDITOR.md) para as proteções editoriais e
 ## Persistência
 
 O documento armazena tiles, paredes, portais, salas, entidades e referências de
-assets. Geometrias derivadas, buffers WebGL e meshes não são persistidos.
+assets, além da progressão entre esses elementos. Geometrias derivadas, buffers
+WebGL e meshes não são persistidos.
 
 Cada edição persistida gera uma versão monotônica e um snapshot imutável.
 Checkpoints manuais não alteram a versão; restaurações criam uma versão nova.

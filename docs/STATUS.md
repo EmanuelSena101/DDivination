@@ -45,6 +45,9 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 - FPS no hardware-alvo ainda precisa de validação formal;
 - runtime de física dos dados permanece grande, embora carregado sob demanda;
 - instalador Windows ainda não existe.
+- câmera e ferramentas de mapa ainda compartilham gestos ambíguos; o remake de
+  interação, responsividade e controles foi registrado na
+  [Batch 13](batches/BATCH-013-vtt-ux-controls.md) e na issue #35;
 
 ## Última batch concluída
 

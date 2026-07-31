@@ -37,7 +37,7 @@ issue correspondente.
 | BATCH-010 | Catálogo e regras 5E | PLANNED |
 | BATCH-011 | Administração da mesa | PLANNED |
 | BATCH-012 | Durabilidade em tempo real | PLANNED |
-| BATCH-013 | Ferramentas finais da VTT | PLANNED |
+| BATCH-013 | Remake de UX e controles da VTT | PLANNED |
 | BATCH-014 | Assets e pacote portátil | PLANNED |
 | BATCH-015 | IA opcional | PLANNED |
 | BATCH-016 | Release v1 | PLANNED |

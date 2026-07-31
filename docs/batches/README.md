@@ -31,7 +31,7 @@ release v1.
 | [BATCH-007](BATCH-007-editorial-persistence.md) | Persistência editorial | DONE |
 | [BATCH-008](BATCH-008-generation-runs.md) | Execuções de geração | DONE |
 | [BATCH-009](BATCH-009-progression-generator.md) | Gerador de progressão | DONE |
-| [BATCH-010](BATCH-010-catalog-rules.md) | Catálogo e regras 5E | VALIDATING |
+| [BATCH-010](BATCH-010-catalog-rules.md) | Catálogo e regras 5E | DONE |
 | [BATCH-013](BATCH-013-vtt-ux-controls.md) | Remake de UX e controles da VTT | PLANNED |
 
 O estado das demais próximas batches permanece centralizado no

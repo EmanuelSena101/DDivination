@@ -51,23 +51,24 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 
 ## Última batch concluída
 
-`BATCH-009 — Gerador de progressão`
-
-O documento agora possui progressão semântica da entrada ao clímax, chaves e
-locks vinculados a portas e portais reais, segredos opcionais e validação por
-simulação de solubilidade. A validação incluiu 1.000 seeds, 30 testes Vitest, 7
-cenários Playwright, QA bilíngue e todos os sete jobs do CI.
-
-Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-009-progression-generator.md](batches/BATCH-009-progression-generator.md).
-
-## Batch em execução
-
 `BATCH-010 — Catálogo e regras 5E`
 
-A [Batch 10](batches/BATCH-010-catalog-rules.md) ampliou o catálogo SRD 5.2.1 e
-aplicou budgets de encontros, tesouros, armadilhas, puzzles, descansos e
-recompensas sobre a progressão já validada. A regressão local passou e a batch
-aguarda os gates do CI na issue #37.
+O gerador agora usa um catálogo SRD 5.2.1 versionado, budgets oficiais de XP e
+conteúdo semântico bilíngue de encontros, tesouros, puzzles, armadilhas e
+descansos. O mestre recebe essas informações na VTT e nas exportações, enquanto
+o servidor as remove da visão do jogador. A validação incluiu 1.000 seeds, 320
+combinações adicionais, 31 testes Vitest, 7 cenários Playwright, QA bilíngue e
+todos os sete gates do projeto no CI.
+
+Consulte [ROADMAP.md](ROADMAP.md) e
+[BATCH-010-catalog-rules.md](batches/BATCH-010-catalog-rules.md).
+
+## Próxima batch
+
+`BATCH-011 — Administração da mesa`
+
+A Batch 11 permanece `PLANNED` e deverá consolidar a administração da sessão:
+participantes, papéis, atribuição de tokens e controles operacionais do mestre.
+Seu escopo será detalhado e aprovado antes da implementação.
 
 O pipeline completo de GLB permanece reservado à BATCH-014.

@@ -8,7 +8,7 @@ Planejamento: [Pull Request #53](https://github.com/EmanuelSena101/DDivination/p
 
 Branch: `codex/batch-012-postgresql-durability`
 
-Pull Request: a criar após a validação local
+Pull Request: [#56](https://github.com/EmanuelSena101/DDivination/pull/56)
 
 ## Contexto
 
@@ -159,7 +159,9 @@ A validação local contra PostgreSQL real aprovou toda a suíte Go, inclusive
 1.000 eventos, dois commits concorrentes em mesas independentes, falha anterior
 ao commit, retry posterior ao commit, reinício do hub e retenção. O Playwright
 interrompeu o WebSocket de um jogador, retomou pela revisão confirmada e manteve
-a mesma rolagem autoritativa. A conclusão aguarda apenas PR e CI remoto.
+a mesma rolagem autoritativa; os oito cenários E2E e os 32 testes Vitest passaram.
+O smoke test também aprovou start, health, frontend incorporado, Vite e stop com
+PostgreSQL gerenciado pelos scripts. A conclusão aguarda apenas o CI da PR #56.
 
 ## Pendências encontradas
 

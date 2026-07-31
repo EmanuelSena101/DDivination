@@ -664,12 +664,22 @@ func (s *Server) streamSession(w http.ResponseWriter, r *http.Request) {
 				readErrors <- err
 				return
 			}
-			if _, err := s.hub.HandleCommand(ctx, sessionID, token, command); err != nil {
+			event, err := s.hub.HandleCommand(ctx, sessionID, token, command)
+			if err != nil {
 				outbound <- map[string]any{
 					"type":    "command.rejected",
 					"command": command.ID,
 					"detail":  err.Error(),
 				}
+				continue
+			}
+			// The direct acknowledgement is intentionally separate from the
+			// broadcast event. It also acknowledges an idempotent retry whose
+			// original event was committed before the connection was lost.
+			outbound <- map[string]any{
+				"type":     "command.accepted",
+				"command":  command.ID,
+				"revision": event.Revision,
 			}
 		}
 	}()

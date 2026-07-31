@@ -17,6 +17,13 @@ Somente depois do commit o evento é transmitido. Uma falha anterior ao commit
 não muda a revisão. Se a resposta se perder depois do commit, repetir o mesmo
 `commandId` devolve o evento original sem aplicar o efeito novamente.
 
+Além do evento autoritativo transmitido aos participantes, a conexão que enviou
+o comando recebe um `command.accepted` com a revisão confirmada. O navegador
+mantém comandos sem essa confirmação durante reconexões. Um
+`command.rejected` por conflito de revisão é repetido de forma limitada, com o
+mesmo `commandId` e a revisão local mais recente; rejeições de permissão ou
+validação continuam visíveis e não são repetidas.
+
 ## Tabelas
 
 - `session_heads`: estado corrente, revisão, aventura e hash do código de entrada;

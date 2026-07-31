@@ -43,6 +43,14 @@ interface SessionSnapshotMessage {
   adventure: AdventureDocument;
 }
 
+interface PendingSessionCommand {
+  command: SessionCommand;
+  attempts: number;
+}
+
+const pendingSessionCommands = new Map<string, PendingSessionCommand>();
+const MAX_COMMAND_ATTEMPTS = 5;
+
 interface AppState {
   language: Language;
   adventure: AdventureDocument | null;
@@ -416,6 +424,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   connect: ({ sessionId, participantId, token, role, state, adventure, reconnecting = false }) => {
     const currentState = get();
+    if (!reconnecting) pendingSessionCommands.clear();
     currentState.socket?.close();
     const resumedState = reconnecting ? (currentState.session ?? state) : state;
     const resumedAdventure = reconnecting ? (currentState.adventure ?? adventure) : adventure;
@@ -424,12 +433,21 @@ export const useAppStore = create<AppState>((set, get) => ({
     const initialConnectionTelemetry = reconnecting
       ? reduceConnectionTelemetry(get().connectionTelemetry, { type: "connect" })
       : reduceConnectionTelemetry(createConnectionTelemetry(), { type: "connect" });
-    socket.onopen = () =>
+    socket.onopen = () => {
       set((current) => ({
         connected: true,
         error: null,
         connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, { type: "open" }),
       }));
+      const current = get();
+      for (const pending of pendingSessionCommands.values()) {
+        pending.command = {
+          ...pending.command,
+          expectedRevision: current.session?.revision ?? pending.command.expectedRevision,
+        };
+        socket.send(JSON.stringify(pending.command));
+      }
+    };
     socket.onclose = (event) => {
       if (get().socket !== socket) return;
       if (event.code === 1008) {
@@ -471,7 +489,12 @@ export const useAppStore = create<AppState>((set, get) => ({
     socket.onmessage = (message) => {
       const data = JSON.parse(String(message.data)) as SessionSnapshotMessage | SessionEvent | {
         type: "command.rejected";
+        command: string;
         detail: string;
+      } | {
+        type: "command.accepted";
+        command: string;
+        revision: number;
       };
       if (data.type === "session.snapshot" && "state" in data && "adventure" in data) {
         set((current) => ({
@@ -490,12 +513,50 @@ export const useAppStore = create<AppState>((set, get) => ({
         return;
       }
       if (data.type === "command.rejected" && "detail" in data) {
+        const pending = pendingSessionCommands.get(data.command);
+        if (
+          data.detail === "session revision conflict" &&
+          pending &&
+          pending.attempts < MAX_COMMAND_ATTEMPTS
+        ) {
+          pending.attempts += 1;
+          window.setTimeout(() => {
+            const current = get();
+            const retry = pendingSessionCommands.get(data.command);
+            if (
+              retry !== pending ||
+              current.socket?.readyState !== WebSocket.OPEN ||
+              !current.session
+            ) return;
+            retry.command = {
+              ...retry.command,
+              expectedRevision: current.session.revision,
+            };
+            current.socket.send(JSON.stringify(retry.command));
+            set((latest) => ({
+              connectionTelemetry: reduceConnectionTelemetry(latest.connectionTelemetry, {
+                type: "command-sent",
+              }),
+            }));
+          }, 75 * (2 ** (pending.attempts - 1)));
+          set((current) => ({
+            connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, {
+              type: "rejected",
+            }),
+          }));
+          return;
+        }
+        pendingSessionCommands.delete(data.command);
         set((current) => ({
           error: data.detail,
           connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, {
             type: "rejected",
           }),
         }));
+        return;
+      }
+      if (data.type === "command.accepted" && "command" in data) {
+        pendingSessionCommands.delete(data.command);
         return;
       }
       const event = data as SessionEvent;
@@ -567,6 +628,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   disconnect: () => {
     get().socket?.close();
+    pendingSessionCommands.clear();
     set({
       socket: null,
       session: null,
@@ -591,6 +653,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       type,
       payload,
     };
+    pendingSessionCommands.set(command.id, { command, attempts: 1 });
     socket.send(JSON.stringify(command));
     set((current) => ({
       connectionTelemetry: reduceConnectionTelemetry(current.connectionTelemetry, {

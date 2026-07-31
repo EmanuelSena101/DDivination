@@ -50,3 +50,8 @@ if ($record.PSObject.Properties.Name -contains "databaseManaged" -and $record.da
 
 Write-Host "DDivination encerrado." -ForegroundColor Green
 Write-Host "Os logs foram preservados em $runtimeDir."
+
+# Native process-tree helpers may leave a non-zero LASTEXITCODE behind even
+# when every managed process was stopped successfully. GitHub Actions uses
+# that residual value as the PowerShell step result on Linux.
+$global:LASTEXITCODE = 0

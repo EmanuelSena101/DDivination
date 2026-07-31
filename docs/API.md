@@ -153,6 +153,10 @@ cliente avance a revisão sem receber o segredo.
 O identificador do comando é obrigatório e idempotente. Um retry devolve o
 evento originalmente confirmado; `expectedRevision` divergente é rejeitada sem
 gravação. O evento só é transmitido depois que PostgreSQL confirma a transação.
+Para cada comando, a conexão de origem também recebe `command.accepted`, com o
+identificador e a revisão confirmada, ou `command.rejected`, com o motivo. O
+cliente mantém comandos ainda não confirmados durante uma reconexão e repete
+automaticamente conflitos transitórios de revisão com o mesmo identificador.
 
 Comandos administrativos são exclusivos do GM: `participant.role.set`,
 `participant.remove`, `token.assign`, `permissions.set`, `admission.set`,

@@ -11,7 +11,10 @@ async function join(browser: Browser, session: string, code: string, name: strin
 }
 
 test("GM approves joins and administers roles, tokens, permissions and access", async ({ browser, page }) => {
-  test.setTimeout(120_000);
+  // This scenario intentionally keeps four independent 3D browser contexts
+  // alive while it exercises every administrative round-trip. Trace/video
+  // capture in CI can push an otherwise successful run beyond two minutes.
+  test.setTimeout(180_000);
   await page.goto("/");
   await page.getByRole("button", { name: /Divinar dungeon/ }).click();
   await page.getByRole("button", { name: /Abrir mesa/ }).click();

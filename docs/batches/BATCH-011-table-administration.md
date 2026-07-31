@@ -8,7 +8,7 @@ Planejamento: [Pull Request #53](https://github.com/EmanuelSena101/DDivination/p
 
 Branch: `codex/batch-011-table-administration`
 
-Pull Request: a criar após a primeira implementação validada
+Pull Request: [#54](https://github.com/EmanuelSena101/DDivination/pull/54)
 
 ## Contexto
 

@@ -48,8 +48,8 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
   [Batch 21](batches/BATCH-021-optional-ai.md);
 - FPS no hardware-alvo ainda precisa de validação formal;
 - runtime de física dos dados permanece grande, embora carregado sob demanda;
-- instalador Windows ainda não existe; entrega prevista na
-  [Batch 22](batches/BATCH-022-v1-release.md);
+- o deploy cloud ainda não existe; integração Vercel + Supabase e lançamento
+  estão previstos na [Batch 22](batches/BATCH-022-v1-release.md);
 - câmera e ferramentas de mapa ainda compartilham gestos ambíguos; o remake de
   interação, responsividade e controles foi registrado na
   [Batch 13](batches/BATCH-013-vtt-ux-controls.md) e na issue #35;
@@ -68,10 +68,12 @@ Consulte [ROADMAP.md](ROADMAP.md) e
 
 ## Próxima batch
 
-`BATCH-012 — Durabilidade em tempo real`
+`BATCH-012 — Durabilidade em tempo real e migração para PostgreSQL`
 
-A próxima batch consolidará replay, snapshots periódicos, reconexão por revisão
-e recuperação de sessões abertas após reinício. Seu escopo está no
+A próxima batch migrará a persistência operacional de SQLite para PostgreSQL e
+consolidará replay, snapshots periódicos, reconexão por revisão e recuperação de
+sessões abertas após reinício. Ela prepara contratos compatíveis com Supabase,
+mas continuará local/CI e não criará infraestrutura cloud. Seu escopo está no
 [diário da Batch 12](batches/BATCH-012-realtime-durability.md).
 
 ## Roadmap ampliado após auditoria do legado
@@ -82,6 +84,14 @@ não possui essa paridade nem um compêndio. As Batches 14–19 agora cobrem pac
 versionados, separação 2014/2024, paridade do legado, SRD 5.2.1 completo,
 navegação, edição e regeneração parcial.
 
-Assets e pacote portátil passaram para a Batch 20, IA para a Batch 21 e o
-release v1 para a Batch 22. Fichas/combate manual e automação permanecem
-expansões pós-v1 nas Batches 23 e 24.
+Assets e pacote portátil passaram para a Batch 20 e IA para a Batch 21. A Batch
+22 fará a integração Vercel + Supabase e será o próprio release v1. Fichas,
+combate manual e automação permanecem expansões pós-v1 nas Batches 23 e 24.
+
+## Direção de arquitetura aprovada
+
+O requisito de operação offline-first foi removido. O estado atual continua
+executável com Go, SQLite e LAN enquanto a transição é construída, mas o destino
+do v1 é online-first: PostgreSQL a partir da Batch 12 e Vercel + Supabase na
+Batch 22. A decisão e seus limites estão no
+[ADR-003](decisions/ADR-003-online-first-postgresql.md).

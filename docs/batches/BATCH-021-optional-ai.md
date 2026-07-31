@@ -17,12 +17,13 @@ experiência de diagnóstico para o usuário.
 ## Objetivo
 
 Entregar IA opcional e segura para transformar intenção em `AdventureSpec` e
-enriquecer narrativa bilíngue sem controlar regras nem comprometer o modo offline.
+enriquecer narrativa bilíngue sem controlar regras nem tornar a geração
+procedural dependente de um provider.
 
 ## Escopo
 
 - OpenAI como primeiro adapter configurável;
-- chave no keychain do sistema ou memória, nunca SQLite/log/pacote;
+- chave em secret manager ou memória autorizada, nunca banco/log/pacote;
 - teste de conexão e seleção de modelo suportado;
 - prompt para `AdventureSpec` com preview e confirmação;
 - enriquecimento de hook, objetivo, antagonista, atmosfera e textos autorizados;
@@ -36,7 +37,7 @@ enriquecer narrativa bilíngue sem controlar regras nem comprometer o modo offli
 
 - gerar ou corrigir regras, stat blocks e budgets sem validação determinística;
 - enviar aventura completa, notas secretas ou dados de participantes por default;
-- exigir internet ou chave;
+- exigir chave de IA para usar o fluxo procedural;
 - imagens/3D generativos no v1.
 
 ## Decisões
@@ -78,7 +79,7 @@ Planejamento registrado. Implementação permanece futura.
 
 ## Pendências encontradas
 
-- selecionar integração de keychain multiplataforma;
+- definir se o v1 aceita chave do usuário, chave do serviço ou ambas;
 - definir limites default de custo e tamanho de contexto.
 
 ## Documentação atualizada

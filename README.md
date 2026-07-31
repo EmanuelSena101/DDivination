@@ -13,8 +13,8 @@
 </p>
 
 <p align="center">
-  Gerador determinístico de aventuras compatíveis com 5E 2024 e VTT 3D
-  local-first para mestres e jogadores na mesma rede.
+  Gerador determinístico de aventuras compatíveis com 5E 2024 e VTT 3D. O
+  build atual roda localmente; o v1 será uma aplicação online por URL.
 </p>
 
 <p align="center">
@@ -23,7 +23,7 @@
   </a>
   <img src="https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white" alt="Go 1.26" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=101820" alt="React 19" />
-  <img src="https://img.shields.io/badge/funciona-offline-6f52ff" alt="Funciona offline" />
+  <img src="https://img.shields.io/badge/v1-online--first-6f52ff" alt="v1 online-first" />
 </p>
 
 <p align="center">
@@ -38,7 +38,9 @@
 > O DDivination ainda está em desenvolvimento. O vertical slice é funcional,
 > mas não existe instalador oficial. O editor de mapa, conteúdo bilíngue e
 > entidades já possui autosave versionado, checkpoints e resolução de conflitos.
-> O fluxo recomendado neste momento é Windows + PowerShell.
+> O fluxo recomendado neste momento é Windows + PowerShell. SQLite e LAN ainda
+> descrevem o build atual; a migração para PostgreSQL começa na Batch 12 e o
+> deploy Vercel + Supabase pertence à Batch 22.
 
 ## O que já funciona
 
@@ -346,10 +348,11 @@ Ainda não fazem parte do vertical slice, mas agora possuem destino explícito:
 - editor semântico completo e regeneração parcial — Batches 18–19;
 - fichas e combate manual — Batch 23, após o v1;
 - combate automatizado — Batch 24, após fichas e regras versionadas;
-- multiplayer pela internet;
+- multiplayer pela internet — planejado com Vercel + Supabase na Batch 22;
 - line-of-sight dinâmico;
 - marketplace, macros, VR ou primeira pessoa;
-- instalador Windows — Batch 22.
+- deploy cloud e release 1.0 — Batch 22;
+- instalador desktop — não é requisito do v1.
 
 O editor mantém um rascunho reversível e o salva automaticamente no SQLite.
 Checkpoints marcam versões importantes; conflitos nunca sobrescrevem dados
@@ -357,12 +360,17 @@ remotos sem confirmação. Acompanhe o [roadmap](docs/ROADMAP.md).
 
 ## Privacidade, IA e segurança
 
-- A aplicação funciona offline e não exige conta.
+- O build atual funciona offline e não exige conta; isso não é um requisito do
+  v1 online.
 - Códigos de entrada expiram e tokens de sessão são efêmeros.
 - Chaves de IA não entram no SQLite, logs ou pacotes.
 - A IA é opcional; falhas nunca bloqueiam a geração procedural.
 - Imports validam tamanho, formato, hashes e caminhos.
 - O relatório de diagnóstico é local e não contém narrativa ou credenciais.
+
+A migração de SQLite para PostgreSQL está planejada na Batch 12. Credenciais e
+infraestrutura reais de Vercel/Supabase só entram na Batch 22. Consulte o
+[ADR-003](docs/decisions/ADR-003-online-first-postgresql.md).
 
 ## SRD e atribuição
 

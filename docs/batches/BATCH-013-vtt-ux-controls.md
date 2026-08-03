@@ -1,12 +1,14 @@
 # BATCH-013 — Remake de UX e controles da VTT
 
-Estado: `PLANNED`
+Estado: `DONE`
 
 Issue: [#35](https://github.com/EmanuelSena101/DDivination/issues/35)
 
 Planejamento: [Pull Request #36](https://github.com/EmanuelSena101/DDivination/pull/36)
 
-Pull Request: a criar quando a implementação começar
+Branch: `codex/batch-013-vtt-ux-controls`
+
+Pull Request: [#57](https://github.com/EmanuelSena101/DDivination/pull/57)
 
 ## Contexto
 
@@ -98,20 +100,20 @@ responsividade e superfícies específicas para mestre, jogador e display.
 - primeira pessoa, realidade virtual ou suporte mobile equivalente a desktop 3D;
 - mudança do protocolo autoritativo de sessão sem necessidade comprovada.
 
-## Critérios de aceitação planejados
+## Critérios de aceitação
 
-- [ ] botão esquerdo nunca orbita nem desloca a câmera;
-- [ ] botão direito orbita, botão central desloca e roda controla zoom;
-- [ ] nenhum drag de câmera executa ação no mapa;
-- [ ] ferramentas são mutuamente exclusivas e exibem cursor/preview coerente;
-- [ ] câmera pode ser centralizada, colocada no topo e focada na seleção;
-- [ ] GM, jogador e display recebem somente controles pertinentes;
-- [ ] jogador sem fog revelado entende que está aguardando o mestre;
-- [ ] troca de andar e ferramentas essenciais funcionam nos breakpoints suportados;
-- [ ] interface não mistura idiomas e invariantes possuem rótulos de produto;
-- [ ] fontes, contraste, foco e áreas clicáveis passam pela revisão de acessibilidade;
-- [ ] dados possuem presets, validação e histórico acessível;
-- [ ] testes de mouse, touch, teclado, responsividade e regressão visual são aprovados.
+- [x] botão esquerdo nunca orbita nem desloca a câmera;
+- [x] botão direito orbita, botão central desloca e roda controla zoom;
+- [x] nenhum drag de câmera executa ação no mapa;
+- [x] ferramentas são mutuamente exclusivas e exibem cursor/preview coerente;
+- [x] câmera pode ser centralizada, colocada no topo e focada na seleção;
+- [x] GM, jogador e display recebem somente controles pertinentes;
+- [x] jogador sem fog revelado entende que está aguardando o mestre;
+- [x] troca de andar e ferramentas essenciais funcionam nos breakpoints suportados;
+- [x] interface não mistura idiomas e invariantes possuem rótulos de produto;
+- [x] fontes, contraste, foco e áreas clicáveis passam pela revisão de acessibilidade;
+- [x] dados possuem presets, validação e histórico acessível;
+- [x] testes de mouse, touch, teclado, responsividade e regressão são aprovados no CI.
 
 ## Testes obrigatórios planejados
 
@@ -144,14 +146,59 @@ responsividade e superfícies específicas para mestre, jogador e display.
 - Controles serão filtrados por papel, não apenas desabilitados visualmente.
 - Esta revisão será executada na Batch 13 para não desviar as Batches 10–12.
 
-## Resultado
+## Resultado implementado
 
-Planejamento registrado. Implementação permanece futura.
+A cena agora usa um contrato explícito de entrada. O `OrbitControls` ignora o
+botão esquerdo, orbita com o direito, desloca com o central e mantém zoom na
+roda. Uma máquina de gestos compartilhada classifica botão, propósito e limiar
+de arrasto; somente um clique esquerdo que não virou arrasto pode executar ação
+de mapa.
+
+Os booleanos independentes de fog, ping, medição e editor foram substituídos por
+uma ferramenta exclusiva. A cena mostra cursor e preview contextuais, e os
+comandos de câmera centralizam, restauram a isométrica, mostram o topo ou focam
+o token selecionado.
+
+A toolbar passou a ser filtrada por papel. Ações administrativas e exportações
+ficam em um menu secundário; display não recebe dados nem ferramentas de mapa.
+Em telas estreitas, a sidebar vira drawer, o andar fica disponível em um seletor
+compacto e os controles preservam nomes acessíveis mesmo quando o texto visual é
+ocultado.
+
+O dock de dados ganhou presets, validação local consistente com o servidor,
+motivos para indisponibilidade e histórico recente. A ajuda contextual, o estado
+da ferramenta e a espera por revelação do fog completam o onboarding bilíngue.
+
+O contrato definitivo está em [VTT_CONTROLS.md](../VTT_CONTROLS.md).
+
+## Validação realizada
+
+- `npm --workspace apps/web run lint`: aprovado;
+- `npm --workspace apps/web run test -- --run`: 12 arquivos e 43 testes aprovados;
+- `npm --workspace apps/web run build`: aprovado;
+- Playwright: 10 cenários aprovados em 9m41s, incluindo os três botões do mouse,
+  roda, câmera, drawer, andar e ferramentas no breakpoint móvel;
+- fluxos existentes de editor, performance, mesa e vertical slice foram
+  adaptados à hierarquia definitiva;
+- GitHub Actions: 8 de 8 jobs próprios aprovados na execução
+  [30807949483](https://github.com/EmanuelSena101/DDivination/actions/runs/30807949483),
+  cobrindo web, contrato, workflow local, PostgreSQL, E2E e Go em Windows, Linux
+  e macOS.
 
 ## Pendências encontradas
 
-- Fechar os breakpoints oficialmente suportados antes da implementação.
-- Definir o conjunto mínimo de atalhos e gestos touch no início da batch.
+Não restou pendência funcional dentro do escopo da Batch 13. Os itens abaixo
+foram explicitamente mantidos como limites ou débitos futuros:
+
+- O breakpoint compacto foi fixado em 700 px; edição 3D extensa em touch segue
+  deliberadamente recomendada apenas em desktop.
+- Pan direto por touch não entrou: dois dedos controlam órbita/zoom e os comandos
+  de reenquadramento oferecem a recuperação equivalente suportada no v1.
+- A validação E2E local com PostgreSQL ficou temporariamente indisponível porque
+  o Windows recusou iniciar a VM do WSL com `0x80070569`. O problema é do host,
+  não do código ou do banco; o job E2E usa PostgreSQL efêmero no GitHub Actions.
+- Regressão visual por snapshots de pixels continua no backlog geral; esta batch
+  valida estrutura, estado, semântica e interação no Playwright.
 
 ## Documentação atualizada
 
@@ -159,5 +206,6 @@ Planejamento registrado. Implementação permanece futura.
 - [x] `docs/ROADMAP.md`;
 - [x] `docs/STATUS.md`;
 - [x] issue no GitHub;
-- [ ] documentação definitiva de controles, durante a implementação;
-- [ ] ADR, se a máquina de estados alterar fronteiras arquiteturais.
+- [x] documentação definitiva em `docs/VTT_CONTROLS.md`;
+- [x] ADR dispensado: a máquina é uma fronteira interna do frontend e não altera
+  contratos persistidos, API ou protocolo de sessão.

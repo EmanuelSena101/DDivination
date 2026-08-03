@@ -1,6 +1,6 @@
 # Estado do DDivination
 
-Última atualização: 2026-07-31
+Última atualização: 2026-08-03
 
 ## Estado atual
 
@@ -52,30 +52,28 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 - runtime de física dos dados permanece grande, embora carregado sob demanda;
 - o deploy cloud ainda não existe; integração Vercel + Supabase e lançamento
   estão previstos na [Batch 22](batches/BATCH-022-v1-release.md);
-- câmera e ferramentas de mapa ainda compartilham gestos ambíguos; o remake de
-  interação, responsividade e controles foi registrado na
-  [Batch 13](batches/BATCH-013-vtt-ux-controls.md) e na issue #35;
 
 ## Última batch concluída
 
-`BATCH-012 — Durabilidade em tempo real e migração para PostgreSQL`
-
-Toda a persistência operacional agora usa PostgreSQL. Mesas possuem log
-transacional, idempotência, snapshots, replay, retenção configurável e
-recuperação após reinício. O cliente reconecta por revisão, preserva comandos
-pendentes e recebe confirmação autoritativa; todos os jobs próprios da PR #56,
-incluindo 8 cenários Playwright, foram aprovados.
-
-Consulte [ROADMAP.md](ROADMAP.md) e
-[BATCH-012-realtime-durability.md](batches/BATCH-012-realtime-durability.md).
-
-## Próxima batch
-
 `BATCH-013 — Remake de UX e controles da VTT`
 
-O próximo trabalho reorganiza gestos, seleção, câmera, ferramentas e feedback
-visual da VTT, eliminando a ambiguidade entre mover a câmera e agir no mapa.
-Consulte o [diário da Batch 13](batches/BATCH-013-vtt-ux-controls.md).
+O novo contrato separa gestos de câmera das ações do mapa, oferece ferramentas
+exclusivas, toolbar por papel, drawer responsivo, ajuda contextual e um dock de
+dados validado. TypeScript strict, 43 testes unitários, build e budgets foram
+aprovados; os 8 jobs próprios da PR #57 passaram, incluindo 10 cenários
+Playwright.
+
+Consulte [ROADMAP.md](ROADMAP.md) e
+[BATCH-013-vtt-ux-controls.md](batches/BATCH-013-vtt-ux-controls.md).
+
+## Próxima batch planejada
+
+`BATCH-014 — Fundação de dados e rulesets`
+
+A próxima etapa cria a fundação versionada de packs e rulesets necessária para
+recuperar o catálogo do legado sem misturar regras 2014 e 2024. Ela permanece
+`PLANNED` até a abertura formal da batch.
+Consulte o [plano da Batch 14](batches/BATCH-014-ruleset-data-foundation.md).
 
 ## Roadmap ampliado após auditoria do legado
 

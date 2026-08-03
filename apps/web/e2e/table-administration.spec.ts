@@ -48,8 +48,8 @@ test("GM approves joins and administers roles, tokens, permissions and access", 
   await expect(partyOwner.locator("option:checked")).toHaveText("Lia");
 
   await admin.getByLabel("Papel Teo").selectOption("display");
-  await expect(teo.page.getByRole("button", { name: "Rolar" })).toBeDisabled();
-  await expect(display.page.getByRole("button", { name: "Rolar" })).toBeDisabled();
+  await expect(teo.page.getByRole("button", { name: "Rolar" })).toHaveCount(0);
+  await expect(display.page.getByRole("button", { name: "Rolar" })).toHaveCount(0);
 
   await admin.getByText("Permissões dos jogadores").click();
   await admin.getByLabel("Rolar dados").uncheck();

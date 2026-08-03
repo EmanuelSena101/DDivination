@@ -150,6 +150,21 @@ As métricas observadas em modo headless validam o instrumento, mas não definem
 o budget de produto. Para medições manuais e interpretação, consulte
 [VTT_DIAGNOSTICS.md](VTT_DIAGNOSTICS.md).
 
+## Controles e responsividade da VTT
+
+Vitest cobre a máquina de gestos, o limiar entre clique e arrasto, o mapeamento
+dos três botões do mouse, a supressão de ações após navegação de câmera, cursores
+contextuais e validação das expressões de dados.
+
+O cenário Playwright `vtt-controls.spec.ts` verifica que clique esquerdo edita o
+mapa, enquanto arrastos com botão direito e central e o uso da roda não o
+alteram. Ele também cobre comandos de câmera, nomes acessíveis, drawer móvel,
+seletor compacto de andar e troca exclusiva de ferramenta no breakpoint móvel.
+
+Os fluxos existentes de vertical slice, editor, performance e administração
+foram ajustados à nova hierarquia sem reduzir permissões ou segurança. Consulte
+[VTT_CONTROLS.md](VTT_CONTROLS.md) para o contrato de interação validado.
+
 ## Performance da cena
 
 Vitest valida as fixtures determinísticas e os perfis `quality`, `balanced` e

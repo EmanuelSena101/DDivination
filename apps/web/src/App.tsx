@@ -33,6 +33,7 @@ import { ProgressionPanel } from "./components/ProgressionPanel";
 import { AdventureContentPanel } from "./components/AdventureContentPanel";
 import { VTTDiagnosticsPanel } from "./components/VTTDiagnosticsPanel";
 import { TableAdministrationPanel } from "./components/TableAdministrationPanel";
+import type { CameraCommand } from "./components/DungeonScene";
 import type { GridEditorTool } from "./gridEditor";
 import { isGenerationTerminal, reconcileGenerationRun } from "./generationRun";
 import { useAppStore } from "./store";
@@ -49,6 +50,10 @@ import {
   type JoinedSession,
   type Language,
 } from "./types";
+import {
+  validateDiceExpression,
+  type VTTInteractionTool,
+} from "./vttInteraction";
 
 const DungeonScene = lazy(() =>
   import("./components/DungeonScene").then(({ DungeonScene: Scene }) => ({
@@ -539,9 +544,10 @@ function VTT() {
   const editorPast = useAppStore((state) => state.editorPast);
   const editorFuture = useAppStore((state) => state.editorFuture);
   const editorDirty = useAppStore((state) => state.editorDirty);
-  const [fogBrush, setFogBrush] = useState(false);
-  const [pingMode, setPingMode] = useState(false);
-  const [measureMode, setMeasureMode] = useState(false);
+  const [interactionTool, setInteractionTool] = useState<VTTInteractionTool>("select");
+  const [cameraCommand, setCameraCommand] = useState<CameraCommand | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [controlsHelpOpen, setControlsHelpOpen] = useState(false);
   const [measureStart, setMeasureStart] = useState<{ x: number; z: number } | null>(null);
   const [measureEnd, setMeasureEnd] = useState<{ x: number; z: number } | null>(null);
   const [dice, setDice] = useState("1d20");
@@ -556,6 +562,7 @@ function VTT() {
     useState<EditorPersistenceStatus>("saved");
   const saveInFlight = useRef(false);
   const [renderTelemetry, setRenderTelemetry] = useState<RenderTelemetry>(() => emptyRenderTelemetry());
+  const diceValidation = useMemo(() => validateDiceExpression(dice), [dice]);
 
   const floor = adventure.floors.find((candidate) => candidate.id === floorId) || adventure.floors[0];
   const activeSceneTelemetry = useMemo(
@@ -684,7 +691,20 @@ function VTT() {
   };
 
   const localize = (value: { "pt-BR": string; "en-US": string }) => value[language];
-  const roll = () => send("dice.roll", { expression: dice, visibility });
+  const roll = () => {
+    if (!diceValidation.valid) return;
+    send("dice.roll", { expression: diceValidation.normalized, visibility });
+  };
+  const activateTool = (tool: VTTInteractionTool) => {
+    setInteractionTool((current) => (current === tool && tool !== "select" ? "select" : tool));
+    if (tool !== "select") setSelectedToken(null);
+    if (tool !== "measure") {
+      setMeasureStart(null);
+      setMeasureEnd(null);
+    }
+  };
+  const requestCamera = (type: CameraCommand["type"]) =>
+    setCameraCommand((current) => ({ id: (current?.id ?? 0) + 1, type }));
   const startInitiative = () => {
     const entries = initiativeTokens
       .map((entity) => ({
@@ -722,10 +742,9 @@ function VTT() {
     }, "image/png");
   };
   const toggleEditor = () => {
-    setEditorOpen((current) => !current);
-    setFogBrush(false);
-    setPingMode(false);
-    setMeasureMode(false);
+    const opening = !editorOpen;
+    setEditorOpen(opening);
+    setInteractionTool(opening ? "edit-grid" : "select");
     setMeasureStart(null);
     setMeasureEnd(null);
     setSelectedToken(null);
@@ -738,6 +757,29 @@ function VTT() {
   const canPing = role === "gm" || (role === "player" && Boolean(session?.permissions.playerCanPing));
   const canRollDice = role === "gm" || (role === "player" && Boolean(session?.permissions.playerCanRollDice));
   const canManageInitiative = role === "gm" || (role === "player" && Boolean(session?.permissions.playerCanManageInitiative));
+  const waitingForFog =
+    role !== "gm" &&
+    Boolean(session) &&
+    (session?.revealedCells[floor.id]?.length ?? 0) === 0;
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (
+        target?.matches("input, textarea, select, button, a") ||
+        target?.isContentEditable
+      ) return;
+      const key = event.key.toLowerCase();
+      if (key === "escape") activateTool("select");
+      if (key === "h") requestCamera("center");
+      if (key === "i") requestCamera("isometric");
+      if (key === "t") requestCamera("top");
+      if (key === "f" && selectedTokenId) requestCamera("focus-selection");
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  });
+
   const connectionLabel = !session
     ? "SOLO"
     : connected
@@ -750,7 +792,14 @@ function VTT() {
 
   return (
     <main className="vtt-layout">
-      <aside className="vtt-sidebar">
+      <aside className={`vtt-sidebar ${sidebarOpen ? "open" : ""}`} aria-label={t("adventureNavigation")}>
+        <button
+          className="sidebar-close"
+          aria-label={t("closeNavigation")}
+          onClick={() => setSidebarOpen(false)}
+        >
+          ×
+        </button>
         <div className="vtt-title">
           <button className="icon-button" title={t("newAdventure")} onClick={startNewAdventure}>
             ←
@@ -774,7 +823,7 @@ function VTT() {
             </span>
             <span>
               <strong>{adventure.spec.partyLevel}</strong>
-              LVL
+              {t("levelShort")}
             </span>
           </div>
         </div>
@@ -803,7 +852,10 @@ function VTT() {
           </header>
           <div className="floor-list">
             {adventure.floors.map((item) => (
-              <button key={item.id} className={floor.id === item.id ? "active" : ""} onClick={() => setFloor(item.id)}>
+              <button key={item.id} className={floor.id === item.id ? "active" : ""} onClick={() => {
+                setFloor(item.id);
+                setSidebarOpen(false);
+              }}>
                 <span>{String(item.index + 1).padStart(2, "0")}</span>
                 <div>
                   <strong>{localize(item.name)}</strong>
@@ -862,7 +914,7 @@ function VTT() {
           </header>
           <ul className="invariant-list">
             {adventure.analysis.invariants.map((invariant) => (
-              <li key={invariant}>✓ {invariant.replaceAll("-", " ")}</li>
+              <li key={invariant}>✓ {t(`invariant_${invariant.replaceAll("-", "_")}`)}</li>
             ))}
           </ul>
         </section>
@@ -873,58 +925,58 @@ function VTT() {
         </footer>
       </aside>
 
+      {sidebarOpen && (
+        <button
+          className="sidebar-backdrop"
+          aria-label={t("closeNavigation")}
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       <section className="vtt-stage">
         <div className="stage-toolbar">
-          <div className="tool-group">
-            <button
-              data-testid="toggle-grid-editor"
-              aria-pressed={editorOpen}
-              className={editorOpen ? "active" : ""}
-              disabled={role !== "gm" || Boolean(session)}
-              onClick={toggleEditor}
-            >
-              {editorOpen ? "◈" : "✎"}{" "}
-              <span>{editorOpen ? t("editorExit") : t("editorToggle")}</span>
-            </button>
-            <button className={fogBrush ? "active" : ""} disabled={!canRevealFog || !session} onClick={() => setFogBrush(!fogBrush)}>
-              ◐ <span>{t("revealFog")}</span>
-            </button>
-            <button
-              className={pingMode ? "active" : ""}
-              disabled={!session || !canPing}
-              onClick={() => {
-                setPingMode(!pingMode);
-                setMeasureMode(false);
-                setSelectedToken(null);
-              }}
-            >
-              ⌖ <span>{t("ping")}</span>
-            </button>
-            <button
-              className={measureMode ? "active" : ""}
-              onClick={() => {
-                setMeasureMode(!measureMode);
-                setPingMode(false);
-                setMeasureStart(null);
-                setMeasureEnd(null);
-              }}
-            >
-              ↔ <span>{t("measure")}</span>
-            </button>
-            <button
-              data-testid="toggle-vtt-diagnostics"
-              aria-pressed={diagnosticsOpen}
-              className={diagnosticsOpen ? "active" : ""}
-              onClick={() => setDiagnosticsOpen((current) => !current)}
-            >
-              ◫ <span>{t("diagnostics")}</span>
-            </button>
+          <div className="tool-group map-tools" aria-label={t("mapTools")}>
+            <button className="sidebar-toggle" aria-label={t("openNavigation")} onClick={() => setSidebarOpen(true)}>☰</button>
+            {role !== "display" && (
+              <button aria-label={t("select")} aria-pressed={interactionTool === "select"} className={interactionTool === "select" ? "active" : ""} title={t("selectHint")} onClick={() => activateTool("select")}>
+                ◇ <span>{t("select")}</span>
+              </button>
+            )}
+            {role === "gm" && !session && (
+              <button data-testid="toggle-grid-editor" aria-label={editorOpen ? t("editorExit") : t("editorToggle")} aria-pressed={editorOpen} className={editorOpen ? "active" : ""} onClick={toggleEditor}>
+                {editorOpen ? "◈" : "✎"} <span>{editorOpen ? t("editorExit") : t("editorToggle")}</span>
+              </button>
+            )}
+            {session && canRevealFog && (
+              <button aria-label={t("revealFog")} aria-pressed={interactionTool === "fog"} className={interactionTool === "fog" ? "active" : ""} onClick={() => activateTool("fog")}>
+                ◐ <span>{t("revealFog")}</span>
+              </button>
+            )}
+            {session && canPing && (
+              <button aria-label={t("ping")} aria-pressed={interactionTool === "ping"} className={interactionTool === "ping" ? "active" : ""} onClick={() => activateTool("ping")}>
+                ⌖ <span>{t("ping")}</span>
+              </button>
+            )}
+            {role !== "display" && (
+              <button aria-label={t("measure")} aria-pressed={interactionTool === "measure"} className={interactionTool === "measure" ? "active" : ""} onClick={() => activateTool("measure")}>
+                ↔ <span>{t("measure")}</span>
+              </button>
+            )}
           </div>
-          <div className="connection-pill">
-            <i className={connected ? "online" : ""} />
-            {connectionLabel}
+          <div className="toolbar-status">
+            <label className="compact-floor-picker">
+              <span>{t("floor")}</span>
+              <select value={floor.id} onChange={(event) => setFloor(event.target.value)}>
+                {adventure.floors.map((item) => <option key={item.id} value={item.id}>{item.index + 1} · {localize(item.name)}</option>)}
+              </select>
+            </label>
+            <div className="connection-pill"><i className={connected ? "online" : ""} />{connectionLabel}</div>
           </div>
-          <div className="tool-group">
+          <div className="tool-group camera-tools" aria-label={t("cameraTools")}>
+            <button aria-label={t("cameraCenter")} title={`${t("cameraCenter")} (H)`} onClick={() => requestCamera("center")}>⌂ <span>{t("cameraCenter")}</span></button>
+            <button aria-label={t("cameraIsometric")} title={`${t("cameraIsometric")} (I)`} onClick={() => requestCamera("isometric")}>◩ <span>{t("cameraIsometric")}</span></button>
+            <button aria-label={t("cameraTop")} title={`${t("cameraTop")} (T)`} onClick={() => requestCamera("top")}>⊙ <span>{t("cameraTop")}</span></button>
+            {selectedTokenId && role !== "display" && <button aria-label={t("cameraFocus")} title={`${t("cameraFocus")} (F)`} onClick={() => requestCamera("focus-selection")}>◎ <span>{t("cameraFocus")}</span></button>}
             {role === "gm" && !session && (
               <button
                 className="accent"
@@ -945,19 +997,17 @@ function VTT() {
                 × <span>{t("closeTable")}</span>
               </button>
             )}
-            {role === "gm" && <><a className="tool-link" href={packageURL(adventure.id)}>
-              ⇩ <span>{t("exportPackage")}</span>
-            </a>
-            <a className="tool-link" href={markdownURL(adventure.id)}>
-              M↓ <span>Markdown</span>
-            </a>
-            <a className="tool-link" href={printURL(adventure.id)} target="_blank" rel="noreferrer">
-              ⎙ <span>{t("print")}</span>
-            </a>
-            </>}
-            <button onClick={downloadScreenshot}>
-              ▣ <span>{t("screenshot")}</span>
-            </button>
+            <button aria-label={t("controlsHelp")} aria-pressed={controlsHelpOpen} className={controlsHelpOpen ? "active" : ""} onClick={() => setControlsHelpOpen((current) => !current)}>?</button>
+            <details className="utility-menu">
+              <summary aria-label={t("moreActions")}>•••</summary>
+              <div>
+                {role === "gm" && <a className="tool-link" href={packageURL(adventure.id)}>⇩ {t("exportPackage")}</a>}
+                {role === "gm" && <a className="tool-link" href={markdownURL(adventure.id)}>M↓ Markdown</a>}
+                {role === "gm" && <a className="tool-link" href={printURL(adventure.id)} target="_blank" rel="noreferrer">⎙ {t("print")}</a>}
+                <button onClick={downloadScreenshot}>▣ {t("screenshot")}</button>
+                <button data-testid="toggle-vtt-diagnostics" aria-pressed={diagnosticsOpen} onClick={() => setDiagnosticsOpen((current) => !current)}>◫ {t("diagnostics")}</button>
+              </div>
+            </details>
           </div>
         </div>
 
@@ -965,18 +1015,17 @@ function VTT() {
           <DungeonScene
             adventure={adventure}
             floor={floor}
+            language={language}
             session={session}
             role={role}
             participantId={participantId}
             selectedTokenId={selectedTokenId}
-            fogBrush={fogBrush}
+            interactionTool={interactionTool}
+            cameraCommand={cameraCommand}
             latestRoll={latestRoll}
             latestPing={latestPing}
-            pingMode={pingMode}
-            measureMode={measureMode}
             measureStart={measureStart}
             measureEnd={measureEnd}
-            editorEnabled={editorOpen && editorMode === "grid"}
             editorTool={editorTool}
             telemetryEnabled={diagnosticsOpen}
             onTelemetry={updateRenderTelemetry}
@@ -993,7 +1042,7 @@ function VTT() {
             }
             onPing={(nextFloorId, position) => {
               send("ping", { floorId: nextFloorId, x: position.x, z: position.z });
-              setPingMode(false);
+              setInteractionTool("select");
             }}
             onMeasure={(position) => {
               if (!measureStart || measureEnd) {
@@ -1014,13 +1063,38 @@ function VTT() {
           />
         </Suspense>
 
+        <div className="interaction-status" role="status">
+          <span>{t("activeTool")}</span>
+          <strong>{t(`tool_${interactionTool}`)}</strong>
+          <small>{t("interactionStatusHint")}</small>
+        </div>
+
+        {controlsHelpOpen && (
+          <aside className="controls-help" aria-label={t("controlsHelp")}>
+            <header><strong>{t("controlsHelp")}</strong><button aria-label={t("close")} onClick={() => setControlsHelpOpen(false)}>×</button></header>
+            <dl>
+              <div><dt>{t("leftButton")}</dt><dd>{t("leftButtonAction")}</dd></div>
+              <div><dt>{t("rightButton")}</dt><dd>{t("rightButtonAction")}</dd></div>
+              <div><dt>{t("middleButton")}</dt><dd>{t("middleButtonAction")}</dd></div>
+              <div><dt>{t("mouseWheel")}</dt><dd>{t("mouseWheelAction")}</dd></div>
+              <div><dt>{t("touch")}</dt><dd>{t("touchAction")}</dd></div>
+            </dl>
+            <p>{t("keyboardShortcuts")}</p>
+          </aside>
+        )}
+
+        {waitingForFog && <div className="fog-waiting" role="status">◐ <span><strong>{t("waitingForFog")}</strong><small>{t("waitingForFogHint")}</small></span></div>}
+
         {editorOpen && editorMode === "grid" && (
           <GridEditorPanel
             tool={editorTool}
             canUndo={editorPast.length > 0}
             canRedo={editorFuture.length > 0}
             dirty={editorDirty}
-            onContentMode={() => setEditorMode("content")}
+            onContentMode={() => {
+              setEditorMode("content");
+              setInteractionTool("select");
+            }}
             onTool={setEditorTool}
             onUndo={undoGridEdit}
             onRedo={redoGridEdit}
@@ -1034,7 +1108,10 @@ function VTT() {
             canUndo={editorPast.length > 0}
             canRedo={editorFuture.length > 0}
             dirty={editorDirty}
-            onGridMode={() => setEditorMode("grid")}
+            onGridMode={() => {
+              setEditorMode("grid");
+              setInteractionTool("edit-grid");
+            }}
             onContent={editContent}
             onAddEntity={(entity) => addEntity(floor.id, entity)}
             onUpdateEntity={(entity) => updateEntity(floor.id, entity)}
@@ -1067,19 +1144,23 @@ function VTT() {
           </div>
         </div>
 
-        {selectedTokenId && <div className="move-hint">{t("moveHint")}</div>}
+        {selectedTokenId && interactionTool === "select" && <div className="move-hint">{t("moveHint")}</div>}
 
-        <section className="dice-dock">
+        {role !== "display" && <section className="dice-dock" aria-label={t("diceRoller")}>
           <div className="dice-icon">◆</div>
-          <label>
+          <div className="dice-presets" aria-label={t("dicePresets")}>
+            {[4, 6, 8, 10, 12, 20, 100].map((sides) => <button key={sides} onClick={() => setDice(`1d${sides}`)}>d{sides}</button>)}
+          </div>
+          <label className={!diceValidation.valid ? "invalid" : ""}>
             {t("dice")}
-            <input value={dice} onChange={(event) => setDice(event.target.value)} />
+            <input aria-invalid={!diceValidation.valid} aria-describedby="dice-validation" value={dice} onChange={(event) => setDice(event.target.value)} />
+            <small id="dice-validation">{diceValidation.valid ? t("diceExpressionHint") : t(diceValidation.reason === "count" ? "diceCountError" : "diceFormatError")}</small>
           </label>
-          <select value={visibility} onChange={(event) => setVisibility(event.target.value as "public" | "gm")}>
+          <select aria-label={t("rollVisibility")} value={visibility} onChange={(event) => setVisibility(event.target.value as "public" | "gm")}>
             <option value="public">{t("public")}</option>
             <option value="gm">{t("gm")}</option>
           </select>
-          <button className="primary" disabled={!session || !connected || !canRollDice} onClick={roll}>
+          <button className="primary" title={!session ? t("diceNeedsTable") : !canRollDice ? t("diceNotAllowed") : undefined} disabled={!session || !connected || !canRollDice || !diceValidation.valid} onClick={roll}>
             {t("roll")}
           </button>
           {session?.rolls.slice(-1).map((item) => (
@@ -1088,7 +1169,8 @@ function VTT() {
               <strong>{item.total}</strong>
             </div>
           ))}
-        </section>
+          {session && session.rolls.length > 0 && <details className="dice-history"><summary>{t("rollHistory")}</summary><ol>{session.rolls.slice(-5).reverse().map((item) => <li key={item.id}><span>{item.expression}</span><strong>{item.total}</strong></li>)}</ol></details>}
+        </section>}
       </section>
       {share && <SessionShare code={share.code} url={share.url} onClose={() => setShare(null)} />}
     </main>

@@ -28,6 +28,7 @@ test("dense 64×64 scene keeps a bounded render structure", async ({ page }) => 
   const scene = page.getByTestId("scene-shell");
   await expect(scene).toHaveAttribute("data-render-profile", "balanced");
 
+  await page.getByLabel("Mais ações").click();
   await page.getByTestId("toggle-vtt-diagnostics").click();
   await expect
     .poll(async () => page.evaluate(() => window.__DDIVINATION_TELEMETRY__?.frames.sampleCount ?? 0))

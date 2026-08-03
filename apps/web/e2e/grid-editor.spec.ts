@@ -62,5 +62,5 @@ test("GM edits tiles and edges with reversible local history", async ({ page }) 
   await page.getByTestId("toggle-grid-editor").click();
   await expect(openTable).toBeEnabled();
   await openTable.click();
-  await expect(page.getByTestId("toggle-grid-editor")).toBeDisabled();
+  await expect(page.getByTestId("toggle-grid-editor")).toHaveCount(0);
 });

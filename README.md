@@ -161,6 +161,10 @@ paredes, entidades e portais; meshes e buffers gráficos não entram no banco.
 
 | Controle | O que faz |
 | --- | --- |
+| **Clique esquerdo** | Seleciona ou executa somente a ferramenta ativa. |
+| **Botão direito + arrastar** | Orbita a câmera sem agir no mapa. |
+| **Botão central + arrastar** | Desloca a câmera sem agir no mapa. |
+| **Roda do mouse** | Aproxima e afasta a câmera. |
 | **Andares** | Alterna entre os mapas conectados da aventura. |
 | **Medir** | Mede distâncias no grid; cada célula representa 5 pés. |
 | **Diagnóstico** | Mostra FPS, P95, draw calls, triângulos e sincronização. |
@@ -170,6 +174,15 @@ paredes, entidades e portais; meshes e buffers gráficos não entram no banco.
 | **Dados** | Rola uma expressão como `1d20`, com resultado do servidor. |
 | **Exportar** | Gera pacote, Markdown, página imprimível ou screenshot. |
 | **Editar mapa** | Abre os modos Grid e Conteúdo para alterar o rascunho local. |
+
+As ferramentas são mutuamente exclusivas. A barra sempre informa qual delas
+está ativa; `Esc` volta para **Selecionar**. Os botões de câmera permitem
+centralizar (`H`), restaurar a visão isométrica (`I`), ir ao topo (`T`) e focar
+o token selecionado (`F`). Em telas estreitas, andares e navegação continuam
+disponíveis por um seletor compacto e um menu lateral.
+
+Veja o [guia completo de controles da VTT](docs/VTT_CONTROLS.md) para touch,
+papéis, fog, dados, atalhos e solução de problemas.
 
 <p align="center">
   <img

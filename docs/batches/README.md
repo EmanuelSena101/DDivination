@@ -35,7 +35,7 @@ release v1.
 | [BATCH-011](BATCH-011-table-administration.md) | Administração da mesa | DONE |
 | [BATCH-012](BATCH-012-realtime-durability.md) | Durabilidade em tempo real e migração PostgreSQL | DONE |
 | [BATCH-013](BATCH-013-vtt-ux-controls.md) | Remake de UX e controles da VTT | DONE |
-| [BATCH-014](BATCH-014-ruleset-data-foundation.md) | Fundação de dados e rulesets | PLANNED |
+| [BATCH-014](BATCH-014-ruleset-data-foundation.md) | Fundação de dados e rulesets | IN_PROGRESS |
 | [BATCH-015](BATCH-015-legacy-catalog-parity.md) | Paridade do catálogo legado 2014 | PLANNED |
 | [BATCH-016](BATCH-016-srd-521-compendium.md) | Compêndio SRD 5.2.1 | PLANNED |
 | [BATCH-017](BATCH-017-compendium-ux.md) | Navegação e busca do compêndio | PLANNED |

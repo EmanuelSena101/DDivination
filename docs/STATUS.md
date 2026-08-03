@@ -66,13 +66,13 @@ Playwright.
 Consulte [ROADMAP.md](ROADMAP.md) e
 [BATCH-013-vtt-ux-controls.md](batches/BATCH-013-vtt-ux-controls.md).
 
-## Próxima batch planejada
+## Batch em andamento
 
 `BATCH-014 — Fundação de dados e rulesets`
 
-A próxima etapa cria a fundação versionada de packs e rulesets necessária para
-recuperar o catálogo do legado sem misturar regras 2014 e 2024. Ela permanece
-`PLANNED` até a abertura formal da batch.
+A etapa atual cria a fundação versionada de packs e rulesets necessária para
+recuperar o catálogo do legado sem misturar regras 2014 e 2024. O ADR-004 fixa
+PostgreSQL, packs imutáveis, busca, providers e referências reproduzíveis.
 Consulte o [plano da Batch 14](batches/BATCH-014-ruleset-data-foundation.md).
 
 ## Roadmap ampliado após auditoria do legado

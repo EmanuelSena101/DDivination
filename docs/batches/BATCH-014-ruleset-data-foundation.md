@@ -1,12 +1,14 @@
 # BATCH-014 — Fundação de dados e rulesets
 
-Estado: `PLANNED`
+Estado: `IN_PROGRESS`
 
 Issue: [#42](https://github.com/EmanuelSena101/DDivination/issues/42)
 
 Planejamento: [Pull Request #53](https://github.com/EmanuelSena101/DDivination/pull/53)
 
-Pull Request: a criar quando a implementação começar
+Branch: `codex/batch-014-ruleset-data-foundation`
+
+Pull Request: a criar após publicar o checkpoint arquitetural
 
 ## Contexto
 
@@ -88,18 +90,21 @@ fonte única para geração, validação, compêndio, exportação e futuras fic
 
 ## Resultado
 
-Planejamento registrado. Implementação permanece futura.
+Implementação iniciada em 2026-08-03. O primeiro checkpoint corrige a referência
+histórica a SQLite e fixa no ADR-004 identidade imutável, formato, fronteiras de
+provider, persistência PostgreSQL, busca e política de remoção.
 
 ## Pendências encontradas
 
-- definir divisão final entre colunas normalizadas, `JSONB` e payload compactado;
-- escolher índices e configuração da busca textual do PostgreSQL;
-- fechar política de remoção de versões ainda referenciadas.
+- [x] divisão entre colunas normalizadas e `JSONB` definida no ADR-004;
+- [x] busca `tsvector(simple)` com GIN e paginação por cursor definida;
+- [x] remoção recusada enquanto aventuras referenciam a versão;
+- [ ] validar os limites de ingestão e busca com fixtures em escala.
 
 ## Documentação atualizada
 
 - [x] documento desta batch;
 - [x] auditoria comparativa;
 - [x] roadmap, índice e issue;
-- [ ] ADR obrigatório durante a implementação;
+- [x] ADR-004;
 - [ ] contratos e formato de pack durante a implementação.

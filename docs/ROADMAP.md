@@ -38,7 +38,7 @@ issue correspondente.
 | BATCH-011 | Administração da mesa | DONE |
 | BATCH-012 | Durabilidade em tempo real e migração PostgreSQL | DONE |
 | BATCH-013 | Remake de UX e controles da VTT | DONE |
-| BATCH-014 | Fundação de dados e rulesets | PLANNED |
+| BATCH-014 | Fundação de dados e rulesets | IN_PROGRESS |
 | BATCH-015 | Paridade do catálogo legado 2014 | PLANNED |
 | BATCH-016 | Compêndio SRD 5.2.1 | PLANNED |
 | BATCH-017 | Navegação e busca do compêndio | PLANNED |

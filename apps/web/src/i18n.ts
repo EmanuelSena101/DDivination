@@ -107,7 +107,7 @@ const resources = {
       tool_measure: "Medição",
       "tool_edit-grid": "Editor de grid",
       interactionStatusHint: "Botão esquerdo age no mapa · direito orbita · central desloca",
-      controlsHelp: "Como controlar a VTT",
+      controlsHelp: "Ajuda dos controles da VTT",
       leftButton: "Botão esquerdo",
       leftButtonAction: "Seleciona ou aplica somente a ferramenta ativa.",
       rightButton: "Botão direito + arrastar",

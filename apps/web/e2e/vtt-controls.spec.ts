@@ -13,6 +13,7 @@ test("camera gestures never execute the active map tool", async ({ page }) => {
 
   await page.getByTestId("toggle-grid-editor").click();
   const panel = page.getByTestId("grid-editor-panel");
+  await page.getByTestId("editor-tool-tile-lava").click();
   const box = await canvas.boundingBox();
   if (!box) throw new Error("3D canvas has no layout box");
   const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };

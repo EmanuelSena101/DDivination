@@ -1,6 +1,6 @@
 # BATCH-013 — Remake de UX e controles da VTT
 
-Estado: `VALIDATING`
+Estado: `DONE`
 
 Issue: [#35](https://github.com/EmanuelSena101/DDivination/issues/35)
 
@@ -113,7 +113,7 @@ responsividade e superfícies específicas para mestre, jogador e display.
 - [x] interface não mistura idiomas e invariantes possuem rótulos de produto;
 - [x] fontes, contraste, foco e áreas clicáveis passam pela revisão de acessibilidade;
 - [x] dados possuem presets, validação e histórico acessível;
-- [ ] testes de mouse, touch, teclado, responsividade e regressão são aprovados no CI.
+- [x] testes de mouse, touch, teclado, responsividade e regressão são aprovados no CI.
 
 ## Testes obrigatórios planejados
 
@@ -176,13 +176,19 @@ O contrato definitivo está em [VTT_CONTROLS.md](../VTT_CONTROLS.md).
 - `npm --workspace apps/web run lint`: aprovado;
 - `npm --workspace apps/web run test -- --run`: 12 arquivos e 43 testes aprovados;
 - `npm --workspace apps/web run build`: aprovado;
-- novo Playwright cobre os três botões do mouse, roda, câmera, drawer, andar e
-  ferramentas no breakpoint móvel;
+- Playwright: 10 cenários aprovados em 9m41s, incluindo os três botões do mouse,
+  roda, câmera, drawer, andar e ferramentas no breakpoint móvel;
 - fluxos existentes de editor, performance, mesa e vertical slice foram
   adaptados à hierarquia definitiva;
-- GitHub Actions permanece como gate final da implementação publicada na PR #57.
+- GitHub Actions: 8 de 8 jobs próprios aprovados na execução
+  [30807949483](https://github.com/EmanuelSena101/DDivination/actions/runs/30807949483),
+  cobrindo web, contrato, workflow local, PostgreSQL, E2E e Go em Windows, Linux
+  e macOS.
 
 ## Pendências encontradas
+
+Não restou pendência funcional dentro do escopo da Batch 13. Os itens abaixo
+foram explicitamente mantidos como limites ou débitos futuros:
 
 - O breakpoint compacto foi fixado em 700 px; edição 3D extensa em touch segue
   deliberadamente recomendada apenas em desktop.

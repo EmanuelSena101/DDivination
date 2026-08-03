@@ -4,12 +4,17 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
   Color,
   DynamicDrawUsage,
+  MOUSE,
   Matrix4,
   Object3D,
+  TOUCH,
+  Vector3,
   type InstancedMesh,
   type Mesh,
   type MeshBasicMaterial,
+  type PerspectiveCamera as ThreePerspectiveCamera,
 } from "three";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
   selectSceneQualityProfile,
   type SceneQualityProfile,
@@ -31,11 +36,20 @@ import {
   rendererTelemetry,
   type RenderTelemetry,
 } from "../telemetry";
+import {
+  cursorForTool,
+  idlePointerGesture,
+  isMapActivation,
+  reducePointerGesture,
+  type PointerGestureEvent,
+  type VTTInteractionTool,
+} from "../vttInteraction";
 import type {
   AdventureDocument,
   DiceRoll,
   FloorMap,
   GridPosition,
+  Language,
   SceneEntity,
   SessionState,
   Tile,
@@ -52,18 +66,17 @@ const DiceRoll3D = lazy(() =>
 interface Props {
   adventure: AdventureDocument;
   floor: FloorMap;
+  language: Language;
   session: SessionState | null;
   role: "gm" | "player" | "display";
   participantId: string | null;
   selectedTokenId: string | null;
-  fogBrush: boolean;
+  interactionTool: VTTInteractionTool;
+  cameraCommand: CameraCommand | null;
   latestRoll: DiceRoll | null;
   latestPing: (GridPosition & { floorId: string; revision: number }) | null;
-  pingMode: boolean;
-  measureMode: boolean;
   measureStart: GridPosition | null;
   measureEnd: GridPosition | null;
-  editorEnabled: boolean;
   editorTool: GridEditorTool;
   telemetryEnabled: boolean;
   onTelemetry: (telemetry: RenderTelemetry) => void;
@@ -73,6 +86,11 @@ interface Props {
   onPing: (floorId: string, position: GridPosition) => void;
   onMeasure: (position: GridPosition) => void;
   onEdit: (position: GridPosition, direction?: GridEdgeDirection) => void;
+}
+
+export interface CameraCommand {
+  id: number;
+  type: "center" | "isometric" | "top" | "focus-selection";
 }
 
 function TelemetryProbe({
@@ -115,11 +133,9 @@ function worldPosition(floor: FloorMap, position: GridPosition): [number, number
 
 function TileInstances({
   floor,
-  onTile,
   shadows,
 }: {
   floor: FloorMap;
-  onTile: (tile: Tile) => void;
   shadows: boolean;
 }) {
   const slabs = useRef<InstancedMesh>(null);
@@ -154,19 +170,12 @@ function TileInstances({
     }
   }, [color, floor, helper]);
 
-  const handleClick = (event: ThreeEvent<MouseEvent>) => {
-    event.stopPropagation();
-    if (event.instanceId == null) return;
-    onTile(floor.tiles[event.instanceId]);
-  };
-
   return (
     <>
       <instancedMesh
         ref={slabs}
         args={[undefined, undefined, floor.tiles.length]}
         receiveShadow={shadows}
-        onClick={handleClick}
       >
         <boxGeometry args={[TILE_SIZE, 1, TILE_SIZE]} />
         <meshStandardMaterial
@@ -181,7 +190,6 @@ function TileInstances({
         ref={insets}
         args={[undefined, undefined, floor.tiles.length]}
         receiveShadow={shadows}
-        onClick={handleClick}
       >
         <boxGeometry args={[TILE_SIZE, 1, TILE_SIZE]} />
         <meshStandardMaterial
@@ -492,6 +500,7 @@ function EditorSurface({
         onPointerLeave={() => setHover(null)}
         onClick={(event) => {
           event.stopPropagation();
+          if (!isMapActivation(event.button, event.delta)) return;
           const target = targetFromEvent(event);
           if (target) onEdit(target.position, target.direction);
         }}
@@ -849,6 +858,7 @@ function TokenInstances({
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
+    if (!isMapActivation(event.button, event.delta)) return;
     if (event.instanceId == null) return;
     const token = tokens[event.instanceId];
     if (token?.canSelect) onSelect(token);
@@ -959,10 +969,12 @@ function Measurement({
   floor,
   start,
   end,
+  language,
 }: {
   floor: FloorMap;
   start: GridPosition;
   end: GridPosition;
+  language: Language;
 }) {
   const from = worldPosition(floor, start);
   const to = worldPosition(floor, end);
@@ -971,8 +983,134 @@ function Measurement({
     <>
       <Line points={[[from[0], 0.28, from[2]], [to[0], 0.28, to[2]]]} color="#f3c969" lineWidth={2} />
       <Html center position={[(from[0] + to[0]) / 2, 0.55, (from[2] + to[2]) / 2]}>
-        <div className="measure-label">{distance} ft</div>
+        <div className="measure-label">{distance} {language === "pt-BR" ? "pés" : "ft"}</div>
       </Html>
+    </>
+  );
+}
+
+function MapActionSurface({
+  floor,
+  tool,
+  selectedTokenId,
+  onTile,
+}: {
+  floor: FloorMap;
+  tool: VTTInteractionTool;
+  selectedTokenId: string | null;
+  onTile: (tile: Tile) => void;
+}) {
+  const [hover, setHover] = useState<GridPosition | null>(null);
+  const targetFromEvent = (event: ThreeEvent<PointerEvent | MouseEvent>): Tile | null => {
+    const position = {
+      x: Math.floor(event.point.x + floor.width / 2 + 0.5),
+      z: Math.floor(event.point.z + floor.height / 2 + 0.5),
+    };
+    return floor.tiles.find((tile) => tile.x === position.x && tile.z === position.z) ?? null;
+  };
+  const active = tool !== "select" || Boolean(selectedTokenId);
+  const previewColor =
+    tool === "fog"
+      ? "#a68bff"
+      : tool === "ping"
+        ? "#f3c969"
+        : tool === "measure"
+          ? "#65c491"
+          : "#8b70ff";
+
+  return (
+    <>
+      <mesh
+        position={[-0.5, 0.17, -0.5]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        renderOrder={18}
+        onPointerMove={(event) => {
+          if (!active) return;
+          const tile = targetFromEvent(event);
+          setHover(tile ? { x: tile.x, z: tile.z } : null);
+        }}
+        onPointerLeave={() => setHover(null)}
+        onClick={(event) => {
+          event.stopPropagation();
+          if (!isMapActivation(event.button, event.delta)) return;
+          const tile = targetFromEvent(event);
+          if (tile) onTile(tile);
+        }}
+      >
+        <planeGeometry args={[floor.width, floor.height]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
+      {active && hover && (
+        <mesh
+          position={[worldPosition(floor, hover)[0], 0.2, worldPosition(floor, hover)[2]]}
+          renderOrder={19}
+        >
+          <boxGeometry args={[0.9, 0.05, 0.9]} />
+          <meshBasicMaterial
+            color={previewColor}
+            transparent
+            opacity={0.42}
+            depthWrite={false}
+          />
+        </mesh>
+      )}
+    </>
+  );
+}
+
+function CameraRig({
+  sceneSize,
+  floor,
+  selectedPosition,
+  command,
+}: {
+  sceneSize: number;
+  floor: FloorMap;
+  selectedPosition: GridPosition | null;
+  command: CameraCommand | null;
+}) {
+  const camera = useRef<ThreePerspectiveCamera>(null);
+  const controls = useRef<OrbitControlsImpl>(null);
+
+  useEffect(() => {
+    if (!command || !camera.current || !controls.current) return;
+    const target =
+      command.type === "focus-selection" && selectedPosition
+        ? new Vector3(...worldPosition(floor, selectedPosition))
+        : new Vector3(0, 0, 0);
+    const currentOffset = camera.current.position.clone().sub(controls.current.target);
+    const offset =
+      command.type === "top"
+        ? new Vector3(0, sceneSize * 1.15, 0.01)
+        : command.type === "isometric"
+          ? new Vector3(sceneSize * 0.62, sceneSize * 0.82, sceneSize * 0.75)
+          : currentOffset;
+    controls.current.target.copy(target);
+    camera.current.position.copy(target).add(offset);
+    camera.current.lookAt(target);
+    controls.current.update();
+  }, [command, floor, sceneSize, selectedPosition]);
+
+  return (
+    <>
+      <PerspectiveCamera
+        ref={camera}
+        makeDefault
+        position={[0, sceneSize * 0.82, sceneSize * 0.75]}
+        fov={50}
+      />
+      <OrbitControls
+        ref={controls}
+        makeDefault
+        target={[0, 0, 0]}
+        minDistance={8}
+        maxDistance={sceneSize * 1.8}
+        minPolarAngle={0.02}
+        maxPolarAngle={Math.PI / 2.08}
+        mouseButtons={{ LEFT: undefined, MIDDLE: MOUSE.PAN, RIGHT: MOUSE.ROTATE }}
+        touches={{ ONE: undefined, TWO: TOUCH.DOLLY_ROTATE }}
+        enableDamping
+      />
     </>
   );
 }
@@ -981,18 +1119,17 @@ function BattleScene(props: Props & { quality: SceneQualityProfile }) {
   const {
     adventure,
     floor,
+    language,
     session,
     role,
     participantId,
     selectedTokenId,
-    fogBrush,
+    interactionTool,
+    cameraCommand,
     latestRoll,
     latestPing,
-    pingMode,
-    measureMode,
     measureStart,
     measureEnd,
-    editorEnabled,
     editorTool,
     quality,
     onSelectToken,
@@ -1017,16 +1154,16 @@ function BattleScene(props: Props & { quality: SceneQualityProfile }) {
   );
 
   const handleTile = (tile: Tile) => {
-    if (editorEnabled) return;
-    if (pingMode && session) {
+    if (interactionTool === "edit-grid") return;
+    if (interactionTool === "ping" && session) {
       onPing(floor.id, tile);
       return;
     }
-    if (measureMode) {
+    if (interactionTool === "measure") {
       onMeasure(tile);
       return;
     }
-    if (fogBrush && role === "gm" && session) {
+    if (interactionTool === "fog" && role !== "display" && session) {
       const isRevealed = revealed.some((cell) => cell.x === tile.x && cell.z === tile.z);
       onFog(floor.id, tile, !isRevealed);
       return;
@@ -1046,11 +1183,13 @@ function BattleScene(props: Props & { quality: SceneQualityProfile }) {
           position: session?.tokenPositions[entity.id] || entity.position,
           selected: selectedTokenId === entity.id,
           canSelect:
-            role === "gm" ||
-            (role === "player" && session?.tokenOwners[entity.id] === participantId),
+            interactionTool === "select" &&
+            (role === "gm" ||
+              (role === "player" && session?.tokenOwners[entity.id] === participantId)),
         })),
     [
       floor.id,
+      interactionTool,
       participantId,
       role,
       selectedTokenId,
@@ -1061,23 +1200,17 @@ function BattleScene(props: Props & { quality: SceneQualityProfile }) {
     ],
   );
   const sceneSize = Math.max(floor.width, floor.height);
+  const selectedPosition = renderTokens.find((token) => token.selected)?.position ?? null;
 
   return (
     <>
       <color attach="background" args={["#0b0d14"]} />
       <fog attach="fog" args={["#0b0d14", sceneSize * 0.9, sceneSize * 2.5]} />
-      <PerspectiveCamera
-        makeDefault
-        position={[0, sceneSize * 0.82, sceneSize * 0.75]}
-        fov={50}
-      />
-      <OrbitControls
-        makeDefault
-        target={[0, 0, 0]}
-        minDistance={8}
-        maxDistance={sceneSize * 1.8}
-        maxPolarAngle={Math.PI / 2.08}
-        enableDamping
+      <CameraRig
+        sceneSize={sceneSize}
+        floor={floor}
+        selectedPosition={selectedPosition}
+        command={cameraCommand}
       />
       <ambientLight intensity={3.8} color="#e2e4f5" />
       <hemisphereLight color="#c9c4ff" groundColor="#444b61" intensity={2.15} />
@@ -1116,7 +1249,7 @@ function BattleScene(props: Props & { quality: SceneQualityProfile }) {
             roughness={1}
           />
         </mesh>
-        <TileInstances floor={floor} onTile={handleTile} shadows={quality.shadows} />
+        <TileInstances floor={floor} shadows={quality.shadows} />
         <WallInstances floor={floor} shadows={quality.shadows} />
         <PropInstances floor={floor} entities={sceneProps} shadows={quality.shadows} />
         <TokenInstances
@@ -1127,6 +1260,14 @@ function BattleScene(props: Props & { quality: SceneQualityProfile }) {
             onSelectToken(selectedTokenId === entity.id ? null : entity.id)
           }
         />
+        {interactionTool !== "edit-grid" && (
+          <MapActionSurface
+            floor={floor}
+            tool={interactionTool}
+            selectedTokenId={selectedTokenId}
+            onTile={handleTile}
+          />
+        )}
         {session && <FogInstances floor={floor} revealed={revealed} role={role} />}
         {latestRoll && (
           <Suspense fallback={null}>
@@ -1136,13 +1277,13 @@ function BattleScene(props: Props & { quality: SceneQualityProfile }) {
         {latestPing?.floorId === floor.id && (
           <PingMarker key={latestPing.revision} floor={floor} position={latestPing} />
         )}
-        {measureStart && measureEnd && <Measurement floor={floor} start={measureStart} end={measureEnd} />}
-        {editorEnabled && (
+        {measureStart && measureEnd && <Measurement floor={floor} start={measureStart} end={measureEnd} language={language} />}
+        {interactionTool === "edit-grid" && (
           <EditorSurface floor={floor} tool={editorTool} onEdit={onEdit} />
         )}
       </group>
       <Html position={[-floor.width / 2, 0.8, -floor.height / 2]} transform>
-        <div className="scene-label">{adventure.name["en-US"]}</div>
+        <div className="scene-label">{adventure.name[language]}</div>
       </Html>
     </>
   );
@@ -1153,22 +1294,65 @@ export function DungeonScene(props: Props) {
     () => selectSceneQualityProfile(props.floor),
     [props.floor],
   );
+  const gestureRef = useRef(idlePointerGesture);
+  const suppressMissedActionUntil = useRef(0);
+  const [gesture, setGesture] = useState(idlePointerGesture);
+  const updateGesture = (event: PointerGestureEvent) => {
+    gestureRef.current = reducePointerGesture(gestureRef.current, event);
+    setGesture(gestureRef.current);
+  };
 
   return (
     <div
       className="scene-shell"
+      style={{ cursor: cursorForTool(props.interactionTool, Boolean(props.selectedTokenId)) }}
       data-testid="scene-shell"
       data-render-profile={quality.name}
-      data-editor-enabled={props.editorEnabled}
+      data-editor-enabled={props.interactionTool === "edit-grid"}
+      data-interaction-tool={props.interactionTool}
+      data-pointer-purpose={gesture.purpose}
+      data-pointer-dragged={gesture.dragged}
+      data-camera-left="map-action"
+      data-camera-middle="pan"
+      data-camera-right="orbit"
       data-tile-count={props.floor.tiles.length}
       data-wall-count={props.floor.walls.length}
       data-entity-count={props.floor.entities.length}
+      onContextMenu={(event) => event.preventDefault()}
+      onPointerDownCapture={(event) =>
+        updateGesture({
+          type: "pointer-down",
+          pointerId: event.pointerId,
+          button: event.button,
+          x: event.clientX,
+          y: event.clientY,
+        })
+      }
+      onPointerMoveCapture={(event) =>
+        updateGesture({
+          type: "pointer-move",
+          pointerId: event.pointerId,
+          x: event.clientX,
+          y: event.clientY,
+        })
+      }
+      onPointerUpCapture={(event) => {
+        const completed = gestureRef.current;
+        if (completed.dragged || completed.purpose !== "map-action") {
+          suppressMissedActionUntil.current = performance.now() + 100;
+        }
+        updateGesture({ type: "pointer-up", pointerId: event.pointerId });
+      }}
+      onPointerCancel={() => updateGesture({ type: "cancel" })}
     >
       <Canvas
         shadows={quality.shadows}
         dpr={[1, quality.maxDpr]}
         gl={{ antialias: true, powerPreference: "high-performance", preserveDrawingBuffer: true }}
-        onPointerMissed={() => props.onSelectToken(null)}
+        onPointerMissed={(event) => {
+          if (event.button !== 0 || performance.now() < suppressMissedActionUntil.current) return;
+          props.onSelectToken(null);
+        }}
       >
         <BattleScene {...props} quality={quality} />
         <TelemetryProbe enabled={props.telemetryEnabled} onTelemetry={props.onTelemetry} />

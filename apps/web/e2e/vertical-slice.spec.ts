@@ -12,6 +12,7 @@ test("GM and player share an authoritative 3D dice roll", async ({ browser, page
   await expect(page.getByTestId("adventure-content-panel")).toContainText("SRD 5.2.1");
   await expect(page.getByTestId("adventure-content-panel")).toContainText("XP");
 
+  await page.getByLabel("Mais ações").click();
   await page.getByTestId("toggle-vtt-diagnostics").click();
   await expect(page.getByTestId("vtt-diagnostics-panel")).toBeVisible();
   await expect
@@ -52,6 +53,7 @@ test("GM and player share an authoritative 3D dice roll", async ({ browser, page
     )
     .toBeGreaterThan(0);
 
+  await player.getByLabel("Mais ações").click();
   await player.getByTestId("toggle-vtt-diagnostics").click();
   await expect(player.getByTestId("vtt-diagnostics-panel")).toBeVisible();
   await player.evaluate(() => window.__DDIVINATION_INTERRUPT_CONNECTION__?.());

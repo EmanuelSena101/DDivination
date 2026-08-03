@@ -1,6 +1,6 @@
 # Estado do DDivination
 
-Última atualização: 2026-07-31
+Última atualização: 2026-08-03
 
 ## Estado atual
 
@@ -52,8 +52,7 @@ O rewrite possui uma fundação executável e um vertical slice funcional:
 - runtime de física dos dados permanece grande, embora carregado sob demanda;
 - o deploy cloud ainda não existe; integração Vercel + Supabase e lançamento
   estão previstos na [Batch 22](batches/BATCH-022-v1-release.md);
-- câmera e ferramentas de mapa ainda compartilham gestos ambíguos; o remake de
-  interação, responsividade e controles foi registrado na
+- a validação final do novo contrato de controles da VTT está em andamento na
   [Batch 13](batches/BATCH-013-vtt-ux-controls.md) e na issue #35;
 
 ## Última batch concluída
@@ -73,8 +72,10 @@ Consulte [ROADMAP.md](ROADMAP.md) e
 
 `BATCH-013 — Remake de UX e controles da VTT`
 
-O trabalho atual reorganiza gestos, seleção, câmera, ferramentas e feedback
-visual da VTT, eliminando a ambiguidade entre mover a câmera e agir no mapa.
+O novo contrato separa gestos de câmera das ações do mapa, oferece ferramentas
+exclusivas, toolbar por papel, drawer responsivo, ajuda contextual e um dock de
+dados validado. TypeScript strict, 43 testes unitários e o build foram aprovados;
+a PR #57 está no gate final de integração e E2E.
 Consulte o [diário da Batch 13](batches/BATCH-013-vtt-ux-controls.md).
 
 ## Roadmap ampliado após auditoria do legado
